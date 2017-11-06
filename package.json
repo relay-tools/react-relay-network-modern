@@ -1,0 +1,79 @@
+{
+  "name": "react-relay-network-modern",
+  "version": "0.0.0-semantically-released",
+  "description": "Network Layer for React Relay and Express (Batch Queries, AuthToken, Logging, Retry)",
+  "files": [
+    "es",
+    "lib"
+  ],
+  "main": "lib/index.js",
+  "jsnext:main": "es/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nodkz/react-relay-network-modern.git"
+  },
+  "keywords": [
+    "relay",
+    "react",
+    "network layer",
+    "batch",
+    "express",
+    "jwt",
+    "auth token"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nodkz/react-relay-network-modern/issues"
+  },
+  "homepage": "https://github.com/nodkz/react-relay-network-modern#readme",
+  "dependencies": {},
+  "peerDependencies": {
+    "react-relay": ">=0.7.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-eslint": "^8.0.1",
+    "babel-jest": "^21.2.0",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-flow-strip-types": "^6.22.0",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-register": "^6.26.0",
+    "cz-conventional-changelog": "^2.1.0",
+    "eslint": "^4.10.0",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-config-prettier": "^2.7.0",
+    "eslint-module-utils": "^2.1.1",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-prettier": "^2.3.1",
+    "fetch-mock": "^5.13.1",
+    "flow-bin": "^0.58.0",
+    "form-data": "^2.3.1",
+    "jest": "^21.2.1",
+    "prettier": "^1.7.4",
+    "rimraf": "^2.6.2",
+    "semantic-release": "^8.2.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "jest": {
+    "roots": [
+      "<rootDir>/src"
+    ]
+  },
+  "scripts": {
+    "build": "npm run build-lib && npm run build-es && npm run build-flow",
+    "build-lib": "rimraf lib && BABEL_ENV=lib babel src --ignore __tests__,__mocks__ -d lib",
+    "build-es": "rimraf es && BABEL_ENV=es babel src --ignore __tests__,__mocks__ -d es",
+    "build-flow": "find ./src -name '*.js' -not -path '*/__*' | while read filepath; do cp $filepath `echo $filepath | sed 's/\\/src\\//\\/lib\\//g'`.flow; done",
+    "lint": "eslint src test *.js",
+    "coverage": "jest --coverage --maxWorkers 2",
+    "watch": "jest --watch",
+    "test": "npm run coverage && npm run lint",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
+  }
+}
