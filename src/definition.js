@@ -1,42 +1,20 @@
 /* @flow */
 
-import type { BatchRequestMap } from './middleware/batch';
+import type RelayRequest from './RelayRequest';
+import type RelayResponse from './RelayResponse';
 
-export type MiddlewareNextFn = (req: RRNLRequestObject) => Promise<RRNLResponseObject>;
+export type MiddlewareNextFn = (req: RelayRequest) => Promise<RelayResponse>;
 export type Middleware = (next: MiddlewareNextFn) => MiddlewareNextFn;
 // {
 //   supports?: string | string[],
 // };
 
 export type FetchOpts = {
-  url?: string,
-  method: 'POST' | 'GET',
-  headers: { [name: string]: string },
-  body: string | FormData,
-};
-
-export type RRNLRequestObject =
-  | RRNLRequestObjectQuery
-  | RRNLRequestObjectMutation
-  | RRNLRequestObjectBatchQuery;
-
-export type RRNLRequestObjectQuery = FetchOpts & {
-  relayReqType: 'query',
-  relayReqId: string,
-  relayReqObj: RelayClassicRequest,
-};
-
-export type RRNLRequestObjectMutation = FetchOpts & {
-  relayReqType: 'mutation',
-  relayReqId: string,
-  relayReqObj: RelayClassicRequest,
-};
-
-export type RRNLRequestObjectBatchQuery = FetchOpts & {
-  relayReqType: 'batch-query',
-  relayReqId: string,
-  relayReqMap: BatchRequestMap,
-  relayReqObj?: void,
+  url: string,
+  method?: 'POST' | 'GET',
+  headers?: { [name: string]: string },
+  body?: string | FormData,
+  [name: string]: mixed,
 };
 
 export type GraphQLResponseErrors = Array<{
@@ -62,12 +40,50 @@ export type RRNLResponseObject = {
   payload: ?GraphQLResponse,
 };
 
-export type RelayClassicRequest = {
-  resolve: (payload: mixed) => Promise<mixed>,
-  reject: (error: Error) => Promise<mixed>,
-  getID: () => string,
-  getFiles: () => ?{ [key: string]: File },
-  getQueryString: () => string,
-  getVariables: () => Object,
-  getDebugName: () => string,
+export type RNLExecuteFunction = (
+  operation: ConcreteBatch,
+  variables: Variables,
+  cacheConfig: CacheConfig,
+  uploadables?: ?UploadableMap
+) => RelayObservable<QueryPayload>;
+
+// ///////////////////////////
+// Relay Modern re-exports
+// ///////////////////////////
+
+export type Variables = { [name: string]: $FlowFixMe };
+export type ConcreteBatch = any;
+export type CacheConfig = {
+  force?: ?boolean,
+  poll?: ?number,
+  rerunParamExperimental?: ?any,
 };
+export type Disposable = { dispose(): void };
+export type Uploadable = File | Blob;
+export type UploadableMap = { [key: string]: Uploadable };
+export type PayloadData = { [key: string]: mixed };
+export type QueryPayload =
+  | {|
+      data?: ?PayloadData,
+      errors?: Array<any>,
+      rerunVariables?: Variables,
+    |}
+  | RelayResponse;
+// this is workaround should be class from relay-runtime/network/RelayObservable.js
+export type RelayObservable<T> = Promise<T>;
+// Note: This should accept Subscribable<T> instead of RelayObservable<T>,
+// however Flow cannot yet distinguish it from T.
+export type ObservableFromValue<T> = RelayObservable<T> | Promise<T> | T;
+export type FetchFunction = (
+  operation: ConcreteBatch,
+  variables: Variables,
+  cacheConfig: CacheConfig,
+  uploadables: ?UploadableMap
+) => ObservableFromValue<QueryPayload>;
+// See SubscribeFunction type declaration in relay-runtime/network/RelayNetworkTypes.js
+export type SubscribeFunction = (
+  operation: ConcreteBatch,
+  variables: Variables,
+  cacheConfig: CacheConfig,
+  observer: any
+) => RelayObservable<QueryPayload> | Disposable;

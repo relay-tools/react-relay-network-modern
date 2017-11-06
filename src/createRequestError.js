@@ -1,16 +1,12 @@
 /* @flow */
 
-import type {
-  RelayClassicRequest,
-  RRNLRequestObject,
-  RRNLResponseObject,
-  GraphQLResponseErrors,
-} from './definition';
+import type { GraphQLResponseErrors } from './definition';
+import type RelayRequest from './RelayRequest';
+import type RelayResponse from './RelayResponse';
 
 class RRNLRequestError extends Error {
-  status: number;
-  req: RRNLRequestObject;
-  res: ?RRNLResponseObject;
+  req: RelayRequest;
+  res: ?RelayResponse;
 
   constructor(msg: string) {
     super(msg);
@@ -21,7 +17,7 @@ class RRNLRequestError extends Error {
 /**
  * Formats an error response from GraphQL server request.
  */
-function formatRequestErrors(request: RelayClassicRequest, errors: GraphQLResponseErrors): string {
+export function formatRequestErrors(request: RelayRequest, errors: GraphQLResponseErrors): string {
   const CONTEXT_BEFORE = 20;
   const CONTEXT_LENGTH = 60;
 
@@ -56,45 +52,26 @@ function formatRequestErrors(request: RelayClassicRequest, errors: GraphQLRespon
     .join('\n');
 }
 
-function formatResponse(res: RRNLResponseObject): string {
-  return [
-    `Response:`,
-    `   Url: ${res.url}`,
-    `   Status code: ${res.status}`,
-    `   Status text: ${res.statusText}`,
-    `   Response headers: ${JSON.stringify(res.headers)}`,
-    `   Body: ${JSON.stringify(res.payload)}`,
-  ].join('\n');
-}
-
-export function getDebugName(req: RRNLRequestObject): string {
-  if (req.relayReqObj) {
-    return `${req.relayReqType} ${req.relayReqObj.getDebugName()}`;
-  }
-  return req.relayReqId;
-}
-
-export function createRequestError(req: RRNLRequestObject, res?: RRNLResponseObject) {
+export function createRequestError(req: RelayRequest, res?: RelayResponse) {
   let errorReason = '';
 
   if (!res || !res.payload) {
-    errorReason = 'Server return empty `response`.' + (res ? `\n\n${formatResponse(res)}` : '');
+    errorReason = 'Server return empty `response`.' + (res ? `\n\n${res.toString()}` : '');
   } else if (res.payload.errors) {
     if (req.relayReqObj) {
-      errorReason = formatRequestErrors(req.relayReqObj, res.payload.errors);
+      errorReason = formatRequestErrors(req, res.payload.errors);
     } else {
       errorReason = res.payload.errors.toString();
     }
   } else if (!res.payload.data) {
-    errorReason = 'Server return empty `response.data`.\n\n' + formatResponse(res);
+    errorReason = 'Server return empty `response.data`.\n\n' + res.toString();
   }
 
   const error = new RRNLRequestError(
-    `Server request for \`${getDebugName(req)}\` failed by the following reasons:\n\n${errorReason}`
+    `Server request for \`${req.getDebugName()}\` failed by the following reasons:\n\n${errorReason}`
   );
 
   error.req = req;
   error.res = res;
-  error.status = res ? res.status : 0;
   return error;
 }

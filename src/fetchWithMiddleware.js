@@ -2,49 +2,34 @@
 /* eslint-disable no-param-reassign, prefer-const */
 
 import { createRequestError } from './createRequestError';
-import type {
-  Middleware,
-  RRNLRequestObject,
-  RRNLResponseObject,
-  MiddlewareNextFn,
-} from './definition';
+import type RelayRequest from './RelayRequest';
+import RelayResponse from './RelayResponse';
+import type { Middleware, MiddlewareNextFn } from './definition';
 
-async function runFetch(req: RRNLRequestObject): Promise<RRNLResponseObject> {
-  let { url, ...opts } = req;
-
+async function runFetch(req: RelayRequest): Promise<RelayResponse> {
+  const { url } = req.fetchOpts;
   if (!url) {
-    if (req.relayReqType === 'batch-query') {
-      url = '/graphql/batch';
-    } else {
-      url = '/graphql';
-    }
+    throw new Error(
+      'Can not make request, because `url` is empty. Did you miss add urlMiddleware?'
+    );
   }
 
-  const res = await fetch(url, opts);
-
-  if (res.status < 200 || res.status >= 300) {
-    const text = await res.text();
-    const err: any = new Error(text);
-    err.fetchResponse = res;
-    throw err;
-  }
-
-  const payload = await res.json();
-  return { ...res, payload };
+  // $FlowFixMe
+  const fetchRes = await fetch(url, req.fetchOpts);
+  return RelayResponse.createFromFetch(fetchRes);
 }
 
 export default function fetchWithMiddleware(
-  req: RRNLRequestObject,
+  req: RelayRequest,
   middlewares: Middleware[]
-): Promise<any> {
+): Promise<RelayResponse> {
   const wrappedFetch: MiddlewareNextFn = compose(...middlewares)(runFetch);
 
   return wrappedFetch(req).then(res => {
-    const { payload } = res;
-    if (!payload || payload.hasOwnProperty('errors') || !payload.hasOwnProperty('data')) {
+    if (!res || res.errors || !res.data) {
       throw createRequestError(req, res);
     }
-    return payload.data;
+    return res;
   });
 }
 
