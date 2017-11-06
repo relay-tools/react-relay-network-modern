@@ -55,20 +55,24 @@ export function formatRequestErrors(request: RelayRequest, errors: GraphQLRespon
 export function createRequestError(req: RelayRequest, res?: RelayResponse) {
   let errorReason = '';
 
-  if (!res || !res.payload) {
-    errorReason = 'Server return empty `response`.' + (res ? `\n\n${res.toString()}` : '');
-  } else if (res.payload.errors) {
+  if (!res) {
+    errorReason = 'Server return empty response.';
+  } else if (!res.json) {
+    errorReason =
+      (res.text ? res.text : 'Server return empty response.') +
+      (res ? `\n\n${res.toString()}` : '');
+  } else if (res.errors) {
     if (req.relayReqObj) {
-      errorReason = formatRequestErrors(req, res.payload.errors);
+      errorReason = formatRequestErrors(req, res.errors);
     } else {
-      errorReason = res.payload.errors.toString();
+      errorReason = JSON.stringify(res.errors);
     }
-  } else if (!res.payload.data) {
-    errorReason = 'Server return empty `response.data`.\n\n' + res.toString();
+  } else if (!res.data) {
+    errorReason = 'Server return empty response.data.\n\n' + res.toString();
   }
 
   const error = new RRNLRequestError(
-    `Server request for \`${req.getDebugName()}\` failed by the following reasons:\n\n${errorReason}`
+    `Relay request for \`${req.getDebugName()}\` failed by the following reasons:\n\n${errorReason}`
   );
 
   error.req = req;

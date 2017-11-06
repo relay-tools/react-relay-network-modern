@@ -19,7 +19,10 @@ export default class RelayRequest {
     this.variables = variables;
     this.cacheConfig = cacheConfig;
     this.uploadables = uploadables;
-    this.fetchOpts = {};
+    this.fetchOpts = {
+      method: 'POST',
+      headers: {},
+    };
   }
 
   getDebugName(): string {

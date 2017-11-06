@@ -7,16 +7,16 @@ import RelayResponse from './RelayResponse';
 import type { Middleware, MiddlewareNextFn } from './definition';
 
 async function runFetch(req: RelayRequest): Promise<RelayResponse> {
-  const { url } = req.fetchOpts;
-  if (!url) {
-    throw new Error(
-      'Can not make request, because `url` is empty. Did you miss add urlMiddleware?'
-    );
-  }
+  let { url } = req.fetchOpts;
+  if (!url) url = '/graphql';
 
   // $FlowFixMe
   const fetchRes = await fetch(url, req.fetchOpts);
-  return RelayResponse.createFromFetch(fetchRes);
+  const res = await RelayResponse.createFromFetch(fetchRes);
+  if (res.status && res.status >= 400) {
+    throw createRequestError(req, res);
+  }
+  return res;
 }
 
 export default function fetchWithMiddleware(

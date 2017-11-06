@@ -27,9 +27,9 @@ export default class RelayResponse {
     if (res.status < 200 || res.status >= 300) {
       r.text = await res.text();
     } else {
-      const json = await res.json();
-      if (json.data) r.data = json.data;
-      if (json.errors) r.errors = json.errors;
+      r.json = await res.json();
+      if (r.json.data) r.data = r.json.data;
+      if (r.json.errors) r.errors = r.json.errors;
     }
 
     return r;
@@ -42,7 +42,7 @@ export default class RelayResponse {
       `   Status code: ${this.status || ''}`,
       `   Status text: ${this.statusText || ''}`,
       `   Response headers: ${JSON.stringify(this.headers)}`,
-      `   Payload: ${JSON.stringify(this.payload)}`,
+      `   Response body: ${JSON.stringify(this.json)}`,
     ].join('\n');
   }
 }
