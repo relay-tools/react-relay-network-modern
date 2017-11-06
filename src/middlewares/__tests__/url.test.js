@@ -28,7 +28,7 @@ describe('middlewares/url', () => {
     const req = mockReq();
     const res = await req.execute(rnl);
     expect(res.data).toBe('PAYLOAD');
-    expect(fetchMock.lastOptions()).toEqual({ method: 'POST', url: '/some_url' });
+    expect(fetchMock.lastOptions()).toMatchSnapshot();
   });
 
   it('`url` option as thunk', async () => {
@@ -49,7 +49,7 @@ describe('middlewares/url', () => {
     const req = mockReq();
     const res = await req.execute(rnl);
     expect(res.data).toBe('PAYLOAD2');
-    expect(fetchMock.lastOptions()).toEqual({ method: 'POST', url: '/thunk_url' });
+    expect(fetchMock.lastOptions()).toMatchSnapshot();
   });
 
   it('`method` option', async () => {
@@ -71,7 +71,7 @@ describe('middlewares/url', () => {
     const req = mockReq();
     const res = await req.execute(rnl);
     expect(res.data).toBe('PAYLOAD3');
-    expect(fetchMock.lastOptions()).toEqual({ method: 'GET', url: '/get_url' });
+    expect(fetchMock.lastOptions()).toMatchSnapshot();
   });
 
   it('`headers` option as Object', async () => {
@@ -95,11 +95,7 @@ describe('middlewares/url', () => {
     const req = mockReq();
     const res = await req.execute(rnl);
     expect(res.data).toBe('PAYLOAD4');
-    expect(fetchMock.lastOptions()).toEqual({
-      headers: { 'custom-header': '123' },
-      method: 'POST',
-      url: '/headers_url',
-    });
+    expect(fetchMock.lastOptions()).toMatchSnapshot();
   });
 
   it('`headers` option as thunk', async () => {
@@ -123,11 +119,7 @@ describe('middlewares/url', () => {
     const req = mockReq();
     const res = await req.execute(rnl);
     expect(res.data).toBe('PAYLOAD5');
-    expect(fetchMock.lastOptions()).toEqual({
-      headers: { 'thunk-header': '333' },
-      method: 'POST',
-      url: '/headers_thunk',
-    });
+    expect(fetchMock.lastOptions()).toMatchSnapshot();
   });
 
   it('`credentials` option', async () => {
@@ -149,10 +141,6 @@ describe('middlewares/url', () => {
     const req = mockReq();
     const res = await req.execute(rnl);
     expect(res.data).toBe('PAYLOAD6');
-    expect(fetchMock.lastOptions()).toEqual({
-      credentials: 'same-origin',
-      method: 'POST',
-      url: '/credentials_url',
-    });
+    expect(fetchMock.lastOptions()).toMatchSnapshot();
   });
 });

@@ -1,0 +1,54 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`middlewares/url \`credentials\` option 1`] = `
+Object {
+  "credentials": "same-origin",
+  "headers": Object {},
+  "method": "POST",
+  "url": "/credentials_url",
+}
+`;
+
+exports[`middlewares/url \`headers\` option as Object 1`] = `
+Object {
+  "headers": Object {
+    "custom-header": "123",
+  },
+  "method": "POST",
+  "url": "/headers_url",
+}
+`;
+
+exports[`middlewares/url \`headers\` option as thunk 1`] = `
+Object {
+  "headers": Object {
+    "thunk-header": "333",
+  },
+  "method": "POST",
+  "url": "/headers_thunk",
+}
+`;
+
+exports[`middlewares/url \`method\` option 1`] = `
+Object {
+  "headers": Object {},
+  "method": "GET",
+  "url": "/get_url",
+}
+`;
+
+exports[`middlewares/url \`url\` option as string 1`] = `
+Object {
+  "headers": Object {},
+  "method": "POST",
+  "url": "/some_url",
+}
+`;
+
+exports[`middlewares/url \`url\` option as thunk 1`] = `
+Object {
+  "headers": Object {},
+  "method": "POST",
+  "url": "/thunk_url",
+}
+`;
