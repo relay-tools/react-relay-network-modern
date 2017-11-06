@@ -1,6 +1,9 @@
 /* @flow */
 /* eslint-disable import/prefer-default-export, no-param-reassign */
 
+import type RelayNetworkLayer from '../RelayNetworkLayer';
+import type RelayResponse from '../RelayResponse';
+
 type ReqData = {
   query?: string,
   varaibles?: Object,
@@ -46,6 +49,15 @@ class MockReq {
 
   resolve(resp: Object) {
     this.payload = resp;
+  }
+
+  execute(rnl: RelayNetworkLayer): Promise<RelayResponse> {
+    return rnl.fetchFn(
+      {}, // ConcreteBatch,
+      {}, // Variables,
+      {}, // CacheConfig,
+      undefined // ?UploadableMap
+    );
   }
 }
 
