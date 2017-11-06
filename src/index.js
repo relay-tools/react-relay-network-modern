@@ -1,14 +1,14 @@
 /* @flow */
 
 import RelayNetworkLayer from './RelayNetworkLayer';
-import batchMiddleware from './middleware/batch';
-import retryMiddleware from './middleware/retry';
-import urlMiddleware from './middleware/url';
-import authMiddleware from './middleware/auth';
-import perfMiddleware from './middleware/perf';
-import loggerMiddleware from './middleware/logger';
-import gqErrorsMiddleware from './middleware/gqErrors';
-import deferMiddleware from './middleware/defer';
+import batchMiddleware from './middlewares/batch';
+import retryMiddleware from './middlewares/retry';
+import urlMiddleware from './middlewares/url';
+import authMiddleware from './middlewares/auth';
+import perfMiddleware from './middlewares/perf';
+import loggerMiddleware from './middlewares/logger';
+import gqErrorsMiddleware from './middlewares/gqErrors';
+import deferMiddleware from './middlewares/defer';
 import graphqlBatchHTTPWrapper from './express-middleware/graphqlBatchHTTPWrapper';
 
 export {
