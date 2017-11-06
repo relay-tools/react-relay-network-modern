@@ -1,6 +1,6 @@
 /* @flow */
 
-import RelayNetworkLayer from './relayNetworkLayer';
+import RelayNetworkLayer from './RelayNetworkLayer';
 import batchMiddleware from './middleware/batch';
 import retryMiddleware from './middleware/retry';
 import urlMiddleware from './middleware/url';

@@ -28,7 +28,7 @@
   "homepage": "https://github.com/nodkz/react-relay-network-modern#readme",
   "dependencies": {},
   "peerDependencies": {
-    "react-relay": ">=0.7.0"
+    "relay-runtime": ">=1.4.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
@@ -52,6 +52,7 @@
     "form-data": "^2.3.1",
     "jest": "^21.2.1",
     "prettier": "^1.7.4",
+    "relay-runtime": "^1.4.1",
     "rimraf": "^2.6.2",
     "semantic-release": "^8.2.0"
   },
