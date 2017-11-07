@@ -2,6 +2,7 @@
 
 exports[`middlewares/url \`credentials\` option 1`] = `
 Object {
+  "body": "{\\"query\\":\\"\\",\\"variables\\":{}}",
   "credentials": "same-origin",
   "headers": Object {},
   "method": "POST",
@@ -11,6 +12,7 @@ Object {
 
 exports[`middlewares/url \`headers\` option as Object 1`] = `
 Object {
+  "body": "{\\"query\\":\\"\\",\\"variables\\":{}}",
   "headers": Object {
     "custom-header": "123",
   },
@@ -21,6 +23,7 @@ Object {
 
 exports[`middlewares/url \`headers\` option as thunk 1`] = `
 Object {
+  "body": "{\\"query\\":\\"\\",\\"variables\\":{}}",
   "headers": Object {
     "thunk-header": "333",
   },
@@ -29,8 +32,20 @@ Object {
 }
 `;
 
+exports[`middlewares/url \`headers\` option as thunk with Promise 1`] = `
+Object {
+  "body": "{\\"query\\":\\"\\",\\"variables\\":{}}",
+  "headers": Object {
+    "thunk-header": "as promise",
+  },
+  "method": "POST",
+  "url": "/headers_thunk_promise",
+}
+`;
+
 exports[`middlewares/url \`method\` option 1`] = `
 Object {
+  "body": "{\\"query\\":\\"\\",\\"variables\\":{}}",
   "headers": Object {},
   "method": "GET",
   "url": "/get_url",
@@ -39,6 +54,7 @@ Object {
 
 exports[`middlewares/url \`url\` option as string 1`] = `
 Object {
+  "body": "{\\"query\\":\\"\\",\\"variables\\":{}}",
   "headers": Object {},
   "method": "POST",
   "url": "/some_url",
@@ -47,8 +63,18 @@ Object {
 
 exports[`middlewares/url \`url\` option as thunk 1`] = `
 Object {
+  "body": "{\\"query\\":\\"\\",\\"variables\\":{}}",
   "headers": Object {},
   "method": "POST",
   "url": "/thunk_url",
+}
+`;
+
+exports[`middlewares/url \`url\` option as thunk with Promise 1`] = `
+Object {
+  "body": "{\\"query\\":\\"\\",\\"variables\\":{}}",
+  "headers": Object {},
+  "method": "POST",
+  "url": "/thunk_url_promise",
 }
 `;

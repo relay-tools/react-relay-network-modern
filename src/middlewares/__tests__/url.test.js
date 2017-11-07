@@ -52,6 +52,27 @@ describe('middlewares/url', () => {
     expect(fetchMock.lastOptions()).toMatchSnapshot();
   });
 
+  it('`url` option as thunk with Promise', async () => {
+    fetchMock.mock({
+      matcher: '/thunk_url_promise',
+      response: {
+        status: 200,
+        body: { data: 'PAYLOAD promise' },
+      },
+      method: 'POST',
+    });
+
+    const rnl = new RelayNetworkLayer([
+      urlMiddleware({
+        url: () => Promise.resolve('/thunk_url_promise'),
+      }),
+    ]);
+    const req = mockReq();
+    const res = await req.execute(rnl);
+    expect(res.data).toBe('PAYLOAD promise');
+    expect(fetchMock.lastOptions()).toMatchSnapshot();
+  });
+
   it('`method` option', async () => {
     fetchMock.mock({
       matcher: '/get_url',
@@ -114,6 +135,31 @@ describe('middlewares/url', () => {
         headers: () => ({
           'thunk-header': '333',
         }),
+      }),
+    ]);
+    const req = mockReq();
+    const res = await req.execute(rnl);
+    expect(res.data).toBe('PAYLOAD5');
+    expect(fetchMock.lastOptions()).toMatchSnapshot();
+  });
+
+  it('`headers` option as thunk with Promise', async () => {
+    fetchMock.mock({
+      matcher: '/headers_thunk_promise',
+      response: {
+        status: 200,
+        body: { data: 'PAYLOAD5' },
+      },
+      method: 'POST',
+    });
+
+    const rnl = new RelayNetworkLayer([
+      urlMiddleware({
+        url: '/headers_thunk_promise',
+        headers: () =>
+          Promise.resolve({
+            'thunk-header': 'as promise',
+          }),
       }),
     ]);
     const req = mockReq();

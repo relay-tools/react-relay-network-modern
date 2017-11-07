@@ -8,9 +8,9 @@ import type { Middleware } from '../definition';
 type Headers = { [name: string]: string };
 
 export type UrlMiddlewareOpts = {
-  url: string | ((req: RelayRequest) => string),
+  url: string | Promise<string> | ((req: RelayRequest) => string | Promise<string>),
   method?: 'POST' | 'GET',
-  headers?: Headers | ((req: RelayRequest) => Headers),
+  headers?: Headers | Promise<Headers> | ((req: RelayRequest) => Headers | Promise<Headers>),
   credentials?: 'same-origin' | string,
 };
 
@@ -19,11 +19,13 @@ export default function urlMiddleware(opts?: UrlMiddlewareOpts): Middleware {
   const urlOrThunk: any = url || '/graphql';
   const headersOrThunk: any = headers;
 
-  return next => req => {
-    req.fetchOpts.url = isFunction(urlOrThunk) ? urlOrThunk(req) : urlOrThunk;
+  return next => async req => {
+    req.fetchOpts.url = await (isFunction(urlOrThunk) ? urlOrThunk(req) : urlOrThunk);
 
     if (headersOrThunk) {
-      req.fetchOpts.headers = isFunction(headersOrThunk) ? headersOrThunk(req) : headersOrThunk;
+      req.fetchOpts.headers = await (isFunction(headersOrThunk)
+        ? headersOrThunk(req)
+        : headersOrThunk);
     }
 
     if (method) {
