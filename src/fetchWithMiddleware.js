@@ -11,8 +11,8 @@ async function runFetch(req: RelayRequest): Promise<RelayResponse> {
   if (!url) url = '/graphql';
 
   // $FlowFixMe
-  const fetchRes = await fetch(url, req.fetchOpts);
-  const res = await RelayResponse.createFromFetch(fetchRes);
+  const resFromFetch = await fetch(url, req.fetchOpts);
+  const res = await RelayResponse.createFromFetch(resFromFetch);
   if (res.status && res.status >= 400) {
     throw createRequestError(req, res);
   }

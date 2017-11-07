@@ -1,6 +1,6 @@
 /* @flow */
 
-import type { GraphQLResponse, PayloadData } from './definition';
+import type { PayloadData } from './definition';
 
 export default class RelayResponse {
   _res: any; // response from low-level method, eg. fetch
@@ -14,7 +14,7 @@ export default class RelayResponse {
   headers: ?{ [name: string]: string };
   url: ?string;
   text: ?string;
-  json: ?GraphQLResponse;
+  json: mixed;
 
   static async createFromFetch(res: Object): Promise<RelayResponse> {
     const r = new RelayResponse();
@@ -27,12 +27,23 @@ export default class RelayResponse {
     if (res.status < 200 || res.status >= 300) {
       r.text = await res.text();
     } else {
-      r.json = await res.json();
-      if (r.json.data) r.data = r.json.data;
-      if (r.json.errors) r.errors = r.json.errors;
+      r.processJsonData(await res.json());
     }
 
     return r;
+  }
+
+  processJsonData(json: mixed) {
+    this.json = json;
+    if (json) {
+      if (json.data) this.data = (json.data: any);
+      if (json.errors) this.errors = (json.errors: any);
+    }
+  }
+
+  clone(): RelayResponse {
+    // $FlowFixMe
+    return Object.assign(Object.create(Object.getPrototypeOf(this)), this);
   }
 
   toString(): string {

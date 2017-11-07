@@ -1,19 +1,20 @@
 /* @flow */
 
 import type RelayRequest from './RelayRequest';
+import type RelayRequestBatch from './RelayRequestBatch';
 import type RelayResponse from './RelayResponse';
 
-export type MiddlewareNextFn = (req: RelayRequest) => Promise<RelayResponse>;
+export type MiddlewareNextFn = (req: RelayRequest | RelayRequestBatch) => Promise<RelayResponse>;
 export type Middleware = (next: MiddlewareNextFn) => MiddlewareNextFn;
 // {
 //   supports?: string | string[],
 // };
 
 export type FetchOpts = {
-  url: string,
-  method?: 'POST' | 'GET',
-  headers?: { [name: string]: string },
-  body?: string | FormData,
+  url?: string,
+  method: 'POST' | 'GET',
+  headers: { [name: string]: string },
+  body: string | FormData,
   [name: string]: mixed,
 };
 
@@ -52,7 +53,15 @@ export type RNLExecuteFunction = (
 // ///////////////////////////
 
 export type Variables = { [name: string]: $FlowFixMe };
-export type ConcreteBatch = any;
+export type ConcreteBatch = {
+  kind: 'Batch',
+  fragment: any,
+  id: ?string,
+  metadata: { [key: string]: mixed },
+  name: string,
+  query: any,
+  text: ?string,
+};
 export type CacheConfig = {
   force?: ?boolean,
   poll?: ?number,

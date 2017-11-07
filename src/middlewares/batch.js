@@ -2,12 +2,10 @@
 /* eslint-disable no-param-reassign */
 
 import { isFunction } from '../utils';
-import type {
-  Middleware,
-  RRNLRequestObject,
-  RRNLRequestObjectBatchQuery,
-  RRNLResponseObject,
-} from '../definition';
+import RelayRequestBatch from '../RelayRequestBatch';
+import RelayRequest from '../RelayRequest';
+import type RelayResponse from '../RelayResponse';
+import type { Middleware } from '../definition';
 
 // Max out at roughly 100kb (express-graphql imposed max)
 const DEFAULT_BATCH_SIZE = 102400;
@@ -15,7 +13,7 @@ const DEFAULT_BATCH_SIZE = 102400;
 export type BatchMiddlewareOpts = {|
   batchTimeout?: number,
   allowMutations?: boolean,
-  batchUrl?: string,
+  batchUrl?: string | Promise<string> | (() => string | Promise<string>),
   maxBatchSize?: number,
 |};
 
@@ -24,7 +22,7 @@ export type BatchRequestMap = {
 };
 
 export type RequestWrapper = {|
-  req: RRNLRequestObject,
+  req: RelayRequest,
   completeOk: (res: Object) => void,
   completeErr: (e: Error) => void,
   done: boolean,
@@ -47,7 +45,18 @@ export default function batchMiddleware(options?: BatchMiddlewareOpts): Middlewa
 
   return next => req => {
     // do not batch mutations unless allowMutations = true
-    if (req.relayReqType === 'mutation' && !allowMutations) {
+    if (req.isMutation() && !allowMutations) {
+      return next(req);
+    }
+
+    if (!(req instanceof RelayRequest)) {
+      throw new Error(
+        'Relay batch middleware accepts only simple RelayRequest. Did you add batchMiddleware twice?'
+      );
+    }
+
+    // req with FormData can not be batched
+    if (req.isFormData()) {
       return next(req);
     }
 
@@ -60,15 +69,10 @@ export default function batchMiddleware(options?: BatchMiddlewareOpts): Middlewa
   };
 }
 
-function passThroughBatch(req, next, opts) {
+function passThroughBatch(req: RelayRequest, next, opts) {
   const { singleton } = opts;
 
-  // req.body as FormData can not be batched!
-  if (global.FormData && req.body instanceof FormData) {
-    return next(req);
-  }
-
-  const bodyLength = (req.body: any).length;
+  const bodyLength = (req.fetchOpts.body: any).length;
   if (!bodyLength) {
     return next(req);
   }
@@ -86,7 +90,7 @@ function passThroughBatch(req, next, opts) {
 
   // queue request
   return new Promise((resolve, reject) => {
-    const { relayReqId } = req;
+    const relayReqId = req.getID();
     const { requestMap } = singleton.batcher;
 
     const requestWrapper: RequestWrapper = {
@@ -138,56 +142,48 @@ function prepareNewBatcher(next, opts): Batcher {
   return batcher;
 }
 
-function sendRequests(requestMap: BatchRequestMap, next, opts) {
+async function sendRequests(requestMap: BatchRequestMap, next, opts) {
   const ids = Object.keys(requestMap);
 
   if (ids.length === 1) {
     // SEND AS SINGLE QUERY
     const request = requestMap[ids[0]];
 
-    return next(request.req).then(res => {
-      request.completeOk(res);
-      request.duplicates.forEach(r => r.completeOk(res));
-    });
+    const res = await next(request.req);
+    request.completeOk(res);
+    request.duplicates.forEach(r => r.completeOk(res));
+    return res;
   } else if (ids.length > 1) {
     // SEND AS BATCHED QUERY
 
+    const batchRequest = new RelayRequestBatch(ids.map(id => requestMap[id].req));
     // $FlowFixMe
-    const url = isFunction(opts.batchUrl) ? opts.batchUrl(requestMap) : opts.batchUrl;
+    const url = await (isFunction(opts.batchUrl) ? opts.batchUrl(requestMap) : opts.batchUrl);
+    batchRequest.fetchOpts.url = url;
+    batchRequest.fetchOpts.headers['Accept'] = '*/*';
+    batchRequest.fetchOpts.headers['Content-Type'] = 'application/json';
 
-    const req: RRNLRequestObjectBatchQuery = {
-      url,
-      relayReqId: `BATCH_QUERY:${ids.join(':')}`,
-      relayReqMap: requestMap,
-      relayReqType: 'batch-query',
-      method: 'POST',
-      headers: {
-        Accept: '*/*',
-        'Content-Type': 'application/json',
-      },
-      body: `[${ids.map(id => requestMap[id].req.body).join(',')}]`,
-    };
+    try {
+      const batchResponse = await next(batchRequest);
+      if (!batchResponse || !Array.isArray(batchResponse.json)) {
+        throw new Error('Wrong response from server');
+      }
 
-    return next(req)
-      .then(batchResponse => {
-        if (!batchResponse || !Array.isArray(batchResponse.payload)) {
-          throw new Error('Wrong response from server');
+      batchResponse.json.forEach((payload: any) => {
+        if (!payload) return;
+        const request = requestMap[payload.id];
+        if (request) {
+          const res = createSingleResponse(batchResponse, payload);
+          request.completeOk(res);
         }
-
-        batchResponse.payload.forEach(res => {
-          if (!res) return;
-          const request = requestMap[res.id];
-          if (request) {
-            const responsePayload = copyBatchResponse(batchResponse, res);
-            request.completeOk(responsePayload);
-          }
-        });
-      })
-      .catch(e => {
-        ids.forEach(id => {
-          requestMap[id].completeErr(e);
-        });
       });
+
+      return batchResponse;
+    } catch (e) {
+      ids.forEach(id => {
+        requestMap[id].completeErr(e);
+      });
+    }
   }
 
   return Promise.resolve();
@@ -208,15 +204,10 @@ function finalizeUncompleted(requestMap: BatchRequestMap) {
   });
 }
 
-function copyBatchResponse(batchResponse, res): RRNLResponseObject {
+function createSingleResponse(batchResponse: RelayResponse, json: any): RelayResponse {
   // Fallback for graphql-graphene and apollo-server batch responses
-  const payload = res.payload || res;
-  return {
-    ok: batchResponse.ok,
-    status: batchResponse.status,
-    statusText: batchResponse.statusText,
-    url: batchResponse.url,
-    headers: batchResponse.headers,
-    payload,
-  };
+  const data = json.payload || json;
+  const res = batchResponse.clone();
+  res.processJsonData(data);
+  return res;
 }

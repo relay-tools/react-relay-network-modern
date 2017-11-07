@@ -52,12 +52,14 @@ class MockReq {
   }
 
   execute(rnl: RelayNetworkLayer): Promise<RelayResponse> {
-    return rnl.fetchFn(
-      {}, // ConcreteBatch,
+    return (rnl.fetchFn(
+      {
+        id: this.getID(),
+      }, // ConcreteBatch,
       {}, // Variables,
       {}, // CacheConfig,
       undefined // ?UploadableMap
-    );
+    ): any);
   }
 }
 

@@ -1,0 +1,146 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`batchMiddleware option \`batchTimeout\` should gather different requests into one batch request 1`] = `
+Object {
+  "body": "[{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"2\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"3\\",\\"query\\":\\"\\",\\"variables\\":{}}]",
+  "headers": Object {
+    "Accept": "*/*",
+    "Content-Type": "application/json",
+  },
+  "method": "POST",
+  "url": "/graphql/batch",
+}
+`;
+
+exports[`batchMiddleware option \`batchTimeout\` should gather different requests into two batch request 1`] = `
+Array [
+  Array [
+    "/graphql/batch",
+    Object {
+      "body": "[{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"4\\",\\"query\\":\\"\\",\\"variables\\":{}}]",
+      "headers": Object {
+        "Accept": "*/*",
+        "Content-Type": "application/json",
+      },
+      "method": "POST",
+      "url": "/graphql/batch",
+    },
+  ],
+  Array [
+    "/graphql/batch",
+    Object {
+      "body": "[{\\"id\\":\\"2\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"3\\",\\"query\\":\\"\\",\\"variables\\":{}}]",
+      "headers": Object {
+        "Accept": "*/*",
+        "Content-Type": "application/json",
+      },
+      "method": "POST",
+      "url": "/graphql/batch",
+    },
+  ],
+]
+`;
+
+exports[`batchMiddleware should handle network failure 1`] = `
+Object {
+  "body": "[{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"2\\",\\"query\\":\\"\\",\\"variables\\":{}}]",
+  "headers": Object {
+    "Accept": "*/*",
+    "Content-Type": "application/json",
+  },
+  "method": "POST",
+  "url": "/graphql/batch",
+}
+`;
+
+exports[`batchMiddleware should handle responses without payload wrapper 1`] = `
+Object {
+  "body": "[{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"2\\",\\"query\\":\\"\\",\\"variables\\":{}}]",
+  "headers": Object {
+    "Accept": "*/*",
+    "Content-Type": "application/json",
+  },
+  "method": "POST",
+  "url": "/graphql/batch",
+}
+`;
+
+exports[`batchMiddleware should handle server errors for all requests 1`] = `
+Object {
+  "body": "[{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"2\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"3\\",\\"query\\":\\"\\",\\"variables\\":{}}]",
+  "headers": Object {
+    "Accept": "*/*",
+    "Content-Type": "application/json",
+  },
+  "method": "POST",
+  "url": "/graphql/batch",
+}
+`;
+
+exports[`batchMiddleware should handle server errors for one request 1`] = `
+Object {
+  "body": "[{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"2\\",\\"query\\":\\"\\",\\"variables\\":{}}]",
+  "headers": Object {
+    "Accept": "*/*",
+    "Content-Type": "application/json",
+  },
+  "method": "POST",
+  "url": "/graphql/batch",
+}
+`;
+
+exports[`batchMiddleware should make a successfull single request 1`] = `
+Object {
+  "body": "{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}}",
+  "headers": Object {},
+  "method": "POST",
+}
+`;
+
+exports[`batchMiddleware should make a successfully batch request 1`] = `
+Object {
+  "body": "[{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"2\\",\\"query\\":\\"\\",\\"variables\\":{}}]",
+  "headers": Object {
+    "Accept": "*/*",
+    "Content-Type": "application/json",
+  },
+  "method": "POST",
+  "url": "/graphql/batch",
+}
+`;
+
+exports[`batchMiddleware should make a successfully batch request with duplicate request ids 1`] = `
+Object {
+  "body": "[{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"2\\",\\"query\\":\\"\\",\\"variables\\":{}}]",
+  "headers": Object {
+    "Accept": "*/*",
+    "Content-Type": "application/json",
+  },
+  "method": "POST",
+  "url": "/graphql/batch",
+}
+`;
+
+exports[`batchMiddleware should reject if server does not return response for duplicate request ids 1`] = `
+Object {
+  "body": "[{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"2\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"3\\",\\"query\\":\\"\\",\\"variables\\":{}}]",
+  "headers": Object {
+    "Accept": "*/*",
+    "Content-Type": "application/json",
+  },
+  "method": "POST",
+  "url": "/graphql/batch",
+}
+`;
+
+exports[`batchMiddleware should reject if server does not return response for request 1`] = `
+Object {
+  "body": "[{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"2\\",\\"query\\":\\"\\",\\"variables\\":{}}]",
+  "headers": Object {
+    "Accept": "*/*",
+    "Content-Type": "application/json",
+  },
+  "method": "POST",
+  "url": "/graphql/batch",
+}
+`;
