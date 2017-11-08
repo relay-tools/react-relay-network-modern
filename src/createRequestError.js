@@ -59,7 +59,7 @@ export function createRequestError(req: RelayRequest, res?: RelayResponse) {
     errorReason = 'Server return empty response.';
   } else if (!res.json) {
     errorReason =
-      (res.text ? res.text : 'Server return empty response.') +
+      (res.text ? res.text : `Server return empty response with Status Code: ${res.status}.`) +
       (res ? `\n\n${res.toString()}` : '');
   } else if (res.errors) {
     if (req.relayReqObj) {

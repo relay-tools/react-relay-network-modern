@@ -66,7 +66,7 @@ describe('Middleware / auth', () => {
     expect(fetchMock.lastOptions()).toMatchSnapshot();
   });
 
-  it.only('`tokenRefreshPromise` should be called on 401 response', async () => {
+  it('`tokenRefreshPromise` should be called on 401 response', async () => {
     fetchMock.mock({
       matcher: '/graphql',
       response: (_, opts) => {
