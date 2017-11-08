@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`batchMiddleware option \`allowMutations\` should batch mutations if \`allowMutations=true\` 1`] = `
+exports[`middlewares/batch option \`allowMutations\` should batch mutations if \`allowMutations=true\` 1`] = `
 Object {
   "body": "[{\\"id\\":\\"1\\",\\"query\\":\\"mutation {}\\",\\"variables\\":{}},{\\"id\\":\\"2\\",\\"query\\":\\"mutation {}\\",\\"variables\\":{}}]",
   "headers": Object {
@@ -12,7 +12,7 @@ Object {
 }
 `;
 
-exports[`batchMiddleware option \`allowMutations\` should not batch mutations by default 1`] = `
+exports[`middlewares/batch option \`allowMutations\` should not batch mutations by default 1`] = `
 Array [
   Array [
     "/graphql",
@@ -33,7 +33,7 @@ Array [
 ]
 `;
 
-exports[`batchMiddleware option \`batchTimeout\` should gather different requests into one batch request 1`] = `
+exports[`middlewares/batch option \`batchTimeout\` should gather different requests into one batch request 1`] = `
 Object {
   "body": "[{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"2\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"3\\",\\"query\\":\\"\\",\\"variables\\":{}}]",
   "headers": Object {
@@ -45,7 +45,7 @@ Object {
 }
 `;
 
-exports[`batchMiddleware option \`batchTimeout\` should gather different requests into two batch request 1`] = `
+exports[`middlewares/batch option \`batchTimeout\` should gather different requests into two batch request 1`] = `
 Array [
   Array [
     "/graphql/batch",
@@ -74,7 +74,7 @@ Array [
 ]
 `;
 
-exports[`batchMiddleware should handle network failure 1`] = `
+exports[`middlewares/batch should handle network failure 1`] = `
 Object {
   "body": "[{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"2\\",\\"query\\":\\"\\",\\"variables\\":{}}]",
   "headers": Object {
@@ -86,7 +86,7 @@ Object {
 }
 `;
 
-exports[`batchMiddleware should handle responses without payload wrapper 1`] = `
+exports[`middlewares/batch should handle responses without payload wrapper 1`] = `
 Object {
   "body": "[{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"2\\",\\"query\\":\\"\\",\\"variables\\":{}}]",
   "headers": Object {
@@ -98,7 +98,7 @@ Object {
 }
 `;
 
-exports[`batchMiddleware should handle server errors for all requests 1`] = `
+exports[`middlewares/batch should handle server errors for all requests 1`] = `
 Object {
   "body": "[{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"2\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"3\\",\\"query\\":\\"\\",\\"variables\\":{}}]",
   "headers": Object {
@@ -110,7 +110,7 @@ Object {
 }
 `;
 
-exports[`batchMiddleware should handle server errors for one request 1`] = `
+exports[`middlewares/batch should handle server errors for one request 1`] = `
 Object {
   "body": "[{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"2\\",\\"query\\":\\"\\",\\"variables\\":{}}]",
   "headers": Object {
@@ -122,7 +122,7 @@ Object {
 }
 `;
 
-exports[`batchMiddleware should make a successfull single request 1`] = `
+exports[`middlewares/batch should make a successfull single request 1`] = `
 Object {
   "body": "{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}}",
   "headers": Object {},
@@ -130,7 +130,7 @@ Object {
 }
 `;
 
-exports[`batchMiddleware should make a successfully batch request 1`] = `
+exports[`middlewares/batch should make a successfully batch request 1`] = `
 Object {
   "body": "[{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"2\\",\\"query\\":\\"\\",\\"variables\\":{}}]",
   "headers": Object {
@@ -142,7 +142,7 @@ Object {
 }
 `;
 
-exports[`batchMiddleware should make a successfully batch request with duplicate request ids 1`] = `
+exports[`middlewares/batch should make a successfully batch request with duplicate request ids 1`] = `
 Object {
   "body": "[{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"2\\",\\"query\\":\\"\\",\\"variables\\":{}}]",
   "headers": Object {
@@ -154,7 +154,7 @@ Object {
 }
 `;
 
-exports[`batchMiddleware should reject if server does not return response for duplicate request ids 1`] = `
+exports[`middlewares/batch should reject if server does not return response for duplicate request ids 1`] = `
 Object {
   "body": "[{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"2\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"3\\",\\"query\\":\\"\\",\\"variables\\":{}}]",
   "headers": Object {
@@ -166,7 +166,7 @@ Object {
 }
 `;
 
-exports[`batchMiddleware should reject if server does not return response for request 1`] = `
+exports[`middlewares/batch should reject if server does not return response for request 1`] = `
 Object {
   "body": "[{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"2\\",\\"query\\":\\"\\",\\"variables\\":{}}]",
   "headers": Object {

@@ -7,7 +7,7 @@ import { mockReq, mockReqWithSize, mockReqWithFiles } from '../../__mocks__/mock
 
 global.FormData = FormData;
 
-describe('batchMiddleware', () => {
+describe('middlewares/batch', () => {
   beforeEach(() => {
     fetchMock.restore();
   });

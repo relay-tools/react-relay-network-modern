@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Middleware / auth \`token\` option as string (with default \`prefix\` and \`header\`) 1`] = `
+exports[`middlewares/auth \`token\` option as string (with default \`prefix\` and \`header\`) 1`] = `
 Object {
   "body": "{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}}",
   "headers": Object {
@@ -10,7 +10,7 @@ Object {
 }
 `;
 
-exports[`Middleware / auth \`token\` option as thunk (with custom \`prefix\` and \`header\`) 1`] = `
+exports[`middlewares/auth \`token\` option as thunk (with custom \`prefix\` and \`header\`) 1`] = `
 Object {
   "body": "{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}}",
   "headers": Object {
@@ -20,7 +20,7 @@ Object {
 }
 `;
 
-exports[`Middleware / auth \`tokenRefreshPromise\` should be called on 401 response 1`] = `
+exports[`middlewares/auth \`tokenRefreshPromise\` should be called on 401 response 1`] = `
 Array [
   Array [
     "/graphql",

@@ -5,7 +5,7 @@ import { RelayNetworkLayer } from '../../';
 import { mockReq } from '../../__mocks__/mockReq';
 import authMiddleware from '../auth';
 
-describe('Middleware / auth', () => {
+describe('middlewares/auth', () => {
   beforeEach(() => {
     fetchMock.restore();
   });
