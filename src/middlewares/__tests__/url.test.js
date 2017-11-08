@@ -25,7 +25,7 @@ describe('middlewares/url', () => {
         url: '/some_url',
       }),
     ]);
-    const req = mockReq();
+    const req = mockReq(1);
     const res = await req.execute(rnl);
     expect(res.data).toBe('PAYLOAD');
     expect(fetchMock.lastOptions()).toMatchSnapshot();
@@ -46,7 +46,7 @@ describe('middlewares/url', () => {
         url: () => '/thunk_url',
       }),
     ]);
-    const req = mockReq();
+    const req = mockReq(1);
     const res = await req.execute(rnl);
     expect(res.data).toBe('PAYLOAD2');
     expect(fetchMock.lastOptions()).toMatchSnapshot();
@@ -67,7 +67,7 @@ describe('middlewares/url', () => {
         url: () => Promise.resolve('/thunk_url_promise'),
       }),
     ]);
-    const req = mockReq();
+    const req = mockReq(1);
     const res = await req.execute(rnl);
     expect(res.data).toBe('PAYLOAD promise');
     expect(fetchMock.lastOptions()).toMatchSnapshot();
@@ -89,7 +89,7 @@ describe('middlewares/url', () => {
         method: 'GET',
       }),
     ]);
-    const req = mockReq();
+    const req = mockReq(1);
     const res = await req.execute(rnl);
     expect(res.data).toBe('PAYLOAD3');
     expect(fetchMock.lastOptions()).toMatchSnapshot();
@@ -113,7 +113,7 @@ describe('middlewares/url', () => {
         },
       }),
     ]);
-    const req = mockReq();
+    const req = mockReq(1);
     const res = await req.execute(rnl);
     expect(res.data).toBe('PAYLOAD4');
     expect(fetchMock.lastOptions()).toMatchSnapshot();
@@ -137,7 +137,7 @@ describe('middlewares/url', () => {
         }),
       }),
     ]);
-    const req = mockReq();
+    const req = mockReq(1);
     const res = await req.execute(rnl);
     expect(res.data).toBe('PAYLOAD5');
     expect(fetchMock.lastOptions()).toMatchSnapshot();
@@ -162,7 +162,7 @@ describe('middlewares/url', () => {
           }),
       }),
     ]);
-    const req = mockReq();
+    const req = mockReq(1);
     const res = await req.execute(rnl);
     expect(res.data).toBe('PAYLOAD5');
     expect(fetchMock.lastOptions()).toMatchSnapshot();
@@ -184,7 +184,7 @@ describe('middlewares/url', () => {
         credentials: 'same-origin',
       }),
     ]);
-    const req = mockReq();
+    const req = mockReq(1);
     const res = await req.execute(rnl);
     expect(res.data).toBe('PAYLOAD6');
     expect(fetchMock.lastOptions()).toMatchSnapshot();

@@ -28,7 +28,7 @@ class MockReq {
   }
 
   getQueryString(): string {
-    return this.reqData.query || '{}';
+    return this.reqData.query || '';
   }
 
   getDebugName(): string {
@@ -55,10 +55,11 @@ class MockReq {
     return (rnl.fetchFn(
       {
         id: this.getID(),
+        text: this.getQueryString() || '',
       }, // ConcreteBatch,
-      {}, // Variables,
+      this.getVariables() || {}, // Variables,
       {}, // CacheConfig,
-      undefined // ?UploadableMap
+      this.getFiles() // ?UploadableMap
     ): any);
   }
 }

@@ -347,9 +347,7 @@ describe('batchMiddleware', () => {
       const batchReqs = fetchMock.calls('/graphql/batch');
       const singleReqs = fetchMock.calls('/graphql');
       expect(batchReqs).toHaveLength(2);
-      expect(fetchMock.calls('/graphql/batch')).toMatchSnapshot();
       expect(singleReqs).toHaveLength(1);
-      expect(fetchMock.calls('/graphql')).toMatchSnapshot();
     });
   });
 
@@ -369,43 +367,14 @@ describe('batchMiddleware', () => {
       });
 
       const rnl = new RelayNetworkLayer([batchMiddleware({ batchTimeout: 20 })]);
-      mockReqWithFiles(1).execute(rnl);
-      await mockReqWithFiles(1).execute(rnl);
+      mockReq(1, { query: 'mutation {}' }).execute(rnl);
+      await mockReq(1, { query: 'mutation {}' }).execute(rnl);
       const singleReqs = fetchMock.calls('/graphql');
       expect(singleReqs).toHaveLength(2);
       expect(fetchMock.calls('/graphql')).toMatchSnapshot();
     });
 
-    it('should batch mutations if `allowMutations=true`', async () => {
-      const rnlAllowMutations = new RelayNetworkLayer([
-        batchMiddleware({ batchTimeout: 20, allowMutations: true }),
-      ]);
-
-      fetchMock.mock({
-        matcher: '/graphql/batch',
-        response: {
-          status: 200,
-          body: [{ id: 1, data: {} }, { id: 2, data: {} }],
-        },
-        method: 'POST',
-      });
-
-      const req1 = mockReq(1);
-      rnlAllowMutations.sendMutation(req1);
-      const req2 = mockReq(2);
-
-      await rnlAllowMutations.sendMutation(req2);
-
-      const batchReqs = fetchMock.calls('/graphql/batch');
-      expect(batchReqs).toHaveLength(1);
-      expect(fetchMock.lastOptions()).toMatchSnapshot();
-    });
-
-    it('should not batch mutations with files if `allowMutations=true`', async () => {
-      const rnlAllowMutations = new RelayNetworkLayer([
-        batchMiddleware({ batchTimeout: 20, allowMutations: true }),
-      ]);
-
+    it('should not batch requests with FormData', async () => {
       fetchMock.mock({
         matcher: '/graphql',
         response: {
@@ -415,15 +384,57 @@ describe('batchMiddleware', () => {
         method: 'POST',
       });
 
-      const req1 = mockReqWithFiles(1);
-      rnlAllowMutations.sendMutation(req1);
-      const req2 = mockReqWithFiles(1);
+      const rnl = new RelayNetworkLayer([batchMiddleware({ batchTimeout: 20 })]);
+      mockReqWithFiles(1).execute(rnl);
+      await mockReqWithFiles(1).execute(rnl);
+      const singleReqs = fetchMock.calls('/graphql');
+      expect(singleReqs).toHaveLength(2);
+    });
 
-      await rnlAllowMutations.sendMutation(req2);
+    it('should batch mutations if `allowMutations=true`', async () => {
+      fetchMock.mock({
+        matcher: '/graphql/batch',
+        response: {
+          status: 200,
+          body: [{ id: 1, data: {} }, { id: 2, data: {} }],
+        },
+        method: 'POST',
+      });
+
+      const rnl = new RelayNetworkLayer([
+        batchMiddleware({ batchTimeout: 20, allowMutations: true }),
+      ]);
+      const req1 = mockReq(1, { query: 'mutation {}' });
+      req1.execute(rnl);
+      const req2 = mockReq(2, { query: 'mutation {}' });
+      await req2.execute(rnl);
+
+      const batchReqs = fetchMock.calls('/graphql/batch');
+      expect(batchReqs).toHaveLength(1);
+      expect(fetchMock.lastOptions()).toMatchSnapshot();
+    });
+
+    it('should not batch mutations with files if `allowMutations=true`', async () => {
+      fetchMock.mock({
+        matcher: '/graphql',
+        response: {
+          status: 200,
+          body: { id: 1, data: {} },
+        },
+        method: 'POST',
+      });
+
+      const rnl = new RelayNetworkLayer([
+        batchMiddleware({ batchTimeout: 20, allowMutations: true }),
+      ]);
+
+      const req1 = mockReq(1, { query: 'mutation {}', files: { file1: 'data' } });
+      req1.execute(rnl);
+      const req2 = mockReq(2, { query: 'mutation {}', files: { file1: 'data' } });
+      await req2.execute(rnl);
 
       const singleReqs = fetchMock.calls('/graphql');
       expect(singleReqs).toHaveLength(2);
-      expect(fetchMock.lastOptions()).toMatchSnapshot();
     });
   });
 });

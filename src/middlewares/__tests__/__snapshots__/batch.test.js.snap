@@ -1,5 +1,38 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`batchMiddleware option \`allowMutations\` should batch mutations if \`allowMutations=true\` 1`] = `
+Object {
+  "body": "[{\\"id\\":\\"1\\",\\"query\\":\\"mutation {}\\",\\"variables\\":{}},{\\"id\\":\\"2\\",\\"query\\":\\"mutation {}\\",\\"variables\\":{}}]",
+  "headers": Object {
+    "Accept": "*/*",
+    "Content-Type": "application/json",
+  },
+  "method": "POST",
+  "url": "/graphql/batch",
+}
+`;
+
+exports[`batchMiddleware option \`allowMutations\` should not batch mutations by default 1`] = `
+Array [
+  Array [
+    "/graphql",
+    Object {
+      "body": "{\\"id\\":\\"1\\",\\"query\\":\\"mutation {}\\",\\"variables\\":{}}",
+      "headers": Object {},
+      "method": "POST",
+    },
+  ],
+  Array [
+    "/graphql",
+    Object {
+      "body": "{\\"id\\":\\"1\\",\\"query\\":\\"mutation {}\\",\\"variables\\":{}}",
+      "headers": Object {},
+      "method": "POST",
+    },
+  ],
+]
+`;
+
 exports[`batchMiddleware option \`batchTimeout\` should gather different requests into one batch request 1`] = `
 Object {
   "body": "[{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"2\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"3\\",\\"query\\":\\"\\",\\"variables\\":{}}]",

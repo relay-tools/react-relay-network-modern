@@ -160,7 +160,7 @@ async function sendRequests(requestMap: BatchRequestMap, next, opts) {
     // $FlowFixMe
     const url = await (isFunction(opts.batchUrl) ? opts.batchUrl(requestMap) : opts.batchUrl);
     batchRequest.fetchOpts.url = url;
-    batchRequest.fetchOpts.headers['Accept'] = '*/*';
+    batchRequest.fetchOpts.headers.Accept = '*/*';
     batchRequest.fetchOpts.headers['Content-Type'] = 'application/json';
 
     try {
