@@ -72,7 +72,7 @@ export function createRequestError(req: RelayRequestAny, res?: RelayResponse) {
   }
 
   const error = new RRNLRequestError(
-    `Relay request for \`${req.getDebugName()}\` failed by the following reasons:\n\n${errorReason}`
+    `Relay request for \`${req.getID()}\` failed by the following reasons:\n\n${errorReason}`
   );
 
   error.req = req;

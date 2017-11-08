@@ -18,10 +18,6 @@ export default class RelayRequestBatch {
     };
   }
 
-  getDebugName(): string {
-    return `BATCH_QUERY:${this.getID()}`;
-  }
-
   getBody(): string {
     if (!this.fetchOpts.body) {
       this.fetchOpts.body = this.prepareBody();

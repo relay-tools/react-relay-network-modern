@@ -69,13 +69,8 @@ export default class RelayRequest {
     });
   }
 
-  getDebugName(): string {
-    // TODO
-    return 'req.relayReqId';
-  }
-
   getID(): string {
-    return this.id;
+    return this.id || this.operation.name;
   }
 
   _generateID(): string {
