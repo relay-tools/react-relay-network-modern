@@ -53,10 +53,10 @@ class MockReq {
 
   execute(rnl: RelayNetworkLayer): Promise<RelayResponse> {
     return (rnl.fetchFn(
-      {
+      ({
         id: this.getID(),
         text: this.getQueryString() || '',
-      }, // ConcreteBatch,
+      }: any), // ConcreteBatch,
       this.getVariables() || {}, // Variables,
       {}, // CacheConfig,
       this.getFiles() // ?UploadableMap

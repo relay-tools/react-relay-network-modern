@@ -12,7 +12,7 @@ describe('fetchWithMiddleware', () => {
 
   it('should make a successfull request without middlewares', async () => {
     fetchMock.post('/graphql', { id: 1, data: { user: 123 } });
-    const req = new RelayRequest({}, {}, {}, null);
+    const req = new RelayRequest(({}: any), {}, {}, null);
     const res = await fetchWithMiddleware(req, []);
     expect(res.data).toEqual({ user: 123 });
   });
@@ -32,7 +32,7 @@ describe('fetchWithMiddleware', () => {
     };
 
     fetchMock.post('/graphql', { id: 1, data: { text: 'response' } });
-    const req = new RelayRequest({}, {}, {}, null);
+    const req = new RelayRequest(({}: any), {}, {}, null);
     req.fetchOpts.headers = {
       reqId: 'request',
     };
@@ -54,7 +54,7 @@ describe('fetchWithMiddleware', () => {
       },
       method: 'POST',
     });
-    const req = new RelayRequest({}, {}, {}, null);
+    const req = new RelayRequest(({}: any), {}, {}, null);
 
     expect.assertions(2);
     try {
@@ -77,7 +77,7 @@ describe('fetchWithMiddleware', () => {
       method: 'POST',
     });
 
-    const req = new RelayRequest({}, {}, {}, null);
+    const req = new RelayRequest(({}: any), {}, {}, null);
 
     expect.assertions(2);
     try {
@@ -98,7 +98,7 @@ describe('fetchWithMiddleware', () => {
       method: 'POST',
     });
 
-    const req = new RelayRequest({}, {}, {}, null);
+    const req = new RelayRequest(({}: any), {}, {}, null);
 
     expect.assertions(2);
     try {
@@ -120,7 +120,7 @@ describe('fetchWithMiddleware', () => {
       method: 'POST',
     });
 
-    const req = new RelayRequest({}, {}, {}, null);
+    const req = new RelayRequest(({}: any), {}, {}, null);
 
     expect.assertions(2);
     try {

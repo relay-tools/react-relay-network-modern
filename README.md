@@ -107,18 +107,16 @@ Relay.injectNetworkLayer(new RelayNetworkLayer([
   }),
 
   // example of the custom inline middleware
-  next => req => {
-    // `req` is an object with settings for `fetch` function. It's not an express request object.
-    // Internally works following code:
-    //    let { url, ...opts } = req;
-    //    fetch(url, opts)
-    // So `req` is a fetch options. And into this options, I added `url` prop, which will be extracted as shown above.
-    // You have fully control under `fetch` via `req` object.
+  next => async req => {
+    req.fetchOpts.method = 'GET'; // change default POST request method to GET
+    req.fetchOpts.headers['X-Request-ID'] = uuid.v4(); // add `X-Request-ID` to request headers
+    req.fetchOpts.credentials = 'same-origin'; // provide CORS policy to XHR request in fetch method
+    console.log('RelayRequest', req);
 
-    req.method = 'GET'; // change default POST request method to GET
-    req.headers['X-Request-ID'] = uuid.v4(); // add `X-Request-ID` to request headers
-    req.credentials = 'same-origin'; // provide CORS policy to XHR request in fetch method
-    return next(req);
+    const res = await next(req);
+    console.log('RelayResponse', res);
+
+    return res;
   }
 ]));
 ```

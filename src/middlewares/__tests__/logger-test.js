@@ -29,6 +29,8 @@ describe('middlewares/logger', () => {
 
     await mockReq('MyRequest').execute(rnl);
     expect(logger).toHaveBeenCalledTimes(2);
+    // fix changing text `in 12ms` for snapshot
+    logger.mock.calls[1][0] = logger.mock.calls[1][0].replace(/in \d+ms/, 'in XXXms');
     expect(logger.mock.calls).toMatchSnapshot();
   });
 });

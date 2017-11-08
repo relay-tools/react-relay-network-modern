@@ -21,7 +21,7 @@ Array [
     },
   ],
   Array [
-    "Done MyRequest in 0ms",
+    "Done MyRequest in XXXms",
     Object {
       "query": "",
       "req": RelayRequest {

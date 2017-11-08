@@ -23,6 +23,7 @@ export default function fetchWithMiddleware(
   req: RelayRequest,
   middlewares: Middleware[]
 ): Promise<RelayResponse> {
+  // $FlowFixMe
   const wrappedFetch: MiddlewareNextFn = compose(...middlewares)(runFetch);
 
   return wrappedFetch(req).then(res => {
