@@ -55,7 +55,6 @@ Middlewares
 - **gqErrorsMiddleware** - display `errors` data to console from graphql response. If you want see stackTrace for errors, you should provide `formatError` to `express-graphql` (see example below where `graphqlServer` accept `formatError` function).
   - `logger` - log function (default: `console.error.bind(console)`)
   - `prefix` - prefix message (default: `[RELAY-NETWORK] GRAPHQL SERVER ERROR:`)
-- **deferMiddleware** - _experimental_ Right now `deferMiddleware()` just set `defer` as supported option for Relay. So this middleware allow to community play with `defer()` in cases, which was [described by @wincent](https://github.com/facebook/relay/issues/288#issuecomment-199510058).
 
 ### Example of injecting NetworkLayer with middlewares on the **client side**.
 ```js

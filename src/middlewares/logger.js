@@ -12,9 +12,12 @@ export default function loggerMiddleware(opts?: LoggerMiddlewareOpts): Middlewar
 
   return next => req => {
     const query = `${req.relayReqType} ${req.relayReqId}`;
+    const start = new Date().getTime();
 
     logger(`Run ${query}`, req);
     return next(req).then(res => {
+      const end = new Date().getTime();
+      logger(`Done ${query} in ${end - start}ms`);
       if (res.status !== 200) {
         logger(`Status ${res.status}: ${res.statusText} for ${query}`, req, res);
 
