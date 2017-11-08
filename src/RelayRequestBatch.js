@@ -38,7 +38,7 @@ export default class RelayRequestBatch {
   }
 
   getID(): string {
-    return this.getIds().join(':');
+    return `BATCH_REQUEST:${this.getIds().join(':')}`;
   }
 
   isMutation() {

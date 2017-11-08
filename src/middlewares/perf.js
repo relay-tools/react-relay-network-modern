@@ -28,7 +28,7 @@ export default function performanceMiddleware(opts?: PerfMiddlewareOpts): Middle
           response: res.json,
         };
       } else if (req instanceof RelayRequestBatch) {
-        queryId = `BATCH_REQUEST:${req.getID()}`;
+        queryId = req.getID();
         queryData = {
           requests: req.requests,
           response: res.json,
