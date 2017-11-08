@@ -11,7 +11,6 @@ export type Middleware = (next: MiddlewareNextFn) => MiddlewareNextFn;
 //   supports?: string | string[],
 // };
 
-
 export type FetchOpts = {
   url?: string,
   method: 'POST' | 'GET',

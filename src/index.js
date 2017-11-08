@@ -7,7 +7,7 @@ import urlMiddleware from './middlewares/url';
 import authMiddleware from './middlewares/auth';
 import perfMiddleware from './middlewares/perf';
 import loggerMiddleware from './middlewares/logger';
-import gqErrorsMiddleware from './middlewares/gqErrors';
+import gqlErrorsMiddleware from './middlewares/gqlErrors';
 import graphqlBatchHTTPWrapper from './express-middleware/graphqlBatchHTTPWrapper';
 
 export {
@@ -18,6 +18,6 @@ export {
   authMiddleware,
   perfMiddleware,
   loggerMiddleware,
-  gqErrorsMiddleware,
+  gqlErrorsMiddleware,
   graphqlBatchHTTPWrapper,
 };

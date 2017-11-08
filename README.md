@@ -56,7 +56,7 @@ Middlewares
   - If you use `Relay@^0.8.0` you may turn on [internal Relay requests debugger](https://cloud.githubusercontent.com/assets/1946920/15735688/688ccabe-28bc-11e6-82e2-db644eb698b0.png): `import RelayNetworkDebug from 'react-relay/lib/RelayNetworkDebug';  RelayNetworkDebug.init();`
 - **perfMiddleware** - simple time measure for network request.
   - `logger` - log function (default: `console.log.bind(console, '[RELAY-NETWORK]')`)
-- **gqErrorsMiddleware** - display `errors` data to console from graphql response. If you want see stackTrace for errors, you should provide `formatError` to `express-graphql` (see example below where `graphqlServer` accept `formatError` function).
+- **gqlErrorsMiddleware** - display `errors` data to console from graphql response. If you want see stackTrace for errors, you should provide `formatError` to `express-graphql` (see example below where `graphqlServer` accept `formatError` function).
   - `logger` - log function (default: `console.error.bind(console)`)
   - `prefix` - prefix message (default: `[RELAY-NETWORK] GRAPHQL SERVER ERROR:`)
 
@@ -68,7 +68,7 @@ import {
   urlMiddleware,
   batchMiddleware,
   loggerMiddleware,
-  gqErrorsMiddleware,
+  gqlErrorsMiddleware,
   perfMiddleware,
   retryMiddleware,
   authMiddleware,
@@ -83,7 +83,7 @@ Relay.injectNetworkLayer(new RelayNetworkLayer([
     batchTimeout: 10,
   }),
   loggerMiddleware(),
-  gqErrorsMiddleware(),
+  gqlErrorsMiddleware(),
   perfMiddleware(),
   retryMiddleware({
     fetchTimeout: 15000,
@@ -137,17 +137,16 @@ Basic skeleton of middleware:
 export default function skeletonMiddleware(opts = {}) {
   // [SETUP PHASE]: here you can process `opts`, when you create Middleware
 
-  return next => req => {
+  return next => async req => {
     // [CAPTURING PHASE]: here you can change `req` object, before it will pass to following middlewares.
     // ...some code which modify `req`
 
-    const resPromise = next(req); // pass request to following middleware and get response promise from it
+    const res = await next(req); // pass request to following middleware and get response promise from it
 
     // [BUBBLING PHASE]: here you may change response of underlying middlewares, via promise syntax
-    // ...some code, which may add `then()` or `catch()` to response promise
-    //    resPromise.then(res => { console.log(res); return res; })
+    // ...some code, which process `req`
 
-    return resPromise; // return response promise to upper middleware
+    return res; // return response to upper middleware
   };
 }
 ```
