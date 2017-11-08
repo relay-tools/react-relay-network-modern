@@ -3,9 +3,9 @@
 import fetchMock from 'fetch-mock';
 import RelayNetworkLayer from '../../RelayNetworkLayer';
 import { mockReq } from '../../__mocks__/mockReq';
-import perfMiddleware from '../perf';
+import loggerMiddleware from '../logger';
 
-describe('middlewares/perf', () => {
+describe('middlewares/logger', () => {
   beforeEach(() => {
     fetchMock.restore();
   });
@@ -22,14 +22,13 @@ describe('middlewares/perf', () => {
 
     const logger = jest.fn();
     const rnl = new RelayNetworkLayer([
-      perfMiddleware({
+      loggerMiddleware({
         logger,
       }),
     ]);
 
     await mockReq('MyRequest').execute(rnl);
-    expect(logger).toHaveBeenCalledTimes(1);
-    expect(logger.mock.calls[0][0]).toMatch(/\[\d+ms\] MyRequest/);
-    expect(logger.mock.calls[0][1]).toMatchSnapshot();
+    expect(logger).toHaveBeenCalledTimes(2);
+    expect(logger.mock.calls).toMatchSnapshot();
   });
 });

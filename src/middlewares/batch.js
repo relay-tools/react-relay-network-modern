@@ -166,7 +166,7 @@ async function sendRequests(requestMap: BatchRequestMap, next, opts) {
     try {
       const batchResponse = await next(batchRequest);
       if (!batchResponse || !Array.isArray(batchResponse.json)) {
-        throw new Error('Wrong response from server');
+        throw new Error('Wrong response from server. Did your server support batch request?');
       }
 
       batchResponse.json.forEach((payload: any) => {

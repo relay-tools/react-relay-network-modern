@@ -108,7 +108,7 @@ describe('middlewares/retry', () => {
     it('should retry request on timeout', async () => {
       let attempt = 0;
 
-      // First 2 requests answered after 30ms
+      // First 2 requests answered after 50ms
       // 3rd request returns without delay
       fetchMock.mock({
         matcher: '/graphql',
@@ -121,7 +121,7 @@ describe('middlewares/retry', () => {
                   status: 200,
                   body: { data: 'PAYLOAD' },
                 }),
-              attempt <= 2 ? 30 : 0
+              attempt <= 2 ? 50 : 0
             );
           });
         },
