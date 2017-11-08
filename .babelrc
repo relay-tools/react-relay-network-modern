@@ -5,6 +5,9 @@
   ],
   "env": {
     "lib": {
+      "plugins": [
+        "babel-plugin-transform-class-properties",
+      ],
       "presets": [
         ["env", {
           "targets": {
