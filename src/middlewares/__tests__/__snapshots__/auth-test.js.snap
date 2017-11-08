@@ -1,0 +1,46 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Middleware / auth \`token\` option as string (with default \`prefix\` and \`header\`) 1`] = `
+Object {
+  "body": "{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}}",
+  "headers": Object {
+    "Authorization": "Bearer 123",
+  },
+  "method": "POST",
+}
+`;
+
+exports[`Middleware / auth \`token\` option as thunk (with custom \`prefix\` and \`header\`) 1`] = `
+Object {
+  "body": "{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}}",
+  "headers": Object {
+    "MyAuthorization": "MyBearer 333",
+  },
+  "method": "POST",
+}
+`;
+
+exports[`Middleware / auth \`tokenRefreshPromise\` should be called on 401 response 1`] = `
+Array [
+  Array [
+    "/graphql",
+    Object {
+      "body": "{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}}",
+      "headers": Object {
+        "Authorization": "Bearer 123",
+      },
+      "method": "POST",
+    },
+  ],
+  Array [
+    "/graphql",
+    Object {
+      "body": "{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}}",
+      "headers": Object {
+        "Authorization": "Bearer ValidToken",
+      },
+      "method": "POST",
+    },
+  ],
+]
+`;

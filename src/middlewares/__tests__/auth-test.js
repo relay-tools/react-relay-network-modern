@@ -3,10 +3,23 @@
 import fetchMock from 'fetch-mock';
 import { RelayNetworkLayer } from '../../';
 import { mockReq } from '../../__mocks__/mockReq';
-import authMiddleware from '../../middleware/auth';
+import authMiddleware from '../auth';
 
 describe('Middleware / auth', () => {
-  describe('`token` option as string (with default `prefix` and `header`)', () => {
+  beforeEach(() => {
+    fetchMock.restore();
+  });
+
+  it('`token` option as string (with default `prefix` and `header`)', async () => {
+    fetchMock.mock({
+      matcher: '/graphql',
+      response: {
+        status: 200,
+        body: { data: 'PAYLOAD' },
+      },
+      method: 'POST',
+    });
+
     const rnl = new RelayNetworkLayer([
       authMiddleware({
         token: '123',
@@ -14,131 +27,73 @@ describe('Middleware / auth', () => {
       }),
     ]);
 
-    beforeEach(() => {
-      fetchMock.restore();
+    const req = mockReq(1);
+    const res = await req.execute(rnl);
 
-      fetchMock.mock({
-        matcher: '/graphql',
-        response: {
-          status: 200,
-          body: { data: 'PAYLOAD' },
-          sendAsJson: true,
-        },
-        method: 'POST',
-      });
-    });
-
-    it('should work with query', async () => {
-      const req1 = mockReq();
-      await rnl.sendQueries([req1]);
-
-      expect(req1.payload).toEqual({ response: 'PAYLOAD' });
-      const reqs = fetchMock.calls('/graphql');
-      expect(reqs).toHaveLength(1);
-      expect(reqs[0][1].headers.Authorization).toBe('Bearer 123');
-    });
-
-    it('should work with mutation', async () => {
-      const req1 = mockReq();
-      await rnl.sendMutation(req1);
-
-      expect(req1.payload).toEqual({ response: 'PAYLOAD' });
-      const reqs = fetchMock.calls('/graphql');
-      expect(reqs).toHaveLength(1);
-      expect(reqs[0][1].headers.Authorization).toBe('Bearer 123');
-    });
+    expect(res.data).toEqual('PAYLOAD');
+    const reqs = fetchMock.calls('/graphql');
+    expect(reqs).toHaveLength(1);
+    expect(reqs[0][1].headers.Authorization).toBe('Bearer 123');
+    expect(fetchMock.lastOptions()).toMatchSnapshot();
   });
 
-  describe('`token` option as thunk (with custom `prefix` and `header`)', () => {
+  it('`token` option as thunk (with custom `prefix` and `header`)', async () => {
+    fetchMock.mock({
+      matcher: '/graphql',
+      response: {
+        status: 200,
+        body: { data: 'PAYLOAD' },
+      },
+      method: 'POST',
+    });
+
     const rnl = new RelayNetworkLayer([
       authMiddleware({
-        token: () => '333',
+        token: () => Promise.resolve('333'),
         tokenRefreshPromise: () => '345',
         prefix: 'MyBearer ',
         header: 'MyAuthorization',
       }),
     ]);
 
-    beforeEach(() => {
-      fetchMock.restore();
+    const req = mockReq(1);
+    const res = await req.execute(rnl);
 
-      fetchMock.mock({
-        matcher: '/graphql',
-        response: {
-          status: 200,
-          body: { data: 'PAYLOAD' },
-          sendAsJson: true,
-        },
-        method: 'POST',
-      });
-    });
-
-    it('should work with query', async () => {
-      const req1 = mockReq();
-      await rnl.sendQueries([req1]);
-
-      expect(req1.payload).toEqual({ response: 'PAYLOAD' });
-      const reqs = fetchMock.calls('/graphql');
-      expect(reqs).toHaveLength(1);
-      expect(reqs[0][1].headers.MyAuthorization).toBe('MyBearer 333');
-    });
-
-    it('should work with mutation', async () => {
-      const req1 = mockReq();
-      await rnl.sendMutation(req1);
-
-      expect(req1.payload).toEqual({ response: 'PAYLOAD' });
-      const reqs = fetchMock.calls('/graphql');
-      expect(reqs).toHaveLength(1);
-      expect(reqs[0][1].headers.MyAuthorization).toBe('MyBearer 333');
-    });
+    expect(res.data).toEqual('PAYLOAD');
+    const reqs = fetchMock.calls('/graphql');
+    expect(reqs).toHaveLength(1);
+    expect(reqs[0][1].headers.MyAuthorization).toBe('MyBearer 333');
+    expect(fetchMock.lastOptions()).toMatchSnapshot();
   });
 
-  describe('`tokenRefreshPromise` should be called on 401 response', () => {
-    beforeEach(() => {
-      fetchMock.restore();
-
-      fetchMock.mock({
-        matcher: '/graphql',
-        response: (_, opts) => ({
-          status: opts.headers.Authorization === 'Bearer ValidToken' ? 200 : 401,
-          body: { data: 'PAYLOAD' },
-          sendAsJson: true,
-        }),
-        method: 'POST',
-      });
+  it.only('`tokenRefreshPromise` should be called on 401 response', async () => {
+    fetchMock.mock({
+      matcher: '/graphql',
+      response: (_, opts) => {
+        if (opts.headers.Authorization === 'Bearer ValidToken') {
+          return {
+            status: 200,
+            body: { data: 'PAYLOAD' },
+          };
+        }
+        return { status: 401 };
+      },
+      method: 'POST',
     });
 
-    it('should work with query (provided promise)', async () => {
-      const rnl = new RelayNetworkLayer([
-        authMiddleware({
-          token: '123',
-          tokenRefreshPromise: () => Promise.resolve('ValidToken'),
-        }),
-      ]);
+    const rnl = new RelayNetworkLayer([
+      authMiddleware({
+        token: '123',
+        tokenRefreshPromise: () => Promise.resolve('ValidToken'),
+      }),
+    ]);
 
-      const req1 = mockReq();
-      await rnl.sendQueries([req1]);
-
-      const reqs = fetchMock.calls('/graphql');
-      expect(reqs).toHaveLength(2);
-      expect(reqs[1][1].headers.Authorization).toBe('Bearer ValidToken');
-    });
-
-    it('should work with mutation (provided regular value)', async () => {
-      const rnl = new RelayNetworkLayer([
-        authMiddleware({
-          token: '123',
-          tokenRefreshPromise: () => 'ValidToken',
-        }),
-      ]);
-
-      const req1 = mockReq();
-      await rnl.sendMutation(req1);
-
-      const reqs = fetchMock.calls('/graphql');
-      expect(reqs).toHaveLength(2);
-      expect(reqs[1][1].headers.Authorization).toBe('Bearer ValidToken');
-    });
+    const req = mockReq(1);
+    await req.execute(rnl);
+    const reqs = fetchMock.calls('/graphql');
+    expect(reqs).toHaveLength(2);
+    expect(reqs[0][1].headers.Authorization).toBe('Bearer 123');
+    expect(reqs[1][1].headers.Authorization).toBe('Bearer ValidToken');
+    expect(fetchMock.calls('/graphql')).toMatchSnapshot();
   });
 });

@@ -48,4 +48,12 @@ export default class RelayRequestBatch {
   isFormData() {
     return false;
   }
+
+  clone(): RelayRequestBatch {
+    // $FlowFixMe
+    const newRequest = Object.assign(Object.create(Object.getPrototypeOf(this)), this);
+    newRequest.fetchOpts = { ...this.fetchOpts };
+    newRequest.fetchOpts.headers = { ...this.fetchOpts.headers };
+    return (newRequest: any);
+  }
 }

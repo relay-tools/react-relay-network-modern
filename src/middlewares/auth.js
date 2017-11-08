@@ -2,21 +2,19 @@
 /* eslint-disable no-param-reassign, arrow-body-style, dot-notation */
 
 import { isFunction } from '../utils';
-import type { Middleware, RelayClassicRequest, RRNLRequestObject } from '../definition';
+import type RelayResponse from '../RelayResponse';
+import type { Middleware, RelayRequestAny } from '../definition';
 
 class WrongTokenError extends Error {
-  res: ?RelayClassicRequest;
-
-  constructor(msg, res: ?RelayClassicRequest) {
+  constructor(msg) {
     super(msg);
-    this.res = res;
     this.name = 'WrongTokenError';
   }
 }
 
 export type AuthMiddlewareOpts = {|
-  token?: string | Promise<string> | ((req: RRNLRequestObject) => string | Promise<string>),
-  tokenRefreshPromise?: (req: RRNLRequestObject, res: any) => string | Promise<string>,
+  token?: string | Promise<string> | ((req: RelayRequestAny) => string | Promise<string>),
+  tokenRefreshPromise?: (req: RelayRequestAny, res: RelayResponse) => string | Promise<string>,
   allowEmptyToken?: boolean,
   prefix?: string,
   header?: string,
@@ -44,17 +42,17 @@ export default function authMiddleware(opts?: AuthMiddlewareOpts): Middleware {
       }
 
       if (token) {
-        req.headers[header] = `${prefix}${token}`;
+        req.fetchOpts.headers[header] = `${prefix}${token}`;
       }
       const res = await next(req);
       return res;
     } catch (e) {
       if (e && tokenRefreshPromise) {
-        if (e.message === 'Empty token' || (e.fetchResponse && e.fetchResponse.status === 401)) {
+        if (e.message === 'Empty token' || (e.res && e.res.status === 401)) {
           if (tokenRefreshPromise) {
             if (!tokenRefreshInProgress) {
               tokenRefreshInProgress = Promise.resolve(
-                tokenRefreshPromise(req, e.fetchResponse)
+                tokenRefreshPromise(req, e.res)
               ).then(newToken => {
                 tokenRefreshInProgress = null;
                 return newToken;
@@ -62,8 +60,9 @@ export default function authMiddleware(opts?: AuthMiddlewareOpts): Middleware {
             }
 
             return tokenRefreshInProgress.then(newToken => {
-              req.headers[header] = `${prefix}${newToken}`;
-              return next(req); // re-run query with new token
+              const newReq = req.clone();
+              newReq.fetchOpts.headers[header] = `${prefix}${newToken}`;
+              return next(newReq); // re-run query with new token
             });
           }
         }

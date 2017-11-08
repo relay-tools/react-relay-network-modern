@@ -32,7 +32,7 @@
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
-    "babel-eslint": "^8.0.1",
+    "babel-eslint": "^8.0.2",
     "babel-jest": "^21.2.0",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-transform-flow-strip-types": "^6.22.0",
@@ -51,7 +51,7 @@
     "flow-bin": "^0.58.0",
     "form-data": "^2.3.1",
     "jest": "^21.2.1",
-    "prettier": "^1.7.4",
+    "prettier": "^1.8.1",
     "relay-runtime": "^1.4.1",
     "rimraf": "^2.6.2",
     "semantic-release": "^8.2.0"

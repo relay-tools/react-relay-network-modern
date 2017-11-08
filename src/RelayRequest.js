@@ -102,4 +102,12 @@ export default class RelayRequest {
     const _FormData_ = getFormDataInterface();
     return !!_FormData_ && this.fetchOpts.body instanceof _FormData_;
   }
+
+  clone(): RelayRequest {
+    // $FlowFixMe
+    const newRequest = Object.assign(Object.create(Object.getPrototypeOf(this)), this);
+    newRequest.fetchOpts = { ...this.fetchOpts };
+    newRequest.fetchOpts.headers = { ...this.fetchOpts.headers };
+    return (newRequest: any);
+  }
 }
