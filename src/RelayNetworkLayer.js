@@ -16,13 +16,13 @@ export default class RelayNetworkLayer {
   fetchFn: FetchFunction;
   subscribeFn: ?SubscribeFunction;
 
-  constructor(middlewares: Middleware[] | Middleware, subscribeFn?: SubscribeFunction) {
-    this._middlewares = Array.isArray(middlewares) ? middlewares : [middlewares];
+  constructor(middlewares: Array<?Middleware>, subscribeFn?: SubscribeFunction) {
+    this._middlewares = Array.isArray(middlewares) ? (middlewares: any) : [middlewares];
     this.subscribeFn = subscribeFn;
 
     this.fetchFn = (operation, variables, cacheConfig, uploadables) => {
       const req = new RelayRequest(operation, variables, cacheConfig, uploadables);
-      return fetchWithMiddleware(req, this._middlewares);
+      return fetchWithMiddleware(req, this._middlewares.filter(o => !!o));
     };
 
     this.execute = Network.create(this.fetchFn, this.subscribeFn);
