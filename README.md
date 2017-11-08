@@ -27,10 +27,16 @@ Middlewares
 - **your custom inline middleware** - [see example](https://github.com/nodkz/react-relay-network-modern#example-of-injecting-networklayer-with-middlewares-on-the-client-side) below where added `credentials` and `headers` to the `fetch` method.
   - `next => req => { /* your modification of 'req' object */ return next(req); }`
 - **urlMiddleware** - for manipulating fetch `url` on fly via thunk.
-  - `url` - string for single request. Can be Promise or function(req). (default: `/graphql`)  
+  - `url` - string for single request. Can be Promise or function(req). (default: `/graphql`).
   - `method` - string, for request method type (default: `POST`)
   - headers - Object with headers for fetch. Can be Promise or function(req).
-  - credentials - string, setting for fetch method, eg. 'same-origin' (default: empty)
+  - credentials - string, setting for fetch method, eg. 'same-origin' (default: empty).
+- **cacheMiddleware** - for caching same queries you may use this middleware. It will skip (do not cache) mutations and FormData requests.
+  - `size` - max number of request in cache, least-recently *updated* entries purged first (default: `100`).
+  - `ttl` - number in milliseconds, how long records stay valid in cache (default: `900000`, 15 minutes).
+  - `onInit` - function(cache) which will be called once when cache is created. As first argument you receive `QueryResponseCache` instance from `relay-runtime`.
+  - `allowMutations` - allow to cache Mutation requests (default: `false`)
+  - `allowFormData` - allow to cache FormData requests (default: `false`)
 - **authMiddleware** - for adding auth token, and refreshing it if gets 401 response from server.
   - `token` - string which returns token. Can be function(req) or Promise. If function is provided, then it will be called for every request (so you may change tokens on fly).
   - `tokenRefreshPromise`: - function(req, res) which must return promise or regular value with a new token. This function is called when server returns 401 status code. After receiving a new token, middleware re-run query to the server seamlessly for Relay.
@@ -75,6 +81,10 @@ import {
 } from 'react-relay-network-modern';
 
 Relay.injectNetworkLayer(new RelayNetworkLayer([
+  cacheMiddleware({
+    size: 100, // max 100 requests
+    ttl: 900000, // 15 minutes
+  }),
   urlMiddleware({
     url: (req) => '/graphql',
   }),

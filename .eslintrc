@@ -41,5 +41,7 @@
     "$Shape": true,
     "$FlowFixMe": true,
     "Blob": true,
+    "Class": true,
+    "window": true,
   }
 }

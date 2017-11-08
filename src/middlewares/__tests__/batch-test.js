@@ -3,7 +3,12 @@
 import fetchMock from 'fetch-mock';
 import FormData from 'form-data';
 import { RelayNetworkLayer, batchMiddleware } from '../../';
-import { mockReq, mockReqWithSize, mockReqWithFiles } from '../../__mocks__/mockReq';
+import {
+  mockReq,
+  mockReqWithSize,
+  mockMutationReq,
+  mockReqWithFiles,
+} from '../../__mocks__/mockReq';
 
 global.FormData = FormData;
 
@@ -367,8 +372,8 @@ describe('middlewares/batch', () => {
       });
 
       const rnl = new RelayNetworkLayer([batchMiddleware({ batchTimeout: 20 })]);
-      mockReq(1, { query: 'mutation {}' }).execute(rnl);
-      await mockReq(1, { query: 'mutation {}' }).execute(rnl);
+      mockMutationReq(1).execute(rnl);
+      await mockMutationReq(1).execute(rnl);
       const singleReqs = fetchMock.calls('/graphql');
       expect(singleReqs).toHaveLength(2);
       expect(fetchMock.calls('/graphql')).toMatchSnapshot();
@@ -404,9 +409,9 @@ describe('middlewares/batch', () => {
       const rnl = new RelayNetworkLayer([
         batchMiddleware({ batchTimeout: 20, allowMutations: true }),
       ]);
-      const req1 = mockReq(1, { query: 'mutation {}' });
+      const req1 = mockMutationReq(1);
       req1.execute(rnl);
-      const req2 = mockReq(2, { query: 'mutation {}' });
+      const req2 = mockMutationReq(2);
       await req2.execute(rnl);
 
       const batchReqs = fetchMock.calls('/graphql/batch');
@@ -428,9 +433,9 @@ describe('middlewares/batch', () => {
         batchMiddleware({ batchTimeout: 20, allowMutations: true }),
       ]);
 
-      const req1 = mockReq(1, { query: 'mutation {}', files: { file1: 'data' } });
+      const req1 = mockMutationReq(1, { files: { file1: 'data' } });
       req1.execute(rnl);
-      const req2 = mockReq(2, { query: 'mutation {}', files: { file1: 'data' } });
+      const req2 = mockMutationReq(2, { files: { file1: 'data' } });
       await req2.execute(rnl);
 
       const singleReqs = fetchMock.calls('/graphql');

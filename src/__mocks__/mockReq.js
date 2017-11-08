@@ -68,6 +68,20 @@ export function mockReq(reqid?: ReqId | number, data?: ReqData): MockReq {
   return new MockReq(reqid ? reqid.toString() : undefined, data);
 }
 
+export function mockMutationReq(reqid?: ReqId | number, data?: ReqData): MockReq {
+  return new MockReq(reqid ? reqid.toString() : undefined, {
+    query: 'mutation {}',
+    ...data,
+  });
+}
+
+export function mockFormDataReq(reqid?: ReqId | number, data?: ReqData): MockReq {
+  return new MockReq(reqid ? reqid.toString() : undefined, {
+    files: { file1: 'data' },
+    ...data,
+  });
+}
+
 export function mockReqWithSize(reqid: ReqId | number, size: number): MockReq {
   return mockReq(reqid, { query: `{${'x'.repeat(size)}}` });
 }

@@ -1,6 +1,6 @@
 /* @flow */
 
-import type { FetchOpts } from './definition';
+import type { FetchOpts, Variables } from './definition';
 import type RelayRequest from './RelayRequest';
 
 export type Requests = RelayRequest[];
@@ -55,5 +55,9 @@ export default class RelayRequestBatch {
     newRequest.fetchOpts = { ...this.fetchOpts };
     newRequest.fetchOpts.headers = { ...this.fetchOpts.headers };
     return (newRequest: any);
+  }
+
+  getVariables(): Variables {
+    throw new Error('Batch request does not have variables.');
   }
 }
