@@ -27,7 +27,7 @@ export default class RelayRequest {
     this.cacheConfig = cacheConfig;
     this.uploadables = uploadables;
 
-    this.id = this.operation.id || this._generateID();
+    this.id = this.operation.id || this.operation.name || this._generateID();
 
     this.fetchOpts = {
       method: 'POST',
@@ -70,7 +70,7 @@ export default class RelayRequest {
   }
 
   getID(): string {
-    return this.id || this.operation.name;
+    return this.id;
   }
 
   _generateID(): string {
