@@ -8,7 +8,9 @@ ReactRelayNetworkModern (for Relay Modern)
 ![FlowType compatible](https://img.shields.io/badge/flowtype-compatible-brightgreen.svg)
 
 The `ReactRelayNetworkModern` is a [Network Layer for Relay Modern](https://facebook.github.io/relay/docs/network-layer.html)
-with various middlewares which can manipulate requests/responses on the fly (change auth headers, request url or perform some fallback if request fails), batch several relay request by timeout into one http request.
+with various middlewares which can manipulate requests/responses on the fly (change auth headers, request url or perform some fallback if request fails), batch several relay request by timeout into one http request, cache queries.
+
+Network Layer for Relay Classic can be found [here](https://github.com/nodkz/react-relay-network-layer).
 
 `ReactRelayNetworkModern` can be used in browser, react-native or node server for rendering. Under the hood this module uses global `fetch` method. So if your client is too old, please import explicitly proper polyfill to your code (eg. `whatwg-fetch`, `node-fetch` or `fetch-everywhere`).
 
@@ -17,8 +19,6 @@ yarn add react-relay-network-modern
 OR
 npm install react-relay-network-modern --save
 ```
-
-Network Layer for Relay Classic can be found [here](https://github.com/nodkz/react-relay-network-layer).
 
 Middlewares
 ===========
@@ -68,7 +68,7 @@ Middlewares
 
 ### Example of injecting NetworkLayer with middlewares on the **client side**.
 ```js
-import Relay from 'react-relay';
+import { Environment, RecordSource, Store } from 'relay-runtime';
 import {
   RelayNetworkLayer,
   urlMiddleware,
@@ -78,23 +78,24 @@ import {
   perfMiddleware,
   retryMiddleware,
   authMiddleware,
+  cacheMiddleware,
 } from 'react-relay-network-modern';
 
-Relay.injectNetworkLayer(new RelayNetworkLayer([
+const network = new RelayNetworkLayer([
   cacheMiddleware({
     size: 100, // max 100 requests
     ttl: 900000, // 15 minutes
   }),
   urlMiddleware({
-    url: (req) => '/graphql',
+    url: (req) => Promise.resolve('/graphql'),
   }),
   batchMiddleware({
-    batchUrl: (reqestMap) => '/graphql/batch',
+    batchUrl: (requestMap) => Promise.resolve('/graphql/batch'),
     batchTimeout: 10,
   }),
-  loggerMiddleware(),
-  gqlErrorsMiddleware(),
-  perfMiddleware(),
+  __DEV__ ? loggerMiddleware() : null,
+  __DEV__ ? gqlErrorsMiddleware() : null,
+  __DEV__ ? perfMiddleware() : null,
   retryMiddleware({
     fetchTimeout: 15000,
     retryDelays: (attempt) => Math.pow(2, attempt + 4) * 100, // or simple array [3200, 6400, 12800, 25600, 51200, 102400, 204800, 409600],
@@ -128,7 +129,11 @@ Relay.injectNetworkLayer(new RelayNetworkLayer([
 
     return res;
   }
-]));
+]); // as second arg you may pass SubscribeFunction
+
+const source = new RecordSource();
+const store = new Store(source);
+const environment = new Environment({ network, store });
 ```
 
 ### How middlewares work internally
