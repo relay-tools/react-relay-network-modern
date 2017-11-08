@@ -27,9 +27,19 @@ Middlewares
 - **your custom inline middleware** - [see example](https://github.com/nodkz/react-relay-network-modern#example-of-injecting-networklayer-with-middlewares-on-the-client-side) below where added `credentials` and `headers` to the `fetch` method.
   - `next => req => { /* your modification of 'req' object */ return next(req); }`
 - **urlMiddleware** - for manipulating fetch `url` on fly via thunk.
-  - `url` - string or function(req) for single request (default: `/graphql`)  
+  - `url` - string for single request. Can be Promise or function(req). (default: `/graphql`)  
+  - `method` - string, for request method type (default: `POST`)
+  - headers - Object with headers for fetch. Can be Promise or function(req).
+  - credentials - string, setting for fetch method, eg. 'same-origin' (default: empty)
+- **authMiddleware** - for adding auth token, and refreshing it if gets 401 response from server.
+  - `token` - string which returns token. Can be function(req) or Promise. If function is provided, then it will be called for every request (so you may change tokens on fly).
+  - `tokenRefreshPromise`: - function(req, res) which must return promise or regular value with a new token. This function is called when server returns 401 status code. After receiving a new token, middleware re-run query to the server seamlessly for Relay.
+  - `allowEmptyToken` - allow made a request without Authorization header if token is empty (default: `false`).
+  - `prefix` - prefix before token (default: `'Bearer '`).
+  - `header` - name of the HTTP header to pass the token in (default: `'Authorization'`).
+  - If you use `auth` middleware with `retry`, `retry` must be used before `auth`. Eg. if token expired when retries apply, then `retry` can call `auth` middleware again.
 - **batchMiddleware** - gather some period of time relay-requests and sends it as one http-request. You server must support batch request, [how to setup your server](https://github.com/nodkz/react-relay-network-modern#example-how-to-enable-batching)
-  - `batchUrl` - string or function(requestMap). Url of the server endpoint for batch request execution (default: `/graphql/batch`)
+  - `batchUrl` - string. Url of the server endpoint for batch request execution. Can be function(requestMap) or Promise. (default: `/graphql/batch`)
   - `batchTimeout` - integer in milliseconds, period of time for gathering multiple requests before sending them to the server. Will delay sending of the requests on specified in this option period of time, so be careful and keep this value small. (default: `0`)
   - `maxBatchSize` - integer representing maximum size of request to be sent in a single batch. Once a request hits the provided size in length a new batch request is ran. Actual for hardcoded limit in 100kb per request in [express-graphql](https://github.com/graphql/express-graphql/blob/master/src/parseBody.js#L112) module. (default: `102400` characters, roughly 100kb for 1-byte characters or 200kb for 2-byte characters)
   - `allowMutations` - by default batching disabled for mutations, you may enable it passing `true` (default: `false`)
@@ -39,13 +49,6 @@ Middlewares
   - `statusCodes` - array of response status codes which will fire up retryMiddleware (default: `status < 200 or status > 300`).
   - `allowMutations` - by default retries disabled for mutations, you may allow process retries for them passing `true` (default: `false`)
   - `forceRetry` - function(cb, delay), when request is delayed for next retry, middleware will call this function and pass to it a callback and delay time. When you call this callback, middleware will proceed request immediately (default: `false`).
-- **authMiddleware** - for adding auth token, and refreshing it if gets 401 response from server.
-  - `token` - string or function(req) which returns token. If function is provided, then it will be called for every request (so you may change tokens on fly).
-  - `tokenRefreshPromise`: - function(req, err) which must return promise or regular value with a new token. This function is called when server returns 401 status code. After receiving a new token, middleware re-run query to the server with it seamlessly for Relay.
-  - `allowEmptyToken` - allow made a request without Authorization header if token is empty (default: `false`).
-  - `prefix` - prefix before token (default: `'Bearer '`).
-  - `header` - name of the HTTP header to pass the token in (default: `'Authorization'`).
-  - If you use `auth` middleware with `retry`, `retry` must be used before `auth`. Eg. if token expired when retries apply, then `retry` can call `auth` middleware again.
 - **loggerMiddleware** - for logging requests and responses.
   - `logger` - log function (default: `console.log.bind(console, '[RELAY-NETWORK]')`)
   - If you use `Relay@^0.9.0` you may turn on relay's internal [extended mutation debugger](https://twitter.com/steveluscher/status/738101549591732225). For this you should open browser console and type `__DEV__=true`. With webpack you may use `webpack.BannerPlugin('__DEV__=true;', {raw: true})` or `webpack.DefinePlugin({__DEV__: true})`.

@@ -11,10 +11,10 @@ import type { Middleware } from '../definition';
 const DEFAULT_BATCH_SIZE = 102400;
 
 export type BatchMiddlewareOpts = {|
+  batchUrl?: string | Promise<string> | ((requestMap: BatchRequestMap) => string | Promise<string>),
   batchTimeout?: number,
-  allowMutations?: boolean,
-  batchUrl?: string | Promise<string> | (() => string | Promise<string>),
   maxBatchSize?: number,
+  allowMutations?: boolean,
 |};
 
 export type BatchRequestMap = {
