@@ -25,6 +25,7 @@ export default class RelayNetworkLayer {
       return fetchWithMiddleware(req, this._middlewares.filter(o => !!o));
     };
 
-    this.execute = Network.create(this.fetchFn, this.subscribeFn);
+    const network = Network.create(this.fetchFn, this.subscribeFn);
+    this.execute = network.execute;
   }
 }
