@@ -5,11 +5,11 @@ import RelayNetworkLayer from '../../RelayNetworkLayer';
 import { mockReq } from '../../__mocks__/mockReq';
 import retryMiddleware, { delayExecution, promiseWithTimeout } from '../retry';
 
-const sleep = (timeout: number): Promise<void> => {
+async function sleep(timeout: number): Promise<void> {
   return new Promise(resolve => {
     setTimeout(resolve, timeout);
   });
-};
+}
 
 describe('middlewares/retry', () => {
   describe('promiseWithTimeout()', () => {

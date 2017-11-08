@@ -4,7 +4,9 @@ exports[`middlewares/auth \`token\` option as string (with default \`prefix\` an
 Object {
   "body": "{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}}",
   "headers": Object {
+    "Accept": "*/*",
     "Authorization": "Bearer 123",
+    "Content-Type": "application/json",
   },
   "method": "POST",
 }
@@ -14,6 +16,8 @@ exports[`middlewares/auth \`token\` option as thunk (with custom \`prefix\` and 
 Object {
   "body": "{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}}",
   "headers": Object {
+    "Accept": "*/*",
+    "Content-Type": "application/json",
     "MyAuthorization": "MyBearer 333",
   },
   "method": "POST",
@@ -27,7 +31,9 @@ Array [
     Object {
       "body": "{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}}",
       "headers": Object {
+        "Accept": "*/*",
         "Authorization": "Bearer 123",
+        "Content-Type": "application/json",
       },
       "method": "POST",
     },
@@ -37,7 +43,9 @@ Array [
     Object {
       "body": "{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}}",
       "headers": Object {
+        "Accept": "*/*",
         "Authorization": "Bearer ValidToken",
+        "Content-Type": "application/json",
       },
       "method": "POST",
     },

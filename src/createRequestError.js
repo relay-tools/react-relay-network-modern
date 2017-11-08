@@ -1,11 +1,11 @@
 /* @flow */
 
-import type { GraphQLResponseErrors } from './definition';
-import type RelayRequest from './RelayRequest';
+import RelayRequest from './RelayRequest';
+import type { GraphQLResponseErrors, RelayRequestAny } from './definition';
 import type RelayResponse from './RelayResponse';
 
 class RRNLRequestError extends Error {
-  req: RelayRequest;
+  req: RelayRequestAny;
   res: ?RelayResponse;
 
   constructor(msg: string) {
@@ -52,7 +52,7 @@ export function formatRequestErrors(request: RelayRequest, errors: GraphQLRespon
     .join('\n');
 }
 
-export function createRequestError(req: RelayRequest, res?: RelayResponse) {
+export function createRequestError(req: RelayRequestAny, res?: RelayResponse) {
   let errorReason = '';
 
   if (!res) {
@@ -62,7 +62,7 @@ export function createRequestError(req: RelayRequest, res?: RelayResponse) {
       (res.text ? res.text : `Server return empty response with Status Code: ${res.status}.`) +
       (res ? `\n\n${res.toString()}` : '');
   } else if (res.errors) {
-    if (req.relayReqObj) {
+    if (req instanceof RelayRequest) {
       errorReason = formatRequestErrors(req, res.errors);
     } else {
       errorReason = JSON.stringify(res.errors);

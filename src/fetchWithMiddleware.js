@@ -2,13 +2,17 @@
 /* eslint-disable no-param-reassign, prefer-const */
 
 import { createRequestError } from './createRequestError';
-import type RelayRequest from './RelayRequest';
 import RelayResponse from './RelayResponse';
-import type { Middleware, MiddlewareNextFn } from './definition';
+import type { Middleware, MiddlewareNextFn, RelayRequestAny } from './definition';
 
-async function runFetch(req: RelayRequest): Promise<RelayResponse> {
+async function runFetch(req: RelayRequestAny): Promise<RelayResponse> {
   let { url } = req.fetchOpts;
   if (!url) url = '/graphql';
+
+  if (!req.fetchOpts.headers.Accept) req.fetchOpts.headers.Accept = '*/*';
+  if (!req.fetchOpts.headers['Content-Type'] && !req.isFormData()) {
+    req.fetchOpts.headers['Content-Type'] = 'application/json';
+  }
 
   // $FlowFixMe
   const resFromFetch = await fetch(url, req.fetchOpts);
@@ -20,10 +24,9 @@ async function runFetch(req: RelayRequest): Promise<RelayResponse> {
 }
 
 export default function fetchWithMiddleware(
-  req: RelayRequest,
+  req: RelayRequestAny,
   middlewares: Middleware[]
 ): Promise<RelayResponse> {
-  // $FlowFixMe
   const wrappedFetch: MiddlewareNextFn = compose(...middlewares)(runFetch);
 
   return wrappedFetch(req).then(res => {

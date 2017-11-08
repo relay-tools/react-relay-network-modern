@@ -8,7 +8,10 @@ Array [
       "cacheConfig": Object {},
       "fetchOpts": Object {
         "body": "{\\"id\\":\\"MyRequest\\",\\"query\\":\\"\\",\\"variables\\":{}}",
-        "headers": Object {},
+        "headers": Object {
+          "Accept": "*/*",
+          "Content-Type": "application/json",
+        },
         "method": "POST",
       },
       "id": "MyRequest",
@@ -28,7 +31,10 @@ Array [
         "cacheConfig": Object {},
         "fetchOpts": Object {
           "body": "{\\"id\\":\\"MyRequest\\",\\"query\\":\\"\\",\\"variables\\":{}}",
-          "headers": Object {},
+          "headers": Object {
+            "Accept": "*/*",
+            "Content-Type": "application/json",
+          },
           "method": "POST",
         },
         "id": "MyRequest",

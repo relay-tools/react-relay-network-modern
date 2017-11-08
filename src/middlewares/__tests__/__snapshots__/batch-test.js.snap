@@ -18,7 +18,10 @@ Array [
     "/graphql",
     Object {
       "body": "{\\"id\\":\\"1\\",\\"query\\":\\"mutation {}\\",\\"variables\\":{}}",
-      "headers": Object {},
+      "headers": Object {
+        "Accept": "*/*",
+        "Content-Type": "application/json",
+      },
       "method": "POST",
     },
   ],
@@ -26,7 +29,10 @@ Array [
     "/graphql",
     Object {
       "body": "{\\"id\\":\\"1\\",\\"query\\":\\"mutation {}\\",\\"variables\\":{}}",
-      "headers": Object {},
+      "headers": Object {
+        "Accept": "*/*",
+        "Content-Type": "application/json",
+      },
       "method": "POST",
     },
   ],
@@ -125,7 +131,10 @@ Object {
 exports[`middlewares/batch should make a successfull single request 1`] = `
 Object {
   "body": "{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}}",
-  "headers": Object {},
+  "headers": Object {
+    "Accept": "*/*",
+    "Content-Type": "application/json",
+  },
   "method": "POST",
 }
 `;

@@ -279,10 +279,10 @@ describe('middlewares/batch', () => {
         method: 'POST',
       });
 
-      const rnl = new RelayNetworkLayer([batchMiddleware({ batchTimeout: 50 })]);
+      const rnl = new RelayNetworkLayer([batchMiddleware({ batchTimeout: 100 })]);
       mockReq(1).execute(rnl);
-      setTimeout(() => mockReq(2).execute(rnl), 60);
-      setTimeout(() => mockReq(3).execute(rnl), 70);
+      setTimeout(() => mockReq(2).execute(rnl), 160);
+      setTimeout(() => mockReq(3).execute(rnl), 170);
       mockReq(4).execute(rnl);
 
       await new Promise((resolve, reject) => {
@@ -295,7 +295,7 @@ describe('middlewares/batch', () => {
           } catch (e) {
             reject(e);
           }
-        }, 200);
+        }, 300);
       });
     });
   });
