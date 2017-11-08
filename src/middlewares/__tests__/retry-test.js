@@ -3,7 +3,7 @@
 import fetchMock from 'fetch-mock';
 import RelayNetworkLayer from '../../RelayNetworkLayer';
 import { mockReq } from '../../__mocks__/mockReq';
-import retryMiddleware, { makeRetriableRequest, awaitRetryTimeout } from '../retry';
+import retryMiddleware, { delayExecution, promiseWithTimeout } from '../retry';
 
 const sleep = (timeout: number): Promise<void> => {
   return new Promise(resolve => {
@@ -12,39 +12,81 @@ const sleep = (timeout: number): Promise<void> => {
 };
 
 describe('middlewares/retry', () => {
-  beforeEach(() => {
-    fetchMock.restore();
-  });
-
   describe('promiseWithTimeout()', () => {
-    it('should', () => {});
+    it('should return Promise result if not reach timeout ', async () => {
+      const p = Promise.resolve(5);
+      const r = await promiseWithTimeout(p, 1000, () => Promise.resolve(0));
+      expect(r).toBe(5);
+    });
+
+    it('should run `onTimeout` when timout is reached', async () => {
+      const p = new Promise(resolve => {
+        setTimeout(() => {
+          resolve(333);
+        }, 20);
+      });
+      const onTimeout = jest.fn(() => {
+        return Promise.resolve(555);
+      });
+      const r = await promiseWithTimeout(p, 10, onTimeout);
+      expect(onTimeout).toHaveBeenCalledTimes(1);
+      expect(r).toBe(555);
+    });
   });
 
   describe('delayExecution()', () => {
-    it('should', () => {});
-  });
+    it('should run function after delay', async () => {
+      const execFn = jest.fn(() => Promise.resolve(777));
+      const forceRetryWhenDelay = jest.fn();
 
-  describe('makeRetriableRequest()', () => {
-    it('should', () => {});
+      const promise = delayExecution(execFn, 10, forceRetryWhenDelay);
+      await sleep(5);
+      expect(execFn).toHaveBeenCalledTimes(0);
+      await sleep(10);
+      expect(execFn).toHaveBeenCalledTimes(1);
+
+      const r = await promise;
+      expect(r).toBe(777);
+    });
+
+    it('should run function after call `runNow`', async () => {
+      const execFn = jest.fn(() => Promise.resolve(888));
+      const forceRetryWhenDelay = jest.fn(cb => {
+        setTimeout(() => cb(), 10);
+      });
+
+      const promise = delayExecution(execFn, 1000, forceRetryWhenDelay);
+      await sleep(5);
+      expect(forceRetryWhenDelay).toHaveBeenCalledTimes(1);
+      expect(execFn).toHaveBeenCalledTimes(0);
+      await sleep(10);
+      expect(execFn).toHaveBeenCalledTimes(1);
+
+      const r = await promise;
+      expect(r).toBe(888);
+    });
   });
 
   describe('middleware', () => {
-    it('should make retries', async () => {
-      let attempt = 0;
+    beforeEach(() => {
+      fetchMock.restore();
+    });
 
+    it('should make retries', async () => {
       // First 2 requests return code 500,
       // 3rd request returns code 200
+      let attempt = 0;
       fetchMock.mock({
         matcher: '/graphql',
         response: () => {
           attempt++;
-          if (attempt > 2) {
-            return {
-              status: 200,
-              body: { data: 'PAYLOAD' },
-            };
+          if (attempt < 3) {
+            return { status: 500 };
           }
-          return { status: 500 };
+          return {
+            status: 200,
+            body: { data: 'PAYLOAD' },
+          };
         },
         method: 'POST',
       });
@@ -134,7 +176,7 @@ describe('middlewares/retry', () => {
       expect(reqs).toHaveLength(2);
     });
 
-    it.only('should work forceRetry callback when request delayed', async () => {
+    it('should work forceRetry callback when request delayed', async () => {
       // First request will be fulfilled after 100ms delay
       // 2nd request and next without delays
       let attempt = 0;

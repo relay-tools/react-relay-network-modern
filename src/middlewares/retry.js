@@ -80,7 +80,7 @@ export default function retryMiddleware(options?: RetryMiddlewareOpts): Middlewa
   };
 }
 
-export async function makeRetriableRequest(
+async function makeRetriableRequest(
   o: {
     req: RelayRequestAny,
     next: MiddlewareNextFn,
@@ -93,10 +93,11 @@ export async function makeRetriableRequest(
   delay: number = 0,
   attempt: number = 0
 ): Promise<RelayResponse> {
-  try {
-    const makeRequest = () => {
+  const makeRequest = async () => {
+    try {
+      let res;
       if (o.timeout) {
-        return promiseWithTimeout(o.next(o.req), o.timeout, async () => {
+        res = await promiseWithTimeout(o.next(o.req), o.timeout, async () => {
           const retryDelayMS = o.retryAfterMs(attempt);
           if (retryDelayMS) {
             o.logger(`response timeout, retrying after ${retryDelayMS} ms`);
@@ -104,21 +105,23 @@ export async function makeRetriableRequest(
           }
           throw new Error(`RelayNetworkLayer: reached request timeout in ${o.timeout} ms`);
         });
+      } else {
+        res = await o.next(o.req);
       }
-      return o.next(o.req);
-    };
-
-    return delayExecution(makeRequest, delay, o.forceRetryFn);
-  } catch (e) {
-    if (e && e.res && o.retryOnStatusCode(e.res.status, o.req, e.res)) {
-      const retryDelayMS = o.retryAfterMs(attempt);
-      if (retryDelayMS) {
-        o.logger(`response status ${e.res.status}, retrying after ${retryDelayMS} ms`);
-        return makeRetriableRequest(o, retryDelayMS, attempt + 1);
+      return res;
+    } catch (e) {
+      if (e && e.res && o.retryOnStatusCode(e.res.status, o.req, e.res)) {
+        const retryDelayMS = o.retryAfterMs(attempt);
+        if (retryDelayMS) {
+          o.logger(`response status ${e.res.status}, retrying after ${retryDelayMS} ms`);
+          return makeRetriableRequest(o, retryDelayMS, attempt + 1);
+        }
       }
+      throw e;
     }
-    throw e;
-  }
+  };
+
+  return delayExecution(makeRequest, delay, o.forceRetryFn);
 }
 
 export function delayExecution<T>(
