@@ -38,17 +38,18 @@ Middlewares
   - `prefix` - prefix before token (default: `'Bearer '`).
   - `header` - name of the HTTP header to pass the token in (default: `'Authorization'`).
   - If you use `auth` middleware with `retry`, `retry` must be used before `auth`. Eg. if token expired when retries apply, then `retry` can call `auth` middleware again.
+- **retryMiddleware** - for request retry if the initial request fails.
+  - `fetchTimeout` - number in milliseconds that defines in how much time will request timeout after it has been sent to the server again (default: `15000`).
+  - `retryDelays` - array of millisecond that defines the values on which retries are based on (default: `[1000, 3000]`). Or it may be a function `(attempt: number) => number | false` which returns a timeout in milliseconds for retry or false for disabling retry.
+  - `statusCodes` - array of response status codes which will fire up retryMiddleware. Or it may be a function `(statusCode: number, req, res) => boolean` which makes retry if returned true. (default: `status < 200 or status > 300`).
+  - `forceRetry` - function(cb, delay), when request is delayed for next retry, middleware will call this function and pass to it a callback and delay time. When you call this callback `cb`, middleware will proceed request immediately (default: `false`).
+  - `allowMutations` - by default retries disabled for mutations, you may allow process retries for them passing `true`. (default: `false`)
+  - `allowFormData` - by default retries disabled for file Uploads, you may enable it passing `true` (default: `false`)
 - **batchMiddleware** - gather some period of time relay-requests and sends it as one http-request. You server must support batch request, [how to setup your server](https://github.com/nodkz/react-relay-network-modern#example-how-to-enable-batching)
   - `batchUrl` - string. Url of the server endpoint for batch request execution. Can be function(requestMap) or Promise. (default: `/graphql/batch`)
   - `batchTimeout` - integer in milliseconds, period of time for gathering multiple requests before sending them to the server. Will delay sending of the requests on specified in this option period of time, so be careful and keep this value small. (default: `0`)
   - `maxBatchSize` - integer representing maximum size of request to be sent in a single batch. Once a request hits the provided size in length a new batch request is ran. Actual for hardcoded limit in 100kb per request in [express-graphql](https://github.com/graphql/express-graphql/blob/master/src/parseBody.js#L112) module. (default: `102400` characters, roughly 100kb for 1-byte characters or 200kb for 2-byte characters)
   - `allowMutations` - by default batching disabled for mutations, you may enable it passing `true` (default: `false`)
-- **retryMiddleware** - for request retry if the initial request fails.
-  - `fetchTimeout` - number in milliseconds that defines in how much time will request timeout after it has been sent to the server (default: `15000`).
-  - `retryDelays` - array of millisecond that defines the values on which retries are based on (default: `[1000, 3000]`).
-  - `statusCodes` - array of response status codes which will fire up retryMiddleware (default: `status < 200 or status > 300`).
-  - `allowMutations` - by default retries disabled for mutations, you may allow process retries for them passing `true` (default: `false`)
-  - `forceRetry` - function(cb, delay), when request is delayed for next retry, middleware will call this function and pass to it a callback and delay time. When you call this callback, middleware will proceed request immediately (default: `false`).
 - **loggerMiddleware** - for logging requests and responses.
   - `logger` - log function (default: `console.log.bind(console, '[RELAY-NETWORK]')`)
   - If you use `Relay@^0.9.0` you may turn on relay's internal [extended mutation debugger](https://twitter.com/steveluscher/status/738101549591732225). For this you should open browser console and type `__DEV__=true`. With webpack you may use `webpack.BannerPlugin('__DEV__=true;', {raw: true})` or `webpack.DefinePlugin({__DEV__: true})`.

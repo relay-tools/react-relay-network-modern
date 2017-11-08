@@ -9,7 +9,7 @@ export default class RelayResponse {
   errors: ?Array<any>;
 
   ok: any;
-  status: ?number;
+  status: number;
   statusText: ?string;
   headers: ?{ [name: string]: string };
   url: ?string;

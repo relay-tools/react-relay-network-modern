@@ -4,13 +4,13 @@ import type RelayRequest from './RelayRequest';
 import type RelayRequestBatch from './RelayRequestBatch';
 import type RelayResponse from './RelayResponse';
 
-export type MiddlewareNextFn = (req: RelayRequest | RelayRequestBatch) => Promise<RelayResponse>;
+export type RelayRequestAny = RelayRequest | RelayRequestBatch;
+export type MiddlewareNextFn = (req: RelayRequestAny) => Promise<RelayResponse>;
 export type Middleware = (next: MiddlewareNextFn) => MiddlewareNextFn;
 // {
 //   supports?: string | string[],
 // };
 
-export type RelayRequestAny = RelayRequest | RelayRequestBatch;
 
 export type FetchOpts = {
   url?: string,
