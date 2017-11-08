@@ -1,0 +1,58 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`middlewares/perf measure request time for batch request 1`] = `
+Object {
+  "requests": Array [
+    RelayRequest {
+      "cacheConfig": Object {},
+      "fetchOpts": Object {
+        "body": "{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}}",
+        "headers": Object {},
+        "method": "POST",
+      },
+      "id": "1",
+      "operation": Object {
+        "id": "1",
+        "text": "",
+      },
+      "uploadables": undefined,
+      "variables": Object {},
+    },
+    RelayRequest {
+      "cacheConfig": Object {},
+      "fetchOpts": Object {
+        "body": "{\\"id\\":\\"2\\",\\"query\\":\\"\\",\\"variables\\":{}}",
+        "headers": Object {},
+        "method": "POST",
+      },
+      "id": "2",
+      "operation": Object {
+        "id": "2",
+        "text": "",
+      },
+      "uploadables": undefined,
+      "variables": Object {},
+    },
+  ],
+  "response": Array [
+    Object {
+      "data": "PAYLOAD",
+      "id": 1,
+    },
+    Object {
+      "data": "PAYLOAD",
+      "id": 2,
+    },
+  ],
+}
+`;
+
+exports[`middlewares/perf measure request time for single request 1`] = `
+Object {
+  "query": "",
+  "response": Object {
+    "data": "PAYLOAD",
+  },
+  "variables": Object {},
+}
+`;
