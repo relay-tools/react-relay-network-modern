@@ -58,8 +58,6 @@ Middlewares
   - `allowMutations` - by default batching disabled for mutations, you may enable it passing `true` (default: `false`)
 - **loggerMiddleware** - for logging requests and responses.
   - `logger` - log function (default: `console.log.bind(console, '[RELAY-NETWORK]')`)
-  - If you use `Relay@^0.9.0` you may turn on relay's internal [extended mutation debugger](https://twitter.com/steveluscher/status/738101549591732225). For this you should open browser console and type `__DEV__=true`. With webpack you may use `webpack.BannerPlugin('__DEV__=true;', {raw: true})` or `webpack.DefinePlugin({__DEV__: true})`.
-  - If you use `Relay@^0.8.0` you may turn on [internal Relay requests debugger](https://cloud.githubusercontent.com/assets/1946920/15735688/688ccabe-28bc-11e6-82e2-db644eb698b0.png): `import RelayNetworkDebug from 'react-relay/lib/RelayNetworkDebug';  RelayNetworkDebug.init();`
 - **perfMiddleware** - simple time measure for network request.
   - `logger` - log function (default: `console.log.bind(console, '[RELAY-NETWORK]')`)
 - **gqlErrorsMiddleware** - display `errors` data to console from graphql response. If you want see stackTrace for errors, you should provide `formatError` to `express-graphql` (see example below where `graphqlServer` accept `formatError` function).
@@ -231,11 +229,11 @@ If you are on Koa@2, [koa-graphql-batch](https://github.com/mattecapu/koa-graphq
 And right after server side ready to accept batch queries, you may enable batching on the **client**:
 
 ```js
-Relay.injectNetworkLayer(new RelayNetworkLayer([
+const network = new RelayNetworkLayer([
   batchMiddleware({
     batchUrl: '/graphql/batch', // <--- route for batch queries
   }),
-]));
+]);
 ```
 
 ### How batching works internally
