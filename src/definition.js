@@ -53,7 +53,7 @@ export type RNLExecuteFunction = (
 // Relay Modern re-exports
 // ///////////////////////////
 
-export type Variables = { [name: string]: $FlowFixMe };
+export type Variables = { [name: string]: any };
 export type ConcreteBatch = {
   kind: 'Batch',
   fragment: any,
