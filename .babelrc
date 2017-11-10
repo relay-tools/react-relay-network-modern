@@ -17,15 +17,21 @@
               "defaults"
             ]
           },
-          "include": ["transform-es2015-classes"]
+          "include": ["transform-es2015-classes"],
+          "useBuiltIns": true
         }]
       ]
     },
     "es": {
+      "plugins": [
+        "babel-plugin-transform-class-properties",
+      ]
+    },
+    "node8": {
       "presets": [
         ["env", {
           "targets": {
-            "chrome": 52
+            "node": "8.0.0"
           },
           "loose": true,
           "modules": false

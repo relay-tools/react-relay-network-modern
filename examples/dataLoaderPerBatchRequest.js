@@ -1,3 +1,4 @@
+/* eslint-disable */
 /*
 Example of how you can use a single DataLoader for all (batched) queries
 within a single HTTP-request.

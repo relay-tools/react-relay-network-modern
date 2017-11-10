@@ -14,11 +14,39 @@ Network Layer for Relay Classic can be found [here](https://github.com/nodkz/rea
 
 `ReactRelayNetworkModern` can be used in browser, react-native or node server for rendering. Under the hood this module uses global `fetch` method. So if your client is too old, please import explicitly proper polyfill to your code (eg. `whatwg-fetch`, `node-fetch` or `fetch-everywhere`).
 
+Install
+=======
+
 ```
 yarn add react-relay-network-modern
 OR
 npm install react-relay-network-modern --save
 ```
+
+#### What if `regeneratorRuntime is not defined`?
+
+I don't want to bundle regenerator-runtime with the library - it's a largish dependency and there's a good chance that the user is already including code which depends on it (eg. via `babel-polyfill`). If we bundle it they'll get a duplicate copy and that's bad.
+
+So if you got `regeneratorRuntime is not defined` you should do the following:
+```js
+import 'regenerator-runtime/runtime';
+import { RelayNetworkLayer } from 'react-relay-network-modern';
+```
+
+#### Different builds
+This library contains different builds for any purposes:
+```js
+// Default import for using in any browser
+// last 5 versions, ie 9, defaults
+import { RelayNetworkLayer } from 'react-relay-network-modern';
+
+// For SSR on node 8 and above (native async/await)
+import { RelayNetworkLayer } from 'react-relay-network-modern/node8';
+
+// Source code without Flowtype declarations
+import { RelayNetworkLayer } from 'react-relay-network-modern/es';
+```
+
 
 Middlewares
 ===========
