@@ -85,7 +85,8 @@ Middlewares
   - `maxBatchSize` - integer representing maximum size of request to be sent in a single batch. Once a request hits the provided size in length a new batch request is ran. Actual for hardcoded limit in 100kb per request in [express-graphql](https://github.com/graphql/express-graphql/blob/master/src/parseBody.js#L112) module. (default: `102400` characters, roughly 100kb for 1-byte characters or 200kb for 2-byte characters)
   - `allowMutations` - by default batching disabled for mutations, you may enable it passing `true` (default: `false`)
 - **loggerMiddleware** - for logging requests and responses.
-  - `logger` - log function (default: `console.log.bind(console, '[RELAY-NETWORK]')`)
+  - `logger` - log function (default: `console.log.bind(console, '[RELAY-NETWORK]')`) 
+  - An example of req/res output in console: <img width="968" alt="screen shot 2017-11-19 at 23 05 19" src="https://user-images.githubusercontent.com/1946920/33159466-557517e0-d03d-11e7-9711-ebdfe6e789c8.png">
 - **perfMiddleware** - simple time measure for network request.
   - `logger` - log function (default: `console.log.bind(console, '[RELAY-NETWORK]')`)
 - **gqlErrorsMiddleware** - display `errors` data to console from graphql response. If you want see stackTrace for errors, you should provide `formatError` to `express-graphql` (see example below where `graphqlServer` accept `formatError` function).
