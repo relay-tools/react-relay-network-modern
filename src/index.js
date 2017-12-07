@@ -10,9 +10,15 @@ import loggerMiddleware from './middlewares/logger';
 import gqlErrorsMiddleware from './middlewares/gqlErrors';
 import cacheMiddleware from './middlewares/cache';
 import graphqlBatchHTTPWrapper from './express-middleware/graphqlBatchHTTPWrapper';
+import RelayNetworkLayerRequest from './RelayRequest';
+import RelayNetworkLayerRequestBatch from './RelayRequestBatch';
+import RelayNetworkLayerResponse from './RelayResponse';
 
 export {
   RelayNetworkLayer,
+  RelayNetworkLayerRequest,
+  RelayNetworkLayerRequestBatch,
+  RelayNetworkLayerResponse,
   batchMiddleware,
   retryMiddleware,
   urlMiddleware,

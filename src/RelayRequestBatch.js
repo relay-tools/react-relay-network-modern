@@ -56,4 +56,8 @@ export default class RelayRequestBatch {
   getVariables(): Variables {
     throw new Error('Batch request does not have variables.');
   }
+
+  getQueryString(): string {
+    return this.prepareBody();
+  }
 }

@@ -33,6 +33,17 @@ export default class RelayResponse {
     return r;
   }
 
+  static async createFromGraphQL(res: { errors?: any, data?: any }) {
+    const r = new RelayResponse();
+    r._res = res;
+    r.ok = true;
+    r.status = 200;
+    r.data = res.data;
+    r.errors = res.errors;
+
+    return r;
+  }
+
   processJsonData(json: mixed) {
     this.json = json;
     if (json) {
