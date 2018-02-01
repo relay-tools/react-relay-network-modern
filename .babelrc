@@ -34,7 +34,7 @@
             "node": "8.0.0"
           },
           "loose": true,
-          "modules": false
+          "modules": "commonjs"
         }]
       ]
     },
