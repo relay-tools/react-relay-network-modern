@@ -3,7 +3,7 @@
 import type { ConcreteBatch, Variables, CacheConfig, UploadableMap, FetchOpts } from './definition';
 
 function getFormDataInterface(): ?Class<FormData> {
-  return (window && window.FormData) || (global && global.FormData);
+  return (typeof window !== 'undefined' && window.FormData) || (global && global.FormData);
 }
 
 export default class RelayRequest {
