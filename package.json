@@ -33,8 +33,8 @@
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
-    "babel-eslint": "^8.0.2",
-    "babel-jest": "^21.2.0",
+    "babel-eslint": "^8.2.1",
+    "babel-jest": "^22.1.0",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-transform-flow-strip-types": "^6.22.0",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
@@ -42,20 +42,20 @@
     "babel-preset-env": "^1.6.1",
     "babel-register": "^6.26.0",
     "cz-conventional-changelog": "^2.1.0",
-    "eslint": "^4.10.0",
+    "eslint": "^4.16.0",
     "eslint-config-airbnb-base": "^12.1.0",
-    "eslint-config-prettier": "^2.7.0",
+    "eslint-config-prettier": "^2.9.0",
     "eslint-module-utils": "^2.1.1",
     "eslint-plugin-import": "^2.8.0",
-    "eslint-plugin-prettier": "^2.3.1",
+    "eslint-plugin-prettier": "^2.5.0",
     "fetch-mock": "^5.13.1",
-    "flow-bin": "^0.58.0",
+    "flow-bin": "^0.64.0",
     "form-data": "^2.3.1",
-    "jest": "^21.2.1",
-    "prettier": "^1.8.1",
+    "jest": "^22.1.4",
+    "prettier": "^1.10.2",
     "relay-runtime": "^1.4.1",
     "rimraf": "^2.6.2",
-    "semantic-release": "^8.2.0"
+    "semantic-release": "^12.4.1"
   },
   "config": {
     "commitizen": {
@@ -77,6 +77,6 @@
     "coverage": "jest --coverage --maxWorkers 2",
     "watch": "jest --watch",
     "test": "npm run coverage && npm run lint",
-    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
+    "semantic-release": "semantic-release"
   }
 }
