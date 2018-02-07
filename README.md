@@ -148,7 +148,9 @@ const network = new RelayNetworkLayer([
   next => async req => {
     req.fetchOpts.method = 'GET'; // change default POST request method to GET
     req.fetchOpts.headers['X-Request-ID'] = uuid.v4(); // add `X-Request-ID` to request headers
-    req.fetchOpts.credentials = 'same-origin'; // provide CORS policy to XHR request in fetch method
+    req.fetchOpts.credentials = 'same-origin'; // allow to send cookies (sending credentials to same domains)
+    // req.fetchOpts.credentials = 'include'; // allow to send cookies for CORS (sending credentials to other domains)
+        
     console.log('RelayRequest', req);
 
     const res = await next(req);
