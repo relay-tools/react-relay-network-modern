@@ -25,6 +25,9 @@ npm install react-relay-network-modern --save
 
 #### What if `regeneratorRuntime is not defined`?
 
+<img width="493" alt="screen shot 2018-02-20 at 20 07 45" src="https://user-images.githubusercontent.com/1946920/36428334-da402a6e-1679-11e8-9897-7e730ab3123e.png">
+
+
 I don't want to bundle regenerator-runtime with the library - it's a largish dependency and there's a good chance that the user is already including code which depends on it (eg. via `babel-polyfill`). If we bundle it they'll get a duplicate copy and that's bad.
 
 So if you got `regeneratorRuntime is not defined` you should do the following:
