@@ -11,10 +11,12 @@ export default class RelayRequestBatch {
 
   constructor(requests: Requests) {
     this.requests = requests;
+    const reqWithCredentials = requests.find(r => r.fetchOpts.credentials != null)
     this.fetchOpts = {
       method: 'POST',
       headers: {},
       body: this.prepareBody(),
+      credentials: reqWithCredentials != null ? reqWithCredentials.fetchOpts.credentials : null,
     };
   }
 
