@@ -442,4 +442,121 @@ describe('middlewares/batch', () => {
       expect(singleReqs).toHaveLength(2);
     });
   });
+
+  it('should pass fetch options', async () => {
+    fetchMock.mock({
+      matcher: '/graphql/batch',
+      response: {
+        status: 200,
+        body: [{ id: 1, data: {} }, { id: 2, data: {} }],
+      },
+      method: 'POST',
+    });
+
+    const rnl = new RelayNetworkLayer([
+      batchMiddleware({
+        batchTimeout: 20,
+        credentials: 'include',
+        mode: 'cors',
+        cache: 'no-store',
+        redirect: 'follow',
+      }),
+    ]);
+    const req1 = mockReq(1);
+    req1.execute(rnl);
+    const req2 = mockReq(2);
+    await req2.execute(rnl);
+
+    const batchReqs = fetchMock.calls('/graphql/batch');
+    expect(batchReqs).toHaveLength(1);
+    expect(fetchMock.lastOptions()).toEqual(
+      expect.objectContaining({
+        credentials: 'include',
+        mode: 'cors',
+        cache: 'no-store',
+        redirect: 'follow',
+      })
+    );
+  });
+
+  describe('headers option', () => {
+    it('`headers` option as Object', async () => {
+      fetchMock.mock({
+        matcher: '/graphql/batch',
+        response: {
+          status: 200,
+          body: [{ id: 1, data: {} }, { id: 2, data: {} }],
+        },
+        method: 'POST',
+      });
+      const rnl = new RelayNetworkLayer([
+        batchMiddleware({
+          headers: {
+            'custom-header': '123',
+          },
+        }),
+      ]);
+      const req1 = mockReq(1);
+      const req2 = mockReq(2);
+      await Promise.all([req1.execute(rnl), req2.execute(rnl)]);
+      expect(fetchMock.lastOptions().headers).toEqual(
+        expect.objectContaining({
+          'custom-header': '123',
+        })
+      );
+    });
+
+    it('`headers` option as thunk', async () => {
+      fetchMock.mock({
+        matcher: '/graphql/batch',
+        response: {
+          status: 200,
+          body: [{ id: 1, data: {} }, { id: 2, data: {} }],
+        },
+        method: 'POST',
+      });
+      const rnl = new RelayNetworkLayer([
+        batchMiddleware({
+          headers: () => ({
+            'thunk-header': '333',
+          }),
+        }),
+      ]);
+      const req1 = mockReq(1);
+      const req2 = mockReq(2);
+      await Promise.all([req1.execute(rnl), req2.execute(rnl)]);
+      expect(fetchMock.lastOptions().headers).toEqual(
+        expect.objectContaining({
+          'thunk-header': '333',
+        })
+      );
+    });
+
+    it('`headers` option as thunk with Promise', async () => {
+      fetchMock.mock({
+        matcher: '/graphql/batch',
+        response: {
+          status: 200,
+          body: [{ id: 1, data: {} }, { id: 2, data: {} }],
+        },
+        method: 'POST',
+      });
+      const rnl = new RelayNetworkLayer([
+        batchMiddleware({
+          headers: () =>
+            Promise.resolve({
+              'thunk-header': 'as promise',
+            }),
+        }),
+      ]);
+      const req1 = mockReq(1);
+      const req2 = mockReq(2);
+      await Promise.all([req1.execute(rnl), req2.execute(rnl)]);
+      expect(fetchMock.lastOptions().headers).toEqual(
+        expect.objectContaining({
+          'thunk-header': 'as promise',
+        })
+      );
+    });
+  });
 });
