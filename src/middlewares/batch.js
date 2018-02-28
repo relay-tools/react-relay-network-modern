@@ -5,17 +5,25 @@ import { isFunction } from '../utils';
 import RelayRequestBatch from '../RelayRequestBatch';
 import RelayRequest from '../RelayRequest';
 import type RelayResponse from '../RelayResponse';
-import type { Middleware } from '../definition';
+import type { Middleware, FetchOpts } from '../definition';
 
 // Max out at roughly 100kb (express-graphql imposed max)
 const DEFAULT_BATCH_SIZE = 102400;
+
+type Headers = { [name: string]: string };
 
 export type BatchMiddlewareOpts = {|
   batchUrl?: string | Promise<string> | ((requestMap: BatchRequestMap) => string | Promise<string>),
   batchTimeout?: number,
   maxBatchSize?: number,
   allowMutations?: boolean,
-  credentials?: string,
+  method?: 'POST' | 'GET',
+  headers?: Headers | Promise<Headers> | ((req: RelayRequestBatch) => Headers | Promise<Headers>),
+  // Avaliable request modes in fetch options. For details see https://fetch.spec.whatwg.org/#requests
+  credentials?: $PropertyType<FetchOpts, 'credentials'>,
+  mode?: $PropertyType<FetchOpts, 'mode'>,
+  cache?: $PropertyType<FetchOpts, 'cache'>,
+  redirect?: $PropertyType<FetchOpts, 'redirect'>,
 |};
 
 export type BatchRequestMap = {
@@ -42,8 +50,15 @@ export default function batchMiddleware(options?: BatchMiddlewareOpts): Middlewa
   const allowMutations = opts.allowMutations || false;
   const batchUrl = opts.batchUrl || '/graphql/batch';
   const maxBatchSize = opts.maxBatchSize || DEFAULT_BATCH_SIZE;
-  const credentials = opts.credentials;
   const singleton = {};
+
+  const fetchOpts = {};
+  if (opts.method) fetchOpts.method = opts.method;
+  if (opts.credentials) fetchOpts.credentials = opts.credentials;
+  if (opts.mode) fetchOpts.mode = opts.mode;
+  if (opts.cache) fetchOpts.cache = opts.cache;
+  if (opts.redirect) fetchOpts.redirect = opts.redirect;
+  if (opts.headers) fetchOpts.headersOrThunk = opts.headers;
 
   return next => req => {
     // do not batch mutations unless allowMutations = true
@@ -67,7 +82,7 @@ export default function batchMiddleware(options?: BatchMiddlewareOpts): Middlewa
       batchUrl,
       singleton,
       maxBatchSize,
-      credentials,
+      fetchOpts,
     });
   };
 }
@@ -159,14 +174,20 @@ async function sendRequests(requestMap: BatchRequestMap, next, opts) {
   } else if (ids.length > 1) {
     // SEND AS BATCHED QUERY
 
-    const batchFetchOpts = {
-      credentials: opts.credentials,
-    }
-
-    const batchRequest = new RelayRequestBatch(ids.map(id => requestMap[id].req), batchFetchOpts);
+    const batchRequest = new RelayRequestBatch(ids.map(id => requestMap[id].req));
     // $FlowFixMe
     const url = await (isFunction(opts.batchUrl) ? opts.batchUrl(requestMap) : opts.batchUrl);
-    batchRequest.fetchOpts.url = url;
+    batchRequest.setFetchOption('url', url);
+
+    const { headersOrThunk, ...fetchOpts } = opts.fetchOpts;
+    batchRequest.setFetchOptions(fetchOpts);
+
+    if (headersOrThunk) {
+      const headers = await (isFunction(headersOrThunk)
+        ? headersOrThunk(batchRequest)
+        : headersOrThunk);
+      batchRequest.setFetchOption('headers', headers);
+    }
 
     try {
       const batchResponse = await next(batchRequest);

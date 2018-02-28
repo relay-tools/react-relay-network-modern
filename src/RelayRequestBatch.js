@@ -3,24 +3,29 @@
 import type { FetchOpts, Variables } from './definition';
 import type RelayRequest from './RelayRequest';
 
-type BatchFetchOpts = {
-  credentials?: string,
-  [name: string]: mixed,
-}
-
 export type Requests = RelayRequest[];
 
 export default class RelayRequestBatch {
   fetchOpts: $Shape<FetchOpts>;
   requests: Requests;
 
-  constructor(requests: Requests, options: BatchFetchOpts) {
+  constructor(requests: Requests) {
     this.requests = requests;
     this.fetchOpts = {
       method: 'POST',
       headers: {},
       body: this.prepareBody(),
-      ...options
+    };
+  }
+
+  setFetchOption(name, value: mixed) {
+    this.fetchOpts[name] = value;
+  }
+
+  setFetchOptions(opts: Object) {
+    this.fetchOpts = {
+      ...this.fetchOpts,
+      ...opts,
     };
   }
 
