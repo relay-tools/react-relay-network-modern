@@ -1,57 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`middlewares/url \`credentials\` option 1`] = `
-Object {
-  "body": "{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}}",
-  "credentials": "same-origin",
-  "headers": Object {
-    "Accept": "*/*",
-    "Content-Type": "application/json",
-  },
-  "method": "POST",
-  "url": "/credentials_url",
-}
-`;
-
-exports[`middlewares/url \`headers\` option as Object 1`] = `
-Object {
-  "body": "{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}}",
-  "headers": Object {
-    "Accept": "*/*",
-    "Content-Type": "application/json",
-    "custom-header": "123",
-  },
-  "method": "POST",
-  "url": "/headers_url",
-}
-`;
-
-exports[`middlewares/url \`headers\` option as thunk 1`] = `
-Object {
-  "body": "{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}}",
-  "headers": Object {
-    "Accept": "*/*",
-    "Content-Type": "application/json",
-    "thunk-header": "333",
-  },
-  "method": "POST",
-  "url": "/headers_thunk",
-}
-`;
-
-exports[`middlewares/url \`headers\` option as thunk with Promise 1`] = `
-Object {
-  "body": "{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}}",
-  "headers": Object {
-    "Accept": "*/*",
-    "Content-Type": "application/json",
-    "thunk-header": "as promise",
-  },
-  "method": "POST",
-  "url": "/headers_thunk_promise",
-}
-`;
-
 exports[`middlewares/url \`method\` option 1`] = `
 Object {
   "body": "{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}}",

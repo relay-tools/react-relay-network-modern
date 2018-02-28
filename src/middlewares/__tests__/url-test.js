@@ -116,7 +116,11 @@ describe('middlewares/url', () => {
     const req = mockReq(1);
     const res = await req.execute(rnl);
     expect(res.data).toBe('PAYLOAD4');
-    expect(fetchMock.lastOptions()).toMatchSnapshot();
+    expect(fetchMock.lastOptions().headers).toEqual(
+      expect.objectContaining({
+        'custom-header': '123',
+      })
+    );
   });
 
   it('`headers` option as thunk', async () => {
@@ -140,7 +144,11 @@ describe('middlewares/url', () => {
     const req = mockReq(1);
     const res = await req.execute(rnl);
     expect(res.data).toBe('PAYLOAD5');
-    expect(fetchMock.lastOptions()).toMatchSnapshot();
+    expect(fetchMock.lastOptions().headers).toEqual(
+      expect.objectContaining({
+        'thunk-header': '333',
+      })
+    );
   });
 
   it('`headers` option as thunk with Promise', async () => {
@@ -165,7 +173,11 @@ describe('middlewares/url', () => {
     const req = mockReq(1);
     const res = await req.execute(rnl);
     expect(res.data).toBe('PAYLOAD5');
-    expect(fetchMock.lastOptions()).toMatchSnapshot();
+    expect(fetchMock.lastOptions().headers).toEqual(
+      expect.objectContaining({
+        'thunk-header': 'as promise',
+      })
+    );
   });
 
   it('`credentials` option', async () => {
@@ -187,6 +199,42 @@ describe('middlewares/url', () => {
     const req = mockReq(1);
     const res = await req.execute(rnl);
     expect(res.data).toBe('PAYLOAD6');
-    expect(fetchMock.lastOptions()).toMatchSnapshot();
+    expect(fetchMock.lastOptions()).toEqual(
+      expect.objectContaining({
+        credentials: 'same-origin',
+      })
+    );
+  });
+
+  it('other fetch options', async () => {
+    fetchMock.mock({
+      matcher: '/fetch',
+      response: {
+        status: 200,
+        body: { data: 'PAYLOAD7' },
+      },
+      method: 'POST',
+    });
+
+    const rnl = new RelayNetworkLayer([
+      urlMiddleware({
+        url: '/fetch',
+        credentials: 'include',
+        mode: 'cors',
+        cache: 'no-store',
+        redirect: 'follow',
+      }),
+    ]);
+    const req = mockReq(1);
+    const res = await req.execute(rnl);
+    expect(res.data).toBe('PAYLOAD7');
+    expect(fetchMock.lastOptions()).toEqual(
+      expect.objectContaining({
+        credentials: 'include',
+        mode: 'cors',
+        cache: 'no-store',
+        redirect: 'follow',
+      })
+    );
   });
 });
