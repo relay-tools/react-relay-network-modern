@@ -15,6 +15,7 @@ export type BatchMiddlewareOpts = {|
   batchTimeout?: number,
   maxBatchSize?: number,
   allowMutations?: boolean,
+  credentials?: string,
 |};
 
 export type BatchRequestMap = {
@@ -41,6 +42,7 @@ export default function batchMiddleware(options?: BatchMiddlewareOpts): Middlewa
   const allowMutations = opts.allowMutations || false;
   const batchUrl = opts.batchUrl || '/graphql/batch';
   const maxBatchSize = opts.maxBatchSize || DEFAULT_BATCH_SIZE;
+  const credentials = opts.credentials;
   const singleton = {};
 
   return next => req => {
@@ -65,6 +67,7 @@ export default function batchMiddleware(options?: BatchMiddlewareOpts): Middlewa
       batchUrl,
       singleton,
       maxBatchSize,
+      credentials,
     });
   };
 }
@@ -156,7 +159,11 @@ async function sendRequests(requestMap: BatchRequestMap, next, opts) {
   } else if (ids.length > 1) {
     // SEND AS BATCHED QUERY
 
-    const batchRequest = new RelayRequestBatch(ids.map(id => requestMap[id].req));
+    const batchFetchOpts = {
+      credentials: opts.credentials,
+    }
+
+    const batchRequest = new RelayRequestBatch(ids.map(id => requestMap[id].req), batchFetchOpts);
     // $FlowFixMe
     const url = await (isFunction(opts.batchUrl) ? opts.batchUrl(requestMap) : opts.batchUrl);
     batchRequest.fetchOpts.url = url;
