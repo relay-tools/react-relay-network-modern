@@ -31,6 +31,8 @@ describe('middlewares/logger', () => {
     expect(logger).toHaveBeenCalledTimes(2);
     // fix changing text `in 12ms` for snapshot
     logger.mock.calls[1][0] = logger.mock.calls[1][0].replace(/in \d+ms/, 'in XXXms');
+    logger.mock.calls[1][1].req = 'RelayRequest object';
+    logger.mock.calls[1][1].res = 'RelayResponse object';
     expect(logger.mock.calls).toMatchSnapshot();
   });
 });
