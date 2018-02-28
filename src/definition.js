@@ -16,6 +16,11 @@ export type FetchOpts = {
   method: 'POST' | 'GET',
   headers: { [name: string]: string },
   body: string | FormData,
+  // Avaliable request modes in fetch options. For details see https://fetch.spec.whatwg.org/#requests
+  credentials?: 'same-origin' | 'include' | 'omit',
+  mode?: 'cors' | 'websocket' | 'navigate' | 'no-cors' | 'same-origin',
+  cache?: 'default' | 'no-store' | 'reload' | 'no-cache' | 'force-cache' | 'only-if-cached',
+  redirect?: 'follow' | 'error' | 'manual',
   [name: string]: mixed,
 };
 

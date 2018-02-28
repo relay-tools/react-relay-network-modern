@@ -62,6 +62,7 @@ Middlewares
   - `method` - string, for request method type (default: `POST`)
   - headers - Object with headers for fetch. Can be Promise or function(req).
   - credentials - string, setting for fetch method, eg. 'same-origin' (default: empty).
+  - also you may provide `mode`, `cache`, `redirect` options for fetch method, for details see [fetch spec](https://fetch.spec.whatwg.org/#requests).
 - **cacheMiddleware** - for caching same queries you may use this middleware. It will skip (do not cache) mutations and FormData requests.
   - `size` - max number of request in cache, least-recently *updated* entries purged first (default: `100`).
   - `ttl` - number in milliseconds, how long records stay valid in cache (default: `900000`, 15 minutes).
@@ -153,7 +154,7 @@ const network = new RelayNetworkLayer([
     req.fetchOpts.headers['X-Request-ID'] = uuid.v4(); // add `X-Request-ID` to request headers
     req.fetchOpts.credentials = 'same-origin'; // allow to send cookies (sending credentials to same domains)
     // req.fetchOpts.credentials = 'include'; // allow to send cookies for CORS (sending credentials to other domains)
-        
+
     console.log('RelayRequest', req);
 
     const res = await next(req);
