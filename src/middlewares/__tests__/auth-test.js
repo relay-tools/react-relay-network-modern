@@ -76,7 +76,7 @@ describe('middlewares/auth', () => {
             body: { data: 'PAYLOAD' },
           };
         }
-        return { status: 401 };
+        return { status: 401, body: '' };
       },
       method: 'POST',
     });

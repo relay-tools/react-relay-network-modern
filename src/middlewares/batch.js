@@ -184,7 +184,7 @@ async function sendRequests(requestMap: BatchRequestMap, next, opts) {
 
     if (headersOrThunk) {
       const headers = await (isFunction(headersOrThunk)
-        ? headersOrThunk(batchRequest)
+        ? (headersOrThunk: any)(batchRequest)
         : headersOrThunk);
       batchRequest.setFetchOption('headers', headers);
     }

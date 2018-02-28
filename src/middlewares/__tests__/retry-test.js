@@ -81,7 +81,7 @@ describe('middlewares/retry', () => {
         response: () => {
           attempt++;
           if (attempt < 3) {
-            return { status: 500 };
+            return { status: 500, body: '' };
           }
           return {
             status: 200,

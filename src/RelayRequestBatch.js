@@ -18,7 +18,7 @@ export default class RelayRequestBatch {
     };
   }
 
-  setFetchOption(name, value: mixed) {
+  setFetchOption(name: string, value: mixed) {
     this.fetchOpts[name] = value;
   }
 
