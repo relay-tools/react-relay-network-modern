@@ -31,6 +31,10 @@ export default function queryMiddleware(opts?: CacheMiddlewareOpts): Middleware 
     if (req.isFormData() && !allowFormData) {
       return next(req);
     }
+    
+    if (req.cacheConfig && req.cacheConfig.force) {
+      return next(req);
+    }
 
     try {
       const queryId = req.getID();
