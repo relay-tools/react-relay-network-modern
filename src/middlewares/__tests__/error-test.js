@@ -3,9 +3,9 @@
 import fetchMock from 'fetch-mock';
 import RelayNetworkLayer from '../../RelayNetworkLayer';
 import { mockReq } from '../../__mocks__/mockReq';
-import gqlErrorsMiddleware from '../gqlErrors';
+import errorMiddleware from '../error';
 
-describe('middlewares/gqlErrors', () => {
+describe('middlewares/error', () => {
   beforeEach(() => {
     fetchMock.restore();
   });
@@ -43,7 +43,7 @@ describe('middlewares/gqlErrors', () => {
 
     const logger = jest.fn();
     const rnl = new RelayNetworkLayer([
-      gqlErrorsMiddleware({
+      errorMiddleware({
         logger,
       }),
     ]);

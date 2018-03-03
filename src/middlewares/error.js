@@ -12,7 +12,7 @@ export type GqlErrorMiddlewareOpts = {|
   disableServerMiddlewareTip?: boolean,
 |};
 
-export default function gqlErrorsMiddleware(options?: GqlErrorMiddlewareOpts): Middleware {
+export default function errorMiddleware(options?: GqlErrorMiddlewareOpts): Middleware {
   const opts = options || {};
   const logger = opts.logger || console.error.bind(console);
   const prefix = opts.prefix || '[RELAY-NETWORK] GRAPHQL SERVER ERROR:\n\n';

@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`middlewares/gqlErrors should display graphql errors 1`] = `
+exports[`middlewares/error should display graphql errors 1`] = `
 "[RELAY-NETWORK] GRAPHQL SERVER ERROR:
 
 %cError: Wow!
