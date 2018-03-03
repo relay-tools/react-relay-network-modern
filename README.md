@@ -12,6 +12,8 @@ with various middlewares which can manipulate requests/responses on the fly (cha
 
 Network Layer for Relay Classic can be found [here](https://github.com/nodkz/react-relay-network-layer).
 
+Migration guide from v1 to v2 can be found [here](https://github.com/nodkz/react-relay-network-modern/releases/tag/v2.0.0).
+
 `ReactRelayNetworkModern` can be used in browser, react-native or node server for rendering. Under the hood this module uses global `fetch` method. So if your client is too old, please import explicitly proper polyfill to your code (eg. `whatwg-fetch`, `node-fetch` or `fetch-everywhere`).
 
 Install
@@ -166,12 +168,23 @@ const network = new RelayNetworkLayer([
 
     return res;
   }
-]); // as second arg you may pass SubscribeFunction
+], opts); // as second arg you may pass advanced options for RRNL
 
 const source = new RecordSource();
 const store = new Store(source);
 const environment = new Environment({ network, store });
 ```
+
+### Advanced options (2nd argument after middlewares)
+RelayNetworkLayer may accept additional options:
+```js
+const middlewares = []; // array of middlewares
+const options = {}; // optional advanced options
+const network = new RelayNetworkLayer(middlewares, options);
+```
+Available options:
+- **subscribeFn** - if you use subscriptions in your app, you may provide this function which will be passed to [RelayNetwork](https://github.com/facebook/relay/blob/master/packages/relay-runtime/network/RelayNetwork.js).
+- **beforeFetch** - if you need synchronously render app on the client side from already generated payload by server (SSR) this options is for you. Some details can be found [here](https://github.com/facebook/relay/issues/2232).
 
 ### Server-side rendering (SSR)
 For performant server-side rendering with `node 8` and above recommended to use special build of this network layer. Also you may execute `graphql` directly without http-request if you write custom middleware. All this recommendations present in following example:

@@ -95,6 +95,12 @@ export type FetchFunction = (
   cacheConfig: CacheConfig,
   uploadables: ?UploadableMap
 ) => ObservableFromValue<QueryPayload>;
+export type FetchHookFunction = (
+  operation: ConcreteBatch,
+  variables: Variables,
+  cacheConfig: CacheConfig,
+  uploadables: ?UploadableMap
+) => void | ObservableFromValue<QueryPayload>;
 // See SubscribeFunction type declaration in relay-runtime/network/RelayNetworkTypes.js
 export type SubscribeFunction = (
   operation: ConcreteBatch,
