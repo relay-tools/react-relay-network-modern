@@ -71,6 +71,7 @@ Middlewares
   - `onInit` - function(cache) which will be called once when cache is created. As first argument you receive `QueryResponseCache` instance from `relay-runtime`.
   - `allowMutations` - allow to cache Mutation requests (default: `false`)
   - `allowFormData` - allow to cache FormData requests (default: `false`)
+  - `clearOnMutation` - clear the cache on any Mutation (default: `false`)
 - **authMiddleware** - for adding auth token, and refreshing it if gets 401 response from server.
   - `token` - string which returns token. Can be function(req) or Promise. If function is provided, then it will be called for every request (so you may change tokens on fly).
   - `tokenRefreshPromise`: - function(req, res) which must return promise or regular value with a new token. This function is called when server returns 401 status code. After receiving a new token, middleware re-run query to the server seamlessly for Relay.
