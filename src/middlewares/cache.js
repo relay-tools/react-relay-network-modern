@@ -10,10 +10,11 @@ type CacheMiddlewareOpts = {|
   onInit?: (cache: QueryResponseCache) => any,
   allowMutations?: boolean,
   allowFormData?: boolean,
+  clearOnMutation?: boolean,
 |};
 
 export default function queryMiddleware(opts?: CacheMiddlewareOpts): Middleware {
-  const { size, ttl, onInit, allowMutations, allowFormData } = opts || {};
+  const { size, ttl, onInit, allowMutations, allowFormData, clearOnMutation } = opts || {};
   const cache = new QueryResponseCache({
     size: size || 100, // 100 requests
     ttl: ttl || 15 * 60 * 1000, // 15 minutes
@@ -24,8 +25,13 @@ export default function queryMiddleware(opts?: CacheMiddlewareOpts): Middleware 
   }
 
   return next => async req => {
-    if (req.isMutation() && !allowMutations) {
-      return next(req);
+    if (req.isMutation()) {
+      if (clearOnMutation) {
+        cache.clear();
+      }
+      if (!allowMutations) {
+        return next(req);
+      }
     }
 
     if (req.isFormData() && !allowFormData) {
