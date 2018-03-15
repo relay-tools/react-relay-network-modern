@@ -7,9 +7,15 @@ import type RelayResponse from './RelayResponse';
 export type RelayRequestAny = RelayRequest | RelayRequestBatch;
 export type MiddlewareNextFn = (req: RelayRequestAny) => Promise<RelayResponse>;
 export type Middleware = (next: MiddlewareNextFn) => MiddlewareNextFn;
-// {
-//   supports?: string | string[],
-// };
+
+export type MiddlewareSync = {|
+  execute: (
+    operation: ConcreteBatch,
+    variables: Variables,
+    cacheConfig: CacheConfig,
+    uploadables: ?UploadableMap
+  ) => ?ObservableFromValue<QueryPayload>,
+|};
 
 export type FetchOpts = {
   url?: string,
