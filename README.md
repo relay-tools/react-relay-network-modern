@@ -56,7 +56,7 @@ import { RelayNetworkLayer } from 'react-relay-network-modern/es';
 Middlewares
 ===========
 
-### Available middlewares:
+### Build-in middlewares:
 - **your custom inline middleware** - [see example](https://github.com/nodkz/react-relay-network-modern#example-of-injecting-networklayer-with-middlewares-on-the-client-side) below where added `credentials` and `headers` to the `fetch` method.
   - `next => req => { /* your modification of 'req' object */ return next(req); }`
 - **urlMiddleware** - for manipulating fetch `url` on fly via thunk.
@@ -103,6 +103,9 @@ Middlewares
 - **errorMiddleware** - display `errors` data to console from graphql response. If you want see stackTrace for errors, you should provide `formatError` to `express-graphql` (see example below where `graphqlServer` accept `formatError` function).
   - `logger` - log function (default: `console.error.bind(console)`)
   - `prefix` - prefix message (default: `[RELAY-NETWORK] GRAPHQL SERVER ERROR:`)
+
+### Standalone package middlewares:
+- [**react-relay-network-modern-ssr**](https://github.com/nodkz/react-relay-network-modern-ssr) - client/server middleware for server-side rendering (SSR). On server side it makes requests directly via `graphql-js` and your `schema`, cache payloads and serialize them for putting to HTML. On client side it loads provided payloads and renders them in sync mode without visible flashes and loaders.
 
 ### Example of injecting NetworkLayer with middlewares on the **client side**.
 ```js
@@ -185,7 +188,6 @@ const network = new RelayNetworkLayer(middlewares, options);
 ```
 Available options:
 - **subscribeFn** - if you use subscriptions in your app, you may provide this function which will be passed to [RelayNetwork](https://github.com/facebook/relay/blob/master/packages/relay-runtime/network/RelayNetwork.js).
-- **beforeFetch** - if you need synchronously render app on the client side from already generated payload by server (SSR) this options is for you. Some details can be found [here](https://github.com/facebook/relay/issues/2232).
 
 ### Server-side rendering (SSR)
 For performant server-side rendering with `node 8` and above recommended to use special build of this network layer. Also you may execute `graphql` directly without http-request if you write custom middleware. All this recommendations present in following example:
