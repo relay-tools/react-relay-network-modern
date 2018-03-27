@@ -11,10 +11,11 @@ type CacheMiddlewareOpts = {|
   allowMutations?: boolean,
   allowFormData?: boolean,
   clearOnMutation?: boolean,
+  cacheForcedRequests?: boolean,
 |};
 
 export default function queryMiddleware(opts?: CacheMiddlewareOpts): Middleware {
-  const { size, ttl, onInit, allowMutations, allowFormData, clearOnMutation } = opts || {};
+  const { size, ttl, onInit, allowMutations, allowFormData, clearOnMutation, cacheForcedRequests } = opts || {};
   const cache = new QueryResponseCache({
     size: size || 100, // 100 requests
     ttl: ttl || 15 * 60 * 1000, // 15 minutes
@@ -39,7 +40,14 @@ export default function queryMiddleware(opts?: CacheMiddlewareOpts): Middleware 
     }
 
     if (req.cacheConfig && req.cacheConfig.force) {
-      return next(req);
+      if (cacheForcedRequests) {
+        const res = await next(req);
+        cache.set(queryId, variables, res);
+
+        return res;
+      } else {
+        return next(req);
+      }
     }
 
     try {
