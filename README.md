@@ -200,7 +200,7 @@ const network = new RelayNetworkLayer(middlewares, options);
 Available options:
 
 * **subscribeFn** - if you use subscriptions in your app, you may provide this function which will be passed to [RelayNetwork](https://github.com/facebook/relay/blob/master/packages/relay-runtime/network/RelayNetwork.js).
-* **noThrow** - set true to not throw when an error response is given by the server, and to instead handle errors in your app code.
+* **noThrow** - **EXPERIMENTAL (May be deprecated in the future)** set true to not throw when an error response is given by the server, and to instead handle errors in your app code.
 
 ### Server-side rendering (SSR)
 
