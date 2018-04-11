@@ -15,6 +15,7 @@ import type {
 type RelayNetworkLayerOpts = {|
   subscribeFn?: SubscribeFunction,
   beforeFetch?: FetchHookFunction,
+  noThrow?: boolean,
 |};
 
 export default class RelayNetworkLayer {
@@ -23,10 +24,12 @@ export default class RelayNetworkLayer {
   execute: RNLExecuteFunction;
   +fetchFn: FetchFunction;
   +subscribeFn: ?SubscribeFunction;
+  +noThrow: boolean;
 
   constructor(middlewares: Array<?Middleware | MiddlewareSync>, opts?: RelayNetworkLayerOpts) {
     this._middlewares = [];
     this._middlewaresSync = [];
+    this.noThrow = false;
 
     const mws = Array.isArray(middlewares) ? (middlewares: any) : [middlewares];
     mws.forEach(mw => {
@@ -41,6 +44,7 @@ export default class RelayNetworkLayer {
 
     if (opts) {
       this.subscribeFn = opts.subscribeFn;
+      this.noThrow = opts.noThrow === true;
 
       // TODO deprecate
       if (opts.beforeFetch) {
@@ -55,7 +59,7 @@ export default class RelayNetworkLayer {
       }
 
       const req = new RelayRequest(operation, variables, cacheConfig, uploadables);
-      return fetchWithMiddleware(req, this._middlewares);
+      return fetchWithMiddleware(req, this._middlewares, this.noThrow);
     };
 
     const network = Network.create(this.fetchFn, this.subscribeFn);

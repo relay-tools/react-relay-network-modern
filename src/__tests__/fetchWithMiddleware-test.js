@@ -88,6 +88,25 @@ describe('fetchWithMiddleware', () => {
     }
   });
 
+  it('should not throw if noThrow set', async () => {
+    fetchMock.mock({
+      matcher: '/graphql',
+      response: {
+        status: 200,
+        body: {
+          errors: [{ location: 1, message: 'major error' }],
+        },
+      },
+      method: 'POST',
+    });
+
+    const req = new RelayRequest(({}: any), {}, {}, null);
+
+    expect.assertions(1);
+    const res = await fetchWithMiddleware(req, [], true);
+    expect(res.errors).toEqual([{ location: 1, message: 'major error' }]);
+  });
+
   it('should handle server non-2xx errors', async () => {
     fetchMock.mock({
       matcher: '/graphql',

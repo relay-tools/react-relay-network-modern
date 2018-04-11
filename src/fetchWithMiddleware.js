@@ -25,12 +25,13 @@ async function runFetch(req: RelayRequestAny): Promise<RelayResponse> {
 
 export default function fetchWithMiddleware(
   req: RelayRequestAny,
-  middlewares: Middleware[]
+  middlewares: Middleware[],
+  noThrow?: boolean
 ): Promise<RelayResponse> {
   const wrappedFetch: MiddlewareNextFn = compose(...middlewares)(runFetch);
 
   return wrappedFetch(req).then(res => {
-    if (!res || res.errors || !res.data) {
+    if (!noThrow && (!res || res.errors || !res.data)) {
       throw createRequestError(req, res);
     }
     return res;
