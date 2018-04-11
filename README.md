@@ -202,6 +202,7 @@ Available options:
 * **subscribeFn** - if you use subscriptions in your app, you may provide this function which will be passed to [RelayNetwork](https://github.com/facebook/relay/blob/master/packages/relay-runtime/network/RelayNetwork.js).
 * **noThrow** - **EXPERIMENTAL (May be deprecated in the future)** set true to not throw when an error response is given by the server, and to instead handle errors in your app code.
 
+
 ### Server-side rendering (SSR)
 
 For performant server-side rendering with `node 8` and above recommended to use special build of this network layer. Also you may execute `graphql` directly without http-request if you write custom middleware. All this recommendations present in following example:
