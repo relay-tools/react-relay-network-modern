@@ -7,6 +7,9 @@ import type RelayResponse from './RelayResponse';
 export type RelayRequestAny = RelayRequest | RelayRequestBatch;
 export type MiddlewareNextFn = (req: RelayRequestAny) => Promise<RelayResponse>;
 export type Middleware = (next: MiddlewareNextFn) => MiddlewareNextFn;
+export type RawMiddlewareNextFn = (req: RelayRequestAny) => Promise<any>;
+export type RawMiddleware = (next: RawMiddlewareNextFn) => RawMiddlewareNextFn;
+export type FormatMiddleware = (next: RawMiddlewareNextFn) => MiddlewareNextFn;
 
 export type MiddlewareSync = {|
   execute: (
