@@ -3,9 +3,16 @@
 
 import { createRequestError } from './createRequestError';
 import RelayResponse from './RelayResponse';
-import type { Middleware, MiddlewareNextFn, RelayRequestAny } from './definition';
+import type {
+  Middleware,
+  MiddlewareNextFn,
+  RelayRequestAny,
+  RawMiddleware,
+  RawMiddlewareNextFn,
+} from './definition';
+import formatMiddleware from './middlewares/format';
 
-async function runFetch(req: RelayRequestAny): Promise<RelayResponse> {
+async function runFetch(req: RelayRequestAny): Promise<any> {
   let { url } = req.fetchOpts;
   if (!url) url = '/graphql';
 
@@ -16,19 +23,18 @@ async function runFetch(req: RelayRequestAny): Promise<RelayResponse> {
 
   // $FlowFixMe
   const resFromFetch = await fetch(url, req.fetchOpts);
-  const res = await RelayResponse.createFromFetch(resFromFetch);
-  if (res.status && res.status >= 400) {
-    throw createRequestError(req, res);
-  }
-  return res;
+  return resFromFetch;
 }
 
 export default function fetchWithMiddleware(
   req: RelayRequestAny,
   middlewares: Middleware[],
+  rawMiddlewares: RawMiddleware[],
   noThrow?: boolean
 ): Promise<RelayResponse> {
-  const wrappedFetch: MiddlewareNextFn = compose(...middlewares)(runFetch);
+  const baseFetch: RawMiddlewareNextFn = compose(...rawMiddlewares)(runFetch);
+  const formatFetch: MiddlewareNextFn = compose(formatMiddleware())(baseFetch);
+  const wrappedFetch: MiddlewareNextFn = compose(...middlewares)(formatFetch);
 
   return wrappedFetch(req).then(res => {
     if (!noThrow && (!res || res.errors || !res.data)) {
