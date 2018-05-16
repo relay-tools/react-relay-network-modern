@@ -59,7 +59,7 @@ describe('RelayNetworkLayer', () => {
     it('should return payload from beforeFetch, without calling async middlewares', async () => {
       const asyncMW: any = jest.fn(next => next);
 
-      const network = new RelayNetworkLayer([asyncMW], {
+      const network = new RelayNetworkLayer([asyncMW], undefined, {
         beforeFetch: () => ({ data: {} }),
       });
       await network.execute(mockOperation, {}, {});
@@ -69,7 +69,7 @@ describe('RelayNetworkLayer', () => {
     it('should call async middlewares, if beforeFetch returns undefined', async () => {
       const asyncMW: any = jest.fn(next => next);
 
-      const network = new RelayNetworkLayer([asyncMW], {
+      const network = new RelayNetworkLayer([asyncMW], undefined, {
         beforeFetch: () => undefined,
       });
       await network.execute(mockOperation, {}, {});
