@@ -12,7 +12,7 @@ function createProgressHandler(opts: ProgressOpts) {
   const { onProgress, sizeHeader = 'Content-Length' } = opts || {};
 
   return async res => {
-    if (!(res.body instanceof ReadableStream)) {
+    if (!res.body) {
       return;
     }
 

@@ -37,7 +37,6 @@
   "globals": {
     "fetch": true,
     "FormData": true,
-    "ReadableStream": true,
     "File": true,
     "$Shape": true,
     "$FlowFixMe": true,
