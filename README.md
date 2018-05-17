@@ -103,6 +103,9 @@ import { RelayNetworkLayer } from 'react-relay-network-modern/es';
 * **errorMiddleware** - display `errors` data to console from graphql response. If you want see stackTrace for errors, you should provide `formatError` to `express-graphql` (see example below where `graphqlServer` accept `formatError` function).
   * `logger` - log function (default: `console.error.bind(console)`)
   * `prefix` - prefix message (default: `[RELAY-NETWORK] GRAPHQL SERVER ERROR:`)
+* **progressMiddleware** - enable onProgress callback for modern browsers with support for Stream API.
+  * `onProgress` - on progress callback function (`function(bytesCurrent: number, bytesTotal: number | null) => void`, total size will be null if size header is not set)
+  * `sizeHeader` - response header with total size of response (default: `Content-Length`, useful when `Transfer-Encoding: chunked` is set)
 
 ### Standalone package middlewares:
 
@@ -122,6 +125,7 @@ import {
   retryMiddleware,
   authMiddleware,
   cacheMiddleware,
+  progressMiddleware,
 } from 'react-relay-network-modern';
 
 const network = new RelayNetworkLayer(
@@ -161,6 +165,11 @@ const network = new RelayNetworkLayer(
             return token;
           })
           .catch(err => console.log('[client.js] ERROR can not refresh token', err));
+      },
+    }),
+    progressMiddleware({
+      onProgress: (current, total) => {
+        console.log('Downloaded: ' + current + ' B, total: ' + total + ' B');
       },
     }),
 
@@ -228,6 +237,8 @@ return new RRNL.RelayNetworkLayer([
 ### How middlewares work internally
 
 Middlewares on bottom layer use [fetch](https://github.com/github/fetch) method. So `req` is compliant with a `fetch()` options. And `res` can be obtained via `resPromise.then(res => ...)`, which returned by `fetch()`.
+
+Middleware that needs access to the raw response body from fetch (before it has been consumed) can set `isRawMiddleware = true`, see `progressMiddleware` for example. It is important to note that `response.body` can only be consumed once, so make sure to `clone()` the response first.
 
 Middlewares have 3 phases:
 
