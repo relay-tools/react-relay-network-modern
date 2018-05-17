@@ -1,6 +1,6 @@
 /* @flow */
 
-import type { PayloadData } from './definition';
+import type { PayloadData, FetchResponse } from './definition';
 
 export default class RelayResponse {
   _res: any; // response from low-level method, eg. fetch
@@ -16,7 +16,7 @@ export default class RelayResponse {
   text: ?string;
   json: mixed;
 
-  static async createFromFetch(res: Object): Promise<RelayResponse> {
+  static async createFromFetch(res: FetchResponse): Promise<RelayResponse> {
     const r = new RelayResponse();
     r._res = res;
     r.ok = res.ok;

@@ -5,8 +5,8 @@ import RelayRequest from './RelayRequest';
 import fetchWithMiddleware from './fetchWithMiddleware';
 import type {
   Middleware,
-  RawMiddleware,
   MiddlewareSync,
+  MiddlewareRaw,
   FetchFunction,
   FetchHookFunction,
   SubscribeFunction,
@@ -21,7 +21,7 @@ type RelayNetworkLayerOpts = {|
 
 export default class RelayNetworkLayer {
   _middlewares: Middleware[];
-  _rawMiddlewares: RawMiddleware[];
+  _rawMiddlewares: MiddlewareRaw[];
   _middlewaresSync: RNLExecuteFunction[];
   execute: RNLExecuteFunction;
   +fetchFn: FetchFunction;
@@ -29,8 +29,7 @@ export default class RelayNetworkLayer {
   +noThrow: boolean;
 
   constructor(
-    middlewares: Array<?Middleware | MiddlewareSync>,
-    rawMiddlewares?: Array<?RawMiddleware>,
+    middlewares: Array<?Middleware | MiddlewareSync | MiddlewareRaw>,
     opts?: RelayNetworkLayerOpts
   ) {
     this._middlewares = [];
@@ -43,16 +42,11 @@ export default class RelayNetworkLayer {
       if (mw) {
         if (mw.execute) {
           this._middlewaresSync.push(mw.execute);
+        } else if (mw.isRawMiddleware) {
+          this._rawMiddlewares.push(mw);
         } else {
           this._middlewares.push(mw);
         }
-      }
-    });
-
-    const rmws = Array.isArray(rawMiddlewares) ? (rawMiddlewares: any) : [rawMiddlewares];
-    rmws.forEach(rmw => {
-      if (rmw) {
-        this._rawMiddlewares.push(rmw);
       }
     });
 

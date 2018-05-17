@@ -1,34 +1,43 @@
 /* @flow */
 /* eslint-disable no-await-in-loop */
 
-import type { RawMiddleware } from '../definition';
+import type {
+  MiddlewareRaw,
+  RelayRequestAny,
+  FetchResponse,
+  MiddlewareRawNextFn,
+} from '../definition';
 
 export type ProgressOpts = {
   sizeHeader?: string,
-  onProgress: Function,
+  onProgress: (runningTotal: number, totalSize: ?number) => any,
 };
 
 function createProgressHandler(opts: ProgressOpts) {
   const { onProgress, sizeHeader = 'Content-Length' } = opts || {};
 
-  return async res => {
-    if (!res.body) {
+  return async (res: FetchResponse) => {
+    const { body, headers } = res;
+
+    if (!body) {
       return;
     }
 
-    const totalResponseSize = res.headers.get(sizeHeader);
+    const totalResponseSize = headers.get(sizeHeader);
 
     let totalSize = null;
     if (totalResponseSize !== null) {
       totalSize = parseInt(totalResponseSize, 10);
     }
 
-    const reader = res.body.getReader();
+    const reader = body.getReader();
 
     let completed = false;
     let runningTotal = 0;
     do {
-      const { done, value: { length } = { length: 0 } } = await reader.read();
+      const step: { value: ?any, done: boolean } = await reader.read();
+      const { done, value } = step;
+      const length = (value && value.length) || 0;
 
       completed = done;
 
@@ -40,12 +49,17 @@ function createProgressHandler(opts: ProgressOpts) {
   };
 }
 
-export default function progressMiddleware(opts: ProgressOpts): RawMiddleware {
+export default function progressMiddleware(opts: ProgressOpts): MiddlewareRaw {
   const progressHandler = createProgressHandler(opts);
 
-  return next => async req => {
-    const res = await next(req);
+  const mw = (next: MiddlewareRawNextFn) => async (
+    req: RelayRequestAny
+  ): Promise<FetchResponse> => {
+    const res: FetchResponse = await next(req);
     progressHandler(res.clone());
     return res;
   };
+
+  mw.isRawMiddleware = true;
+  return (mw: any);
 }
