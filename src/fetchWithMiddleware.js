@@ -3,9 +3,16 @@
 
 import { createRequestError } from './createRequestError';
 import RelayResponse from './RelayResponse';
-import type { Middleware, MiddlewareNextFn, RelayRequestAny } from './definition';
+import type {
+  Middleware,
+  MiddlewareNextFn,
+  RelayRequestAny,
+  MiddlewareRaw,
+  MiddlewareRawNextFn,
+  FetchResponse,
+} from './definition';
 
-async function runFetch(req: RelayRequestAny): Promise<RelayResponse> {
+function runFetch(req: RelayRequestAny): Promise<FetchResponse> {
   let { url } = req.fetchOpts;
   if (!url) url = '/graphql';
 
@@ -14,21 +21,32 @@ async function runFetch(req: RelayRequestAny): Promise<RelayResponse> {
     req.fetchOpts.headers['Content-Type'] = 'application/json';
   }
 
-  // $FlowFixMe
-  const resFromFetch = await fetch(url, req.fetchOpts);
+  return fetch(url, (req.fetchOpts: any));
+}
+
+// convert fetch response to RelayResponse object
+const convertResponse: (next: MiddlewareRawNextFn) => MiddlewareNextFn = next => async req => {
+  const resFromFetch = await next(req);
+
   const res = await RelayResponse.createFromFetch(resFromFetch);
   if (res.status && res.status >= 400) {
     throw createRequestError(req, res);
   }
   return res;
-}
+};
 
 export default function fetchWithMiddleware(
   req: RelayRequestAny,
-  middlewares: Middleware[],
+  middlewares: Middleware[], // works with RelayResponse
+  rawFetchMiddlewares: MiddlewareRaw[], // works with raw fetch response
   noThrow?: boolean
 ): Promise<RelayResponse> {
-  const wrappedFetch: MiddlewareNextFn = compose(...middlewares)(runFetch);
+  // $FlowFixMe
+  const wrappedFetch: MiddlewareNextFn = compose(
+    ...middlewares,
+    convertResponse,
+    ...rawFetchMiddlewares
+  )((runFetch: any));
 
   return wrappedFetch(req).then(res => {
     if (!noThrow && (!res || res.errors || !res.data)) {
@@ -54,6 +72,6 @@ function compose(...funcs) {
   } else {
     const last = funcs[funcs.length - 1];
     const rest = funcs.slice(0, -1);
-    return (...args) => rest.reduceRight((composed, f) => f(composed), last(...args));
+    return (...args) => rest.reduceRight((composed, f) => f((composed: any)), last(...args));
   }
 }

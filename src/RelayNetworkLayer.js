@@ -6,6 +6,7 @@ import fetchWithMiddleware from './fetchWithMiddleware';
 import type {
   Middleware,
   MiddlewareSync,
+  MiddlewareRaw,
   FetchFunction,
   FetchHookFunction,
   SubscribeFunction,
@@ -20,14 +21,19 @@ type RelayNetworkLayerOpts = {|
 
 export default class RelayNetworkLayer {
   _middlewares: Middleware[];
+  _rawMiddlewares: MiddlewareRaw[];
   _middlewaresSync: RNLExecuteFunction[];
   execute: RNLExecuteFunction;
   +fetchFn: FetchFunction;
   +subscribeFn: ?SubscribeFunction;
   +noThrow: boolean;
 
-  constructor(middlewares: Array<?Middleware | MiddlewareSync>, opts?: RelayNetworkLayerOpts) {
+  constructor(
+    middlewares: Array<?Middleware | MiddlewareSync | MiddlewareRaw>,
+    opts?: RelayNetworkLayerOpts
+  ) {
     this._middlewares = [];
+    this._rawMiddlewares = [];
     this._middlewaresSync = [];
     this.noThrow = false;
 
@@ -36,6 +42,8 @@ export default class RelayNetworkLayer {
       if (mw) {
         if (mw.execute) {
           this._middlewaresSync.push(mw.execute);
+        } else if (mw.isRawMiddleware) {
+          this._rawMiddlewares.push(mw);
         } else {
           this._middlewares.push(mw);
         }
@@ -59,7 +67,7 @@ export default class RelayNetworkLayer {
       }
 
       const req = new RelayRequest(operation, variables, cacheConfig, uploadables);
-      return fetchWithMiddleware(req, this._middlewares, this.noThrow);
+      return fetchWithMiddleware(req, this._middlewares, this._rawMiddlewares, this.noThrow);
     };
 
     const network = Network.create(this.fetchFn, this.subscribeFn);

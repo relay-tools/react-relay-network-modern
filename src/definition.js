@@ -7,6 +7,12 @@ import type RelayResponse from './RelayResponse';
 export type RelayRequestAny = RelayRequest | RelayRequestBatch;
 export type MiddlewareNextFn = (req: RelayRequestAny) => Promise<RelayResponse>;
 export type Middleware = (next: MiddlewareNextFn) => MiddlewareNextFn;
+export type MiddlewareRawNextFn = (req: RelayRequestAny) => Promise<FetchResponse>;
+
+export type MiddlewareRaw = {
+  isRawMiddleware: true,
+  $call: (next: MiddlewareRawNextFn) => MiddlewareRawNextFn,
+};
 
 export type MiddlewareSync = {|
   execute: (
@@ -29,6 +35,8 @@ export type FetchOpts = {
   redirect?: 'follow' | 'error' | 'manual',
   [name: string]: mixed,
 };
+
+export type FetchResponse = Response;
 
 export type GraphQLResponseErrors = Array<{
   message: string,

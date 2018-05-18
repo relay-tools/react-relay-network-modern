@@ -42,6 +42,7 @@
     "$FlowFixMe": true,
     "Blob": true,
     "Class": true,
+    "Response": true,
     "window": true,
     "$PropertyType": true
   }

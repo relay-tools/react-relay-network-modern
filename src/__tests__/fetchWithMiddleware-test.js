@@ -13,7 +13,7 @@ describe('fetchWithMiddleware', () => {
   it('should make a successfull request without middlewares', async () => {
     fetchMock.post('/graphql', { id: 1, data: { user: 123 } });
     const req = new RelayRequest(({}: any), {}, {}, null);
-    const res = await fetchWithMiddleware(req, []);
+    const res = await fetchWithMiddleware(req, [], []);
     expect(res.data).toEqual({ user: 123 });
   });
 
@@ -37,11 +37,15 @@ describe('fetchWithMiddleware', () => {
       reqId: 'request',
     };
 
-    const res: any = await fetchWithMiddleware(req, [
-      numPlus5,
-      numMultiply10, // should be last, when changing request
-      //                should be first, when changing response
-    ]);
+    const res: any = await fetchWithMiddleware(
+      req,
+      [
+        numPlus5,
+        numMultiply10, // should be last, when changing request
+        //                should be first, when changing response
+      ],
+      []
+    );
     expect(res.data.text).toEqual('response:mw2:mw1');
     expect(fetchMock.lastOptions().headers.reqId).toEqual('request:mw1:mw2');
   });
@@ -58,7 +62,7 @@ describe('fetchWithMiddleware', () => {
 
     expect.assertions(2);
     try {
-      await fetchWithMiddleware(req, []);
+      await fetchWithMiddleware(req, [], []);
     } catch (e) {
       expect(e instanceof Error).toBeTruthy();
       expect(e.toString()).toMatch('Network connection error');
@@ -81,7 +85,7 @@ describe('fetchWithMiddleware', () => {
 
     expect.assertions(2);
     try {
-      await fetchWithMiddleware(req, []);
+      await fetchWithMiddleware(req, [], []);
     } catch (e) {
       expect(e instanceof Error).toBeTruthy();
       expect(e.toString()).toMatch('major error');
@@ -103,7 +107,7 @@ describe('fetchWithMiddleware', () => {
     const req = new RelayRequest(({}: any), {}, {}, null);
 
     expect.assertions(1);
-    const res = await fetchWithMiddleware(req, [], true);
+    const res = await fetchWithMiddleware(req, [], [], true);
     expect(res.errors).toEqual([{ location: 1, message: 'major error' }]);
   });
 
@@ -121,7 +125,7 @@ describe('fetchWithMiddleware', () => {
 
     expect.assertions(2);
     try {
-      await fetchWithMiddleware(req, []);
+      await fetchWithMiddleware(req, [], []);
     } catch (e) {
       expect(e instanceof Error).toBeTruthy();
       expect(e.toString()).toMatch('Something went completely wrong');
@@ -143,7 +147,7 @@ describe('fetchWithMiddleware', () => {
 
     expect.assertions(2);
     try {
-      await fetchWithMiddleware(req, []);
+      await fetchWithMiddleware(req, [], []);
     } catch (e) {
       expect(e instanceof Error).toBeTruthy();
       expect(e.toString()).toMatch('Server return empty response.data');
