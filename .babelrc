@@ -1,50 +1,66 @@
 {
   "plugins": [
     "babel-plugin-transform-object-rest-spread",
-    "babel-plugin-transform-flow-strip-types",
+    "babel-plugin-transform-flow-strip-types"
   ],
   "env": {
     "lib": {
-      "plugins": [
-        "babel-plugin-transform-class-properties",
-      ],
+      "plugins": ["babel-plugin-transform-class-properties"],
       "presets": [
-        ["env", {
-          "targets": {
-            "browsers": [
-              "last 5 versions",
-              "ie 9",
-              "defaults"
-            ]
-          },
-          "include": ["transform-es2015-classes"],
-          "useBuiltIns": true
-        }]
+        [
+          "env",
+          {
+            "targets": {
+              "browsers": ["last 5 versions", "ie 9", "defaults"]
+            },
+            "include": ["transform-es2015-classes"],
+            "useBuiltIns": true
+          }
+        ]
       ]
     },
     "es": {
-      "plugins": [
-        "babel-plugin-transform-class-properties",
+      "plugins": ["babel-plugin-transform-class-properties"]
+    },
+    "mjs": {
+      "plugins": ["transform-class-properties"],
+      "presets": [
+        [
+          "env",
+          {
+            "targets": {
+              "node": 6
+            },
+            "loose": true,
+            "modules": false
+          }
+        ]
       ]
     },
     "node8": {
       "presets": [
-        ["env", {
-          "targets": {
-            "node": "8.0.0"
-          },
-          "loose": true,
-          "modules": "commonjs"
-        }]
+        [
+          "env",
+          {
+            "targets": {
+              "node": "8.0.0"
+            },
+            "loose": true,
+            "modules": "commonjs"
+          }
+        ]
       ]
     },
     "test": {
       "presets": [
-        ["env", {
-          "targets": {
-            "node": "current"
-          },
-        }]
+        [
+          "env",
+          {
+            "targets": {
+              "node": "current"
+            }
+          }
+        ]
       ]
     }
   }
