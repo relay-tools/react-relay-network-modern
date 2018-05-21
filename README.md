@@ -8,7 +8,7 @@
 ![FlowType compatible](https://img.shields.io/badge/flowtype-compatible-brightgreen.svg)
 
 The `ReactRelayNetworkModern` is a [Network Layer for Relay Modern](https://facebook.github.io/relay/docs/network-layer.html)
-with various middlewares which can manipulate requests/responses on the fly (change auth headers, request url or perform some fallback if request fails), batch several relay request by timeout into one http request, cache queries.
+with various middlewares which can manipulate requests/responses on the fly (change auth headers, request url or perform some fallback if request fails), batch several relay request by timeout into one http request, cache queries and server-side rendering.
 
 Network Layer for Relay Classic can be found [here](https://github.com/nodkz/react-relay-network-layer).
 
@@ -214,25 +214,7 @@ Available options:
 
 ### Server-side rendering (SSR)
 
-For performant server-side rendering with `node 8` and above recommended to use special build of this network layer. Also you may execute `graphql` directly without http-request if you write custom middleware. All this recommendations present in following example:
-
-```js
-const RRNL = require('react-relay-network-modern/node8');
-const graphql = require('graphql').graphql;
-const schema = require('schema').default;
-return new RRNL.RelayNetworkLayer([
-  () => async req => {
-    const res = await graphql({
-      schema,
-      source: req.getQueryString(),
-      variableValues: req.getVariables(),
-      contextValue: {},
-    });
-    // console.dir(res, { colors: true, depth: 5 });
-    return RRNL.RelayNetworkLayerResponse.createFromGraphQL(res);
-  },
-]);
-```
+See [`react-relay-network-modern-ssr](https://github.com/nodkz/react-relay-network-modern-ssr) for SSR middleware.
 
 ### How middlewares work internally
 
