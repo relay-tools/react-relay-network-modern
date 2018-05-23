@@ -12,7 +12,7 @@
   "module": "mjs/index.mjs",
   "repository": {
     "type": "git",
-    "url": "https://github.com/nodkz/react-relay-network-modern.git"
+    "url": "https://github.com/relay-tools/react-relay-network-modern.git"
   },
   "keywords": [
     "relay",
@@ -23,11 +23,12 @@
     "jwt",
     "auth token"
   ],
+  "author": "Pavel Chertorogov @nodkz",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/nodkz/react-relay-network-modern/issues"
+    "url": "https://github.com/relay-tools/react-relay-network-modern/issues"
   },
-  "homepage": "https://github.com/nodkz/react-relay-network-modern#readme",
+  "homepage": "https://github.com/relay-tools/react-relay-network-modern#readme",
   "dependencies": {},
   "peerDependencies": {
     "relay-runtime": ">=1.4.0"
