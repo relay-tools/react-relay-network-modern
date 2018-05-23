@@ -56,7 +56,7 @@
     "prettier": "^1.12.1",
     "relay-runtime": "^1.6.0",
     "rimraf": "^2.6.2",
-    "semantic-release": "^15.4.2"
+    "semantic-release": "^15.5.0"
   },
   "config": {
     "commitizen": {
