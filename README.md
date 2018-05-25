@@ -18,11 +18,11 @@ Migration guide from v1 to v2 can be found [here](https://github.com/relay-tools
 
 # Install
 
-```
+```bash
 yarn add react-relay-network-modern
 OR
 npm install react-relay-network-modern --save
-```git
+```
 
 If using with Webpack 4, make sure that you're equipped to parse .mjs files correctly. (If using Webpack 3, can omit the `module` definition.)
 
