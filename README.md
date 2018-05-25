@@ -22,7 +22,26 @@ Migration guide from v1 to v2 can be found [here](https://github.com/nodkz/react
 yarn add react-relay-network-modern
 OR
 npm install react-relay-network-modern --save
+```git
+
+If using with Webpack 4, make sure that you're equipped to parse .mjs files correctly. (If using Webpack 3, can omit the `module` definition.)
+
+```javascript
+module: {
+  rules: [
+    // See: https://github.com/aws/aws-amplify/issues/686#issuecomment-387710340
+    {
+      test: /\.mjs$/,
+      include: /node_modules\/react-relay-network-modern/,
+      type: 'javascript/auto',
+    },
+  ]
+},
+resolve: {
+ extensions: ['.mjs', '.js']
+}
 ```
+
 
 #### What if `regeneratorRuntime is not defined`?
 
