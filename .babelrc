@@ -1,35 +1,48 @@
 {
   "plugins": [
-    "babel-plugin-transform-object-rest-spread",
-    "babel-plugin-transform-flow-strip-types"
+    "@babel/plugin-proposal-object-rest-spread",
+    "@babel/plugin-transform-flow-strip-types"
   ],
   "env": {
     "lib": {
-      "plugins": ["babel-plugin-transform-class-properties"],
+      "plugins": [
+        "@babel/plugin-proposal-class-properties"
+      ],
       "presets": [
         [
-          "env",
+          "@babel/preset-env",
           {
             "targets": {
-              "browsers": ["last 5 versions", "ie 9", "defaults"]
+              "browsers": [
+                "last 5 versions",
+                "ie 9",
+                "defaults"
+              ]
             },
-            "include": ["transform-es2015-classes"],
-            "useBuiltIns": true
+            "useBuiltIns": "usage"
           }
         ]
       ]
     },
     "es": {
-      "plugins": ["babel-plugin-transform-class-properties"]
+      "plugins": [
+        "@babel/plugin-proposal-class-properties"
+      ]
     },
     "mjs": {
-      "plugins": ["transform-class-properties"],
+      "plugins": [
+        "@babel/plugin-proposal-class-properties"
+      ],
       "presets": [
         [
-          "env",
+          "@babel/preset-env",
           {
             "targets": {
-              "browsers": ["last 5 versions", "ie 9", "defaults"]
+              "browsers": [
+                "last 5 versions",
+                "ie 9",
+                "defaults"
+              ]
             },
             "loose": true,
             "modules": false
@@ -40,7 +53,7 @@
     "node8": {
       "presets": [
         [
-          "env",
+          "@babel/preset-env",
           {
             "targets": {
               "node": "8.0.0"
@@ -54,7 +67,7 @@
     "test": {
       "presets": [
         [
-          "env",
+          "@babel/preset-env",
           {
             "targets": {
               "node": "current"
