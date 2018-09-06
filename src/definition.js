@@ -11,7 +11,7 @@ export type MiddlewareRawNextFn = (req: RelayRequestAny) => Promise<FetchRespons
 
 export type MiddlewareRaw = {
   isRawMiddleware: true,
-  $call: (next: MiddlewareRawNextFn) => MiddlewareRawNextFn,
+  [[call]]: (next: MiddlewareRawNextFn) => MiddlewareRawNextFn,
 };
 
 export type MiddlewareSync = {|

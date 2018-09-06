@@ -1,6 +1,6 @@
 /* @flow */
 
-import { Network } from 'relay-runtime';
+import { Network } from 'relay-runtime'; // eslint-disable-line
 import RelayRequest from './RelayRequest';
 import fetchWithMiddleware from './fetchWithMiddleware';
 import type {

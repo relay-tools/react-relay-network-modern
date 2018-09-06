@@ -232,7 +232,7 @@ Available options:
 
 ### Server-side rendering (SSR)
 
-See [`react-relay-network-modern-ssr](https://github.com/nodkz/react-relay-network-modern-ssr) for SSR middleware.
+See [`react-relay-network-modern-ssr](https://github.com/relay-tools/react-relay-network-modern-ssr) for SSR middleware.
 
 ### How middlewares work internally
 

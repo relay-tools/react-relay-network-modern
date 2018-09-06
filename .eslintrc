@@ -19,17 +19,18 @@
       "objects": "always-multiline",
       "imports": "always-multiline",
       "exports": "always-multiline",
-      "functions": "ignore",
+      "functions": "ignore"
     }],
     "prettier/prettier": ["error", {
       "printWidth": 100,
       "singleQuote": true,
-      "trailingComma": "es5",
+      "trailingComma": "es5"
     }],
     "no-plusplus": 0,
     "prefer-destructuring": 0,
     "no-prototype-builtins": 0,
-    "class-methods-use-this": 0
+    "class-methods-use-this": 0,
+    "lines-between-class-members": 0
   },
   "env": {
     "jest": true
@@ -44,6 +45,7 @@
     "Class": true,
     "Response": true,
     "window": true,
-    "$PropertyType": true
+    "$PropertyType": true,
+    "call": true
   }
 }

@@ -1,7 +1,7 @@
 /* @flow */
 
 import fetchMock from 'fetch-mock';
-import { RelayNetworkLayer } from '../../';
+import { RelayNetworkLayer } from '../..';
 import { mockReq } from '../../__mocks__/mockReq';
 import authMiddleware from '../auth';
 

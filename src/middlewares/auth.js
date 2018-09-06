@@ -27,8 +27,7 @@ export default function authMiddleware(opts?: AuthMiddlewareOpts): Middleware {
     allowEmptyToken = false,
     prefix = 'Bearer ',
     header = 'Authorization',
-  } =
-    opts || {};
+  } = opts || {};
 
   let tokenRefreshInProgress = null;
 

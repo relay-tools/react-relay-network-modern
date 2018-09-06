@@ -2,7 +2,7 @@
 
 import fetchMock from 'fetch-mock';
 import FormData from 'form-data';
-import { RelayNetworkLayer, batchMiddleware } from '../../';
+import { RelayNetworkLayer, batchMiddleware } from '../..';
 import {
   mockReq,
   mockReqWithSize,
