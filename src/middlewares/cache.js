@@ -43,7 +43,9 @@ export default function queryMiddleware(opts?: CacheMiddlewareOpts): Middleware 
       const variables = req.getVariables();
       const res = await next(req);
 
-      cache.set(queryId, variables, res);
+      if (!res.errors) {
+        cache.set(queryId, variables, res);
+      }
       return res;
     }
 
@@ -57,7 +59,9 @@ export default function queryMiddleware(opts?: CacheMiddlewareOpts): Middleware 
       }
 
       const res = await next(req);
-      cache.set(queryId, variables, res);
+      if (!res.errors) {
+        cache.set(queryId, variables, res);
+      }
 
       return res;
     } catch (e) {

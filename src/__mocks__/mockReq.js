@@ -6,7 +6,7 @@ import type RelayResponse from '../RelayResponse';
 
 type ReqData = {
   query?: string,
-  varaibles?: Object,
+  variables?: Object,
   files?: any,
 };
 
@@ -36,7 +36,7 @@ class MockReq {
   }
 
   getVariables(): Object {
-    return this.reqData.varaibles || {};
+    return this.reqData.variables || {};
   }
 
   getFiles(): any {
