@@ -142,4 +142,46 @@ describe('middlewares/cache', () => {
     expect(res2.data).toBe('PAYLOAD');
     expect(fetchMock.calls('/graphql')).toHaveLength(2);
   });
+
+  it('do not use cache for responses with errors', async () => {
+    fetchMock.mock({
+      matcher: '/graphql',
+      response: {
+        status: 200,
+        body: { data: 'PAYLOAD', errors: [{ type: 'timeout' }] },
+      },
+      method: 'POST',
+    });
+
+    const rnl = new RelayNetworkLayer([cacheMiddleware()]);
+
+    // try fetch
+    await expect(mockReq('FirstQuery').execute(rnl)).rejects.toThrow();
+    expect(fetchMock.calls('/graphql')).toHaveLength(1);
+
+    // try fetch again
+    await expect(mockReq('FirstQuery').execute(rnl)).rejects.toThrow();
+    expect(fetchMock.calls('/graphql')).toHaveLength(2);
+  });
+
+  it('use cache for responses with errors and cacheErrors flag', async () => {
+    fetchMock.mock({
+      matcher: '/graphql',
+      response: {
+        status: 200,
+        body: { data: 'PAYLOAD', errors: [{ type: 'timeout' }] },
+      },
+      method: 'POST',
+    });
+
+    const rnl = new RelayNetworkLayer([cacheMiddleware({ cacheErrors: true })]);
+
+    // try fetch
+    await expect(mockReq('FirstQuery').execute(rnl)).rejects.toThrow();
+    expect(fetchMock.calls('/graphql')).toHaveLength(1);
+
+    // try fetch again
+    await expect(mockReq('FirstQuery').execute(rnl)).rejects.toThrow();
+    expect(fetchMock.calls('/graphql')).toHaveLength(1);
+  });
 });
