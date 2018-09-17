@@ -1,6 +1,6 @@
 /* @flow */
 
-import { QueryResponseCache } from 'relay-runtime'; // eslint-disable-line
+import {QueryResponseCache} from 'relay-runtime'; // eslint-disable-line
 import type { Middleware } from '../definition';
 import { isFunction } from '../utils';
 
@@ -15,7 +15,8 @@ type CacheMiddlewareOpts = {|
 |};
 
 export default function queryMiddleware(opts?: CacheMiddlewareOpts): Middleware {
-  const { size, ttl, onInit, allowMutations, allowFormData, clearOnMutation, cacheErrors } = opts || {};
+  const { size, ttl, onInit, allowMutations, allowFormData, clearOnMutation, cacheErrors } =
+    opts || {};
   const cache = new QueryResponseCache({
     size: size || 100, // 100 requests
     ttl: ttl || 15 * 60 * 1000, // 15 minutes
