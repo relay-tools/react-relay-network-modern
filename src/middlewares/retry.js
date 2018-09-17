@@ -170,8 +170,7 @@ export function delayExecution<T>(
       }
 
       if (onRetryCallback && onRetryCallback({ forceRetry, delay, attempt, lastError }) === false) {
-          clearTimeout(delayId);
-          return;
+        clearTimeout(delayId);
       }
     } else {
       resolve(execFn());
