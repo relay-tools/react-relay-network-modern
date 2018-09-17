@@ -21,6 +21,7 @@ export type RetryMiddlewareOpts = {|
   allowMutations?: boolean,
   allowFormData?: boolean,
   forceRetry?: ForceRetryFn | false,
+  onRetry?: OnRetryFn | false,
 |};
 
 export default function retryMiddleware(options?: RetryMiddlewareOpts): Middleware {
@@ -33,6 +34,7 @@ export default function retryMiddleware(options?: RetryMiddlewareOpts): Middlewa
   const allowMutations = opts.allowMutations || false;
   const allowFormData = opts.allowFormData || false;
   const forceRetryFn = opts.forceRetry || false;
+  const onRetryFn = opts.onRetry || false;
 
   let retryAfterMs: RetryAfterFn = () => false;
   if (retryDelays) {
@@ -75,6 +77,7 @@ export default function retryMiddleware(options?: RetryMiddlewareOpts): Middlewa
       retryAfterMs,
       retryOnStatusCode,
       forceRetryFn,
+      onRetryFn,
       logger,
     });
   };
@@ -88,6 +91,7 @@ async function makeRetriableRequest(
     retryAfterMs: RetryAfterFn,
     retryOnStatusCode: StatusCheckFn,
     forceRetryFn: ForceRetryFn | false,
+    onRetryFn: OnRetryFn | false,
     logger: Function,
   },
   delay: number = 0,
@@ -97,6 +101,9 @@ async function makeRetriableRequest(
     try {
       let res;
       if (o.timeout) {
+      	if (attempt > 0 && isFunction(o.onRetryFn)) {
+      		o.onRetryFn(attempt);
+        }
         res = await promiseWithTimeout(o.next(o.req), o.timeout, async () => {
           const retryDelayMS = o.retryAfterMs(attempt);
           if (retryDelayMS) {
@@ -110,14 +117,17 @@ async function makeRetriableRequest(
       }
       return res;
     } catch (e) {
-      if (e && e.res && o.retryOnStatusCode(e.res.status, o.req, e.res)) {
-        const retryDelayMS = o.retryAfterMs(attempt);
-        if (retryDelayMS) {
-          o.logger(`response status ${e.res.status}, retrying after ${retryDelayMS} ms`);
-          return makeRetriableRequest(o, retryDelayMS, attempt + 1);
-        }
-      }
-      throw e;
+    	const retryDelayMS = o.retryAfterMs(attempt);
+    	if (retryDelayMS) {
+    		if (e && !e.res) {
+    			o.logger(`request failed with error: ${e}, retrying after ${retryDelayMS} ms`);
+    			return makeRetriableRequest(o, retryDelayMS, attempt + 1);
+    		} else if (e && e.res && o.retryOnStatusCode(e.res.status, o.req, e.res)) {
+    			o.logger(`response status ${e.res.status}, retrying after ${retryDelayMS} ms`);
+    			return makeRetriableRequest(o, retryDelayMS, attempt + 1);
+    		}
+    	}
+    	throw e;
     }
   };
 
