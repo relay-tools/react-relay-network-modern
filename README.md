@@ -104,6 +104,7 @@ import { RelayNetworkLayer } from 'react-relay-network-modern/es';
   * `retryDelays` - array of millisecond that defines the values on which retries are based on (default: `[1000, 3000]`). Or it may be a function `(attempt: number) => number | false` which returns a timeout in milliseconds for retry or false for disabling retry.
   * `statusCodes` - array of response status codes which will fire up retryMiddleware. Or it may be a function `(statusCode: number, req, res) => boolean` which makes retry if returned true. (default: `status < 200 or status > 300`).
   * `forceRetry` - function(cb, delay), when request is delayed for next retry, middleware will call this function and pass to it a callback and delay time. When you call this callback `cb`, middleware will proceed request immediately (default: `false`).
+  * `onRetry` - function(attempt), called on every retry attempt with `attemp` being the number of the attemp.
   * `allowMutations` - by default retries disabled for mutations, you may allow process retries for them passing `true`. (default: `false`)
   * `allowFormData` - by default retries disabled for file Uploads, you may enable it passing `true` (default: `false`)
 * **batchMiddleware** - gather some period of time relay-requests and sends it as one http-request. You server must support batch request, [how to setup your server](https://github.com/relay-tools/react-relay-network-modern#example-how-to-enable-batching)
