@@ -1,6 +1,6 @@
 /* @flow */
 
-import { QueryResponseCache } from 'relay-runtime'; // eslint-disable-line
+import {QueryResponseCache} from 'relay-runtime'; // eslint-disable-line
 import type { Middleware } from '../definition';
 import { isFunction } from '../utils';
 
