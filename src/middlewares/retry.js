@@ -11,7 +11,7 @@ export type OnRetryFn = (meta: {
   forceRetry: Function,
   delay: number,
   attempt: number,
-  lastError: Error,
+  lastError: Error | null,
 }) => false | any;
 export type StatusCheckFn = (
   statusCode: number,
@@ -102,7 +102,7 @@ async function makeRetriableRequest(
   },
   delay: number = 0,
   attempt: number = 0,
-  lastError: Error = null
+  lastError: Error | null = null
 ): Promise<RelayResponse> {
   const makeRequest = async () => {
     try {
@@ -116,7 +116,7 @@ async function makeRetriableRequest(
               o,
               retryDelayMS,
               attempt + 1,
-              new Error('Response timeout')
+              new Error(`response timeout, retrying after ${retryDelayMS} ms`)
             );
           }
           throw new Error(`RelayNetworkLayer: reached request timeout in ${o.timeout} ms`);
@@ -128,7 +128,8 @@ async function makeRetriableRequest(
     } catch (e) {
       const retryDelayMS = o.retryAfterMs(attempt);
       if (retryDelayMS) {
-        if (e && !e.res) {
+        // TODO: Handle errors better
+        if (e && !e.res && e.message.indexOf('RelayNetworkLayer') === -1) {
           o.logger(`request failed with error: ${e}, retrying after ${retryDelayMS} ms`);
           return makeRetriableRequest(o, retryDelayMS, attempt + 1, e);
         } else if (e && e.res && o.retryOnStatusCode(e.res.status, o.req, e.res)) {
@@ -149,7 +150,7 @@ export function delayExecution<T>(
   forceRetryWhenDelay?: ?ForceRetryFn | false,
   onRetryCallback?: ?OnRetryFn | false,
   attempt: number = 0,
-  lastError: Error = null
+  lastError: Error | null = null
 ): Promise<T> {
   return new Promise(resolve => {
     if (delay > 0) {
