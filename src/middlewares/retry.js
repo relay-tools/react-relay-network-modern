@@ -11,7 +11,7 @@ export type OnRetryFn = (meta: {
   forceRetry: Function,
   delay: number,
   attempt: number,
-  lastError: Error | null,
+  lastError: ?Error,
 }) => false | any;
 export type StatusCheckFn = (
   statusCode: number,
@@ -102,7 +102,7 @@ async function makeRetriableRequest(
   },
   delay: number = 0,
   attempt: number = 0,
-  lastError: Error | null = null
+  lastError: ?Error = null
 ): Promise<RelayResponse> {
   const makeRequest = async () => {
     try {
@@ -127,12 +127,11 @@ async function makeRetriableRequest(
       return res;
     } catch (e) {
       const retryDelayMS = o.retryAfterMs(attempt);
-      if (retryDelayMS) {
-        // TODO: Handle errors better
-        if (e && !e.res && e.message.indexOf('RelayNetworkLayer') === -1) {
+      if (retryDelayMS && e && e.message.indexOf('RelayNetworkLayer') === -1) {
+        if (!e.res) {
           o.logger(`request failed with error: ${e}, retrying after ${retryDelayMS} ms`);
           return makeRetriableRequest(o, retryDelayMS, attempt + 1, e);
-        } else if (e && e.res && o.retryOnStatusCode(e.res.status, o.req, e.res)) {
+        } else if (o.retryOnStatusCode(e.res.status, o.req, e.res)) {
           o.logger(`response status ${e.res.status}, retrying after ${retryDelayMS} ms`);
           return makeRetriableRequest(o, retryDelayMS, attempt + 1, e);
         }
@@ -150,15 +149,16 @@ export function delayExecution<T>(
   forceRetryWhenDelay?: ?ForceRetryFn | false,
   onRetryCallback?: ?OnRetryFn | false,
   attempt: number = 0,
-  lastError: Error | null = null
+  lastError: ?Error = null
 ): Promise<T> {
-  return new Promise(resolve => {
+  return new Promise((resolve, reject) => {
     if (delay > 0) {
       let delayInProgress = true;
       const delayId = setTimeout(() => {
         delayInProgress = false;
         resolve(execFn());
       }, delay);
+
       const forceRetry = () => {
         if (delayInProgress) {
           clearTimeout(delayId);
@@ -172,6 +172,7 @@ export function delayExecution<T>(
 
       if (onRetryCallback && onRetryCallback({ forceRetry, delay, attempt, lastError }) === false) {
         clearTimeout(delayId);
+        reject(new Error('RelayNetworkLayer: interrupted in onRetry() callback'));
       }
     } else {
       resolve(execFn());

@@ -103,10 +103,10 @@ import { RelayNetworkLayer } from 'react-relay-network-modern/es';
   * `fetchTimeout` - number in milliseconds that defines in how much time will request timeout after it has been sent to the server again (default: `15000`).
   * `retryDelays` - array of millisecond that defines the values on which retries are based on (default: `[1000, 3000]`). Or it may be a function `(attempt: number) => number | false` which returns a timeout in milliseconds for retry or false for disabling retry.
   * `statusCodes` - array of response status codes which will fire up retryMiddleware. Or it may be a function `(statusCode: number, req, res) => boolean` which makes retry if returned true. (default: `status < 200 or status > 300`).
-  * `forceRetry` - function(cb, delay), when request is delayed for next retry, middleware will call this function and pass to it a callback and delay time. When you call this callback `cb`, middleware will proceed request immediately (default: `false`).
-  * `onRetry` - function(attempt: number), called on every retry attempt with `attemp` being the number of the attemp.
+  * `onRetry` - function(meta: { forceRetry: Function, delay: number, attempt: number, lastError: ?Error }), called on every retry attempt with `attemp` being the number of the attemp, `delay` with number of milliseconds while next retry will be, `forceRetry()` for proceeding request immediately, `lastError` will keep Error from previous request. You may return `false` from `onRetry` function, if you want to stop retrying.
   * `allowMutations` - by default retries disabled for mutations, you may allow process retries for them passing `true`. (default: `false`)
   * `allowFormData` - by default retries disabled for file Uploads, you may enable it passing `true` (default: `false`)
+  * `forceRetry` - deprecated, use `onRetry` instead (default: `false`).
 * **batchMiddleware** - gather some period of time relay-requests and sends it as one http-request. You server must support batch request, [how to setup your server](https://github.com/relay-tools/react-relay-network-modern#example-how-to-enable-batching)
   * `batchUrl` - string. Url of the server endpoint for batch request execution. Can be function(requestMap) or Promise. (default: `/graphql/batch`)
   * `batchTimeout` - integer in milliseconds, period of time for gathering multiple requests before sending them to the server. Will delay sending of the requests on specified in this option period of time, so be careful and keep this value small. (default: `0`)
