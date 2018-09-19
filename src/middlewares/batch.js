@@ -6,6 +6,7 @@ import RelayRequestBatch from '../RelayRequestBatch';
 import RelayRequest from '../RelayRequest';
 import type RelayResponse from '../RelayResponse';
 import type { Middleware, FetchOpts } from '../definition';
+import RRNLError from '../RRNLError';
 
 // Max out at roughly 100kb (express-graphql imposed max)
 const DEFAULT_BATCH_SIZE = 102400;
@@ -44,6 +45,13 @@ type Batcher = {
   acceptRequests: boolean,
 };
 
+export class RRNLBatchMiddlewareError extends RRNLError {
+  constructor(msg: string) {
+    super(msg);
+    this.name = 'RRNLBatchMiddlewareError';
+  }
+}
+
 export default function batchMiddleware(options?: BatchMiddlewareOpts): Middleware {
   const opts = options || {};
   const batchTimeout = opts.batchTimeout || 0; // 0 is the same as nextTick in nodeJS
@@ -67,7 +75,7 @@ export default function batchMiddleware(options?: BatchMiddlewareOpts): Middlewa
     }
 
     if (!(req instanceof RelayRequest)) {
-      throw new Error(
+      throw new RRNLBatchMiddlewareError(
         'Relay batch middleware accepts only simple RelayRequest. Did you add batchMiddleware twice?'
       );
     }
@@ -192,7 +200,9 @@ async function sendRequests(requestMap: BatchRequestMap, next, opts) {
     try {
       const batchResponse = await next(batchRequest);
       if (!batchResponse || !Array.isArray(batchResponse.json)) {
-        throw new Error('Wrong response from server. Did your server support batch request?');
+        throw new RRNLBatchMiddlewareError(
+          'Wrong response from server. Did your server support batch request?'
+        );
       }
 
       batchResponse.json.forEach((payload: any) => {
@@ -221,7 +231,7 @@ function finalizeUncompleted(requestMap: BatchRequestMap) {
     const request = requestMap[id];
     if (!request.done) {
       request.completeErr(
-        new Error(
+        new RRNLBatchMiddlewareError(
           `Server does not return response for request with id ${id} \n` +
             `Response should have following shape { "id": "${id}", "data": {} }`
         )

@@ -2,6 +2,7 @@
 
 import type { FetchOpts, Variables } from './definition';
 import type RelayRequest from './RelayRequest';
+import RRNLError from './RRNLError';
 
 export type Requests = RelayRequest[];
 
@@ -65,7 +66,7 @@ export default class RelayRequestBatch {
   }
 
   getVariables(): Variables {
-    throw new Error('Batch request does not have variables.');
+    throw new RRNLError('Batch request does not have variables.');
   }
 
   getQueryString(): string {

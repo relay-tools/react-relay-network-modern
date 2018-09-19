@@ -4,6 +4,7 @@
 import type { Middleware, RelayRequestAny, MiddlewareNextFn } from '../definition';
 import type RelayResponse from '../RelayResponse';
 import { isFunction } from '../utils';
+import RRNLError from '../RRNLError';
 
 export type RetryAfterFn = (attempt: number) => number | false;
 export type ForceRetryFn = (runNow: Function, delay: number) => any;
@@ -35,7 +36,7 @@ export type RetryMiddlewareOpts = {|
 
 function noopFn() {}
 
-class RRNLRetryMiddlewareError extends Error {
+export class RRNLRetryMiddlewareError extends RRNLError {
   constructor(msg: string) {
     super(msg);
     this.name = 'RRNLRetryMiddlewareError';

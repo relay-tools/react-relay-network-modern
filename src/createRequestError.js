@@ -1,10 +1,11 @@
 /* @flow */
 
 import RelayRequest from './RelayRequest';
+import RRNLError from './RRNLError';
 import type { GraphQLResponseErrors, RelayRequestAny } from './definition';
 import type RelayResponse from './RelayResponse';
 
-class RRNLRequestError extends Error {
+export class RRNLRequestError extends RRNLError {
   req: RelayRequestAny;
   res: ?RelayResponse;
 
