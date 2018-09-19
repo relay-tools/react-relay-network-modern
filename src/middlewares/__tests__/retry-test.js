@@ -75,7 +75,8 @@ describe('middlewares/retry', () => {
   });
 
   describe('middleware', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
+      await sleep(5); // fix: some strange error
       fetchMock.restore();
     });
 
@@ -128,7 +129,7 @@ describe('middlewares/retry', () => {
                   status: 200,
                   body: { data: 'PAYLOAD' },
                 }),
-              attempt <= 2 ? 50 : 0
+              attempt <= 2 ? 100 : 0
             );
           });
         },
