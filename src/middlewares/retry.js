@@ -7,12 +7,15 @@ import { isFunction } from '../utils';
 
 export type RetryAfterFn = (attempt: number) => number | false;
 export type ForceRetryFn = (runNow: Function, delay: number) => any;
-export type OnRetryFn = (meta: {
+
+export type BeforeRetryCb = (meta: {|
   forceRetry: Function,
+  abort: Function,
   delay: number,
   attempt: number,
   lastError: ?Error,
-}) => false | any;
+|}) => any;
+
 export type StatusCheckFn = (
   statusCode: number,
   req: RelayRequestAny,
@@ -26,9 +29,18 @@ export type RetryMiddlewareOpts = {|
   logger?: Function | false,
   allowMutations?: boolean,
   allowFormData?: boolean,
-  forceRetry?: ForceRetryFn | false,
-  onRetry?: OnRetryFn | false,
+  forceRetry?: ForceRetryFn | false, // DEPRECATED in favor `beforeRetry`
+  beforeRetry?: BeforeRetryCb | false,
 |};
+
+function noopFn() {}
+
+class RRNLRetryMiddlewareError extends Error {
+  constructor(msg: string) {
+    super(msg);
+    this.name = 'RRNLRetryMiddlewareError';
+  }
+}
 
 export default function retryMiddleware(options?: RetryMiddlewareOpts): Middleware {
   const opts = options || {};
@@ -39,8 +51,8 @@ export default function retryMiddleware(options?: RetryMiddlewareOpts): Middlewa
     opts.logger === false ? () => {} : opts.logger || console.log.bind(console, '[RELAY-NETWORK]');
   const allowMutations = opts.allowMutations || false;
   const allowFormData = opts.allowFormData || false;
-  const forceRetryFn = opts.forceRetry || false;
-  const onRetryFn = opts.onRetry || false;
+  const forceRetryFn = opts.forceRetry || false; // DEPRECATED in favor `beforeRetry`
+  const beforeRetry = opts.beforeRetry || false;
 
   let retryAfterMs: RetryAfterFn = () => false;
   if (retryDelays) {
@@ -83,7 +95,7 @@ export default function retryMiddleware(options?: RetryMiddlewareOpts): Middlewa
       retryAfterMs,
       retryOnStatusCode,
       forceRetryFn,
-      onRetryFn,
+      beforeRetry,
       logger,
     });
   };
@@ -97,97 +109,142 @@ async function makeRetriableRequest(
     retryAfterMs: RetryAfterFn,
     retryOnStatusCode: StatusCheckFn,
     forceRetryFn: ForceRetryFn | false,
-    onRetryFn: OnRetryFn | false,
+    beforeRetry: BeforeRetryCb | false,
     logger: Function,
   },
   delay: number = 0,
   attempt: number = 0,
   lastError: ?Error = null
 ): Promise<RelayResponse> {
+  const makeRetry = async (prevError: Error) => {
+    const retryDelay = o.retryAfterMs(attempt);
+    if (retryDelay) {
+      o.logger(prevError.message);
+      o.logger(`will retry in ${retryDelay} milliseconds`);
+      return makeRetriableRequest(o, retryDelay, attempt + 1, prevError);
+    }
+    throw prevError;
+  };
+
   const makeRequest = async () => {
     try {
-      let res;
-      if (o.timeout) {
-        res = await promiseWithTimeout(o.next(o.req), o.timeout, async () => {
-          const retryDelayMS = o.retryAfterMs(attempt);
-          if (retryDelayMS) {
-            o.logger(`response timeout, retrying after ${retryDelayMS} ms`);
-            return makeRetriableRequest(
-              o,
-              retryDelayMS,
-              attempt + 1,
-              new Error(`response timeout, retrying after ${retryDelayMS} ms`)
-            );
-          }
-          throw new Error(`RelayNetworkLayer: reached request timeout in ${o.timeout} ms`);
-        });
-      } else {
-        res = await o.next(o.req);
-      }
-      return res;
+      return await promiseWithTimeout(o.next(o.req), o.timeout, () => {
+        const err = new RRNLRetryMiddlewareError(`Reached request timeout in ${o.timeout} ms`);
+        return makeRetry(err);
+      });
     } catch (e) {
-      const retryDelayMS = o.retryAfterMs(attempt);
-      if (retryDelayMS && e && e.message.indexOf('RelayNetworkLayer') === -1) {
-        if (!e.res) {
-          o.logger(`request failed with error: ${e}, retrying after ${retryDelayMS} ms`);
-          return makeRetriableRequest(o, retryDelayMS, attempt + 1, e);
-        } else if (o.retryOnStatusCode(e.res.status, o.req, e.res)) {
-          o.logger(`response status ${e.res.status}, retrying after ${retryDelayMS} ms`);
-          return makeRetriableRequest(o, retryDelayMS, attempt + 1, e);
-        }
+      // no response from server (no internet connection), make new attempt
+      if (e && !e.res && !(e instanceof RRNLRetryMiddlewareError)) {
+        return makeRetry(e);
       }
+
+      // response with invalid statusCode
+      if (e && e.res && o.retryOnStatusCode(e.res.status, o.req, e.res)) {
+        const err = new RRNLRetryMiddlewareError(
+          `Wrong response status ${e.res.status}, retrying...`
+        );
+        return makeRetry(err);
+      }
+
       throw e;
     }
   };
 
-  return delayExecution(makeRequest, delay, o.forceRetryFn, o.onRetryFn, attempt, lastError);
-}
+  if (attempt === 0) {
+    // first request should be without delay
+    return makeRequest();
+  } else {
+    // second and all further calls should be delayed
+    const { promise, forceExec, abort } = delayedExecution(makeRequest, delay);
 
-export function delayExecution<T>(
-  execFn: () => Promise<T>,
-  delay: number = 0,
-  forceRetryWhenDelay?: ?ForceRetryFn | false,
-  onRetryCallback?: ?OnRetryFn | false,
-  attempt: number = 0,
-  lastError: ?Error = null
-): Promise<T> {
-  return new Promise((resolve, reject) => {
-    if (delay > 0) {
-      let delayInProgress = true;
-      const delayId = setTimeout(() => {
-        delayInProgress = false;
-        resolve(execFn());
-      }, delay);
-
-      const forceRetry = () => {
-        if (delayInProgress) {
-          clearTimeout(delayId);
-          resolve(execFn());
-        }
-      };
-
-      if (forceRetryWhenDelay) {
-        forceRetryWhenDelay(forceRetry, delay);
-      }
-
-      if (onRetryCallback && onRetryCallback({ forceRetry, delay, attempt, lastError }) === false) {
-        clearTimeout(delayId);
-        reject(new Error('RelayNetworkLayer: interrupted in onRetry() callback'));
-      }
-    } else {
-      resolve(execFn());
+    if (o.forceRetryFn) {
+      // DEPRECATED in favor `beforeRetry`
+      o.forceRetryFn(forceExec, delay);
     }
-  });
+
+    if (o.beforeRetry) {
+      o.beforeRetry({
+        abort,
+        forceRetry: forceExec,
+        attempt,
+        delay,
+        lastError,
+      });
+    }
+
+    return promise;
+  }
 }
 
+/**
+ * This function delays execution of some function for some period of time.
+ * Returns a promise, with ability to run execution immidiately, or abort it.
+ */
+export function delayedExecution<T>(
+  execFn: () => Promise<T>,
+  delay: number = 0
+): {
+  forceExec: () => any,
+  abort: () => any,
+  promise: Promise<T>,
+} {
+  let abort = noopFn;
+  let forceExec = noopFn;
+
+  if (delay <= 0) {
+    return {
+      abort,
+      forceExec,
+      promise: execFn(),
+    };
+  }
+
+  const promise = new Promise((resolve, reject) => {
+    let delayId;
+
+    abort = () => {
+      if (delayId) {
+        clearTimeout(delayId);
+        delayId = null;
+      }
+      reject(new RRNLRetryMiddlewareError('Aborted in beforeRetry() callback'));
+    };
+
+    forceExec = () => {
+      if (delayId) {
+        clearTimeout(delayId);
+        delayId = null;
+        resolve(execFn());
+      }
+    };
+
+    delayId = setTimeout(() => {
+      resolve(execFn());
+    }, delay);
+  });
+
+  return { forceExec, abort, promise };
+}
+
+/*
+* This function accepts a Promise and watch for it some period of time (timeoutMS)
+* if Promise completed in this period, then returns its result
+* if not - returns other Promise from onTimeout() callback
+*/
 export function promiseWithTimeout<T>(
   promise: Promise<T>,
   timeoutMS: number,
   onTimeout: () => Promise<T>
 ): Promise<T> {
+  if (!timeoutMS) {
+    return promise;
+  }
+
   return new Promise((resolve, reject) => {
     const timeoutId = setTimeout(() => {
-      resolve(onTimeout());
+      onTimeout()
+        .then(resolve)
+        .catch(reject);
     }, timeoutMS);
 
     promise
