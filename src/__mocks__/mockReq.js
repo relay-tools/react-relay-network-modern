@@ -52,15 +52,20 @@ class MockReq {
   }
 
   execute(rnl: RelayNetworkLayer): Promise<RelayResponse> {
-    return (rnl.fetchFn(
-      ({
-        id: this.getID(),
-        text: this.getQueryString() || '',
-      }: any), // ConcreteBatch,
-      this.getVariables() || {}, // Variables,
-      {}, // CacheConfig,
-      this.getFiles() // ?UploadableMap
-    ): any);
+    const operation = ({
+      id: this.getID(),
+      text: this.getQueryString() || '',
+    }: any);
+    const variables = this.getVariables() || {};
+    const cacheConfig = {};
+    const uploadables = this.getFiles();
+
+    const res = (rnl.fetchFn(operation, variables, cacheConfig, uploadables): any);
+
+    // avoid unhandled rejection in tests
+    res.catch(() => {});
+    // but allow to read rejected response
+    return res;
   }
 }
 

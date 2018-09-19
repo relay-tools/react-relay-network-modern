@@ -3,7 +3,7 @@
 import fetchMock from 'fetch-mock';
 import RelayNetworkLayer from '../../RelayNetworkLayer';
 import { mockReq } from '../../__mocks__/mockReq';
-import retryMiddleware, { delayExecution, promiseWithTimeout } from '../retry';
+import retryMiddleware, { delayedExecution, promiseWithTimeout } from '../retry';
 
 async function sleep(timeout: number): Promise<void> {
   return new Promise(resolve => {
@@ -34,12 +34,11 @@ describe('middlewares/retry', () => {
     });
   });
 
-  describe('delayExecution()', () => {
+  describe('delayedExecution()', () => {
     it('should run function after delay', async () => {
       const execFn = jest.fn(() => Promise.resolve(777));
-      const forceRetryWhenDelay = jest.fn();
 
-      const promise = delayExecution(execFn, 10, forceRetryWhenDelay);
+      const { promise } = delayedExecution(execFn, 10);
       await sleep(5);
       expect(execFn).toHaveBeenCalledTimes(0);
       await sleep(10);
@@ -49,21 +48,29 @@ describe('middlewares/retry', () => {
       expect(r).toBe(777);
     });
 
-    it('should run function after call `runNow`', async () => {
+    it('should run function immediately after `forceExec` call', async () => {
       const execFn = jest.fn(() => Promise.resolve(888));
-      const forceRetryWhenDelay = jest.fn(cb => {
-        setTimeout(() => cb(), 10);
-      });
 
-      const promise = delayExecution(execFn, 1000, forceRetryWhenDelay);
+      const { promise, forceExec } = delayedExecution(execFn, 1000);
       await sleep(5);
-      expect(forceRetryWhenDelay).toHaveBeenCalledTimes(1);
       expect(execFn).toHaveBeenCalledTimes(0);
-      await sleep(10);
+      forceExec();
+      await sleep(1);
       expect(execFn).toHaveBeenCalledTimes(1);
 
       const r = await promise;
       expect(r).toBe(888);
+    });
+
+    it('should abort function after `abort` call', async () => {
+      const execFn = jest.fn(() => Promise.resolve(999));
+
+      const { promise, abort } = delayedExecution(execFn, 1000);
+      await sleep(5);
+      expect(execFn).toHaveBeenCalledTimes(0);
+      abort();
+      await expect(promise).rejects.toThrow(/aborted/i);
+      expect(execFn).toHaveBeenCalledTimes(0);
     });
   });
 
@@ -166,19 +173,13 @@ describe('middlewares/retry', () => {
         }),
       ]);
 
-      expect.assertions(2);
-      try {
-        await mockReq(1).execute(rnl);
-      } catch (e) {
-        expect(e.toString()).toMatch('RelayNetworkLayer: reached request timeout in 20 ms');
-      }
-      const reqs = fetchMock.calls('/graphql');
-      expect(reqs).toHaveLength(2);
+      await expect(mockReq(1).execute(rnl)).rejects.toThrow('Reached request timeout in 20 ms');
+      expect(fetchMock.calls('/graphql')).toHaveLength(2);
     });
 
     it('should work forceRetry callback when request delayed', async () => {
       // First request will be fulfilled after 100ms delay
-      // 2nd request and next without delays
+      // 2nd request and the following - without delays
       let attempt = 0;
       fetchMock.mock({
         matcher: '/graphql',
@@ -208,7 +209,7 @@ describe('middlewares/retry', () => {
       const rnl = new RelayNetworkLayer([
         retryMiddleware({
           fetchTimeout: 10,
-          retryDelays: () => 999,
+          retryDelays: () => 199,
           logger: false,
           forceRetry,
         }),
@@ -222,19 +223,22 @@ describe('middlewares/retry', () => {
       await sleep(10);
       // after 10 ms should be reached `fetchTimeout`
       // so middleware hang request
-      // and starts 1000ms delayed period before making a new request
+      // and starts 199ms delayed period before making a new request
       // when delay period was started, should be called forceRetry method
       expect(forceRetry).toHaveBeenCalledTimes(1);
       // second arg of forceRetry call should be delay period in ms
-      expect(forceRetry.mock.calls[0][1]).toBe(999);
+      expect(forceRetry.mock.calls[0][1]).toBe(199);
       // on 30 ms will be called `runNow` function
       await sleep(50);
-      // so we make second request before delay period will end
+      // so Middlware should made second request under the hood
       expect(fetchMock.calls('/graphql')).toHaveLength(2);
       expect((await resPromise).data).toBe('PAYLOAD');
+      // await that no more calls was made by middleware
+      await sleep(200);
+      expect(fetchMock.calls('/graphql')).toHaveLength(2);
     });
 
-    it('should call `onRetry` when request delayed', async () => {
+    it('should call `beforeRetry` when request delayed', async () => {
       // First request will be fulfilled after 100ms delay
       // 2nd request and next without delays
       let attempt = 0;
@@ -257,7 +261,7 @@ describe('middlewares/retry', () => {
       });
 
       // will call force retry after 30 ms
-      const onRetry = jest.fn(({ forceRetry }) => {
+      const beforeRetry = jest.fn(({ forceRetry }) => {
         setTimeout(() => {
           forceRetry();
         }, 30);
@@ -268,7 +272,7 @@ describe('middlewares/retry', () => {
           fetchTimeout: 10,
           retryDelays: () => 999,
           logger: false,
-          onRetry,
+          beforeRetry,
         }),
       ]);
 
@@ -282,13 +286,14 @@ describe('middlewares/retry', () => {
       // so middleware hang request
       // and starts 1000ms delayed period before making a new request
       // when delay period was started, should be called forceRetry method
-      expect(onRetry).toHaveBeenCalledTimes(1);
-      expect(onRetry.mock.calls[0][0]).toEqual({
+      expect(beforeRetry).toHaveBeenCalledTimes(1);
+      expect(beforeRetry.mock.calls[0][0]).toEqual({
         attempt: 1,
         delay: 999,
         forceRetry: expect.anything(),
+        abort: expect.anything(),
         lastError: expect.objectContaining({
-          message: expect.stringContaining('response timeout'),
+          message: 'Reached request timeout in 10 ms',
         }),
       });
       // on 30 ms will be called `forceRetry` function
@@ -298,9 +303,9 @@ describe('middlewares/retry', () => {
       expect((await resPromise).data).toBe('PAYLOAD');
     });
 
-    it('should call `onRetry` and reject request if returned `false`', async () => {
+    it('should call `beforeRetry` and reject request if called `abort`', async () => {
       // First request will be fulfilled after 100ms delay
-      // 2nd request and next without delays
+      // 2nd request and further - without delays
       let attempt = 0;
       fetchMock.mock({
         matcher: '/graphql',
@@ -321,8 +326,8 @@ describe('middlewares/retry', () => {
       });
 
       // will call force retry after 30 ms
-      const onRetry = jest.fn(() => {
-        return false;
+      const beforeRetry = jest.fn(({ abort }) => {
+        abort();
       });
 
       const rnl = new RelayNetworkLayer([
@@ -330,7 +335,7 @@ describe('middlewares/retry', () => {
           fetchTimeout: 10,
           retryDelays: () => 999,
           logger: false,
-          onRetry,
+          beforeRetry,
         }),
       ]);
 
@@ -343,22 +348,19 @@ describe('middlewares/retry', () => {
       // after 10 ms should be reached `fetchTimeout`
       // so middleware hang request
       // and starts 1000ms delayed period before making a new request
-      // when delay period was started, should be called forceRetry method
-      expect(onRetry).toHaveBeenCalledTimes(1);
-      expect(onRetry.mock.calls[0][0]).toEqual({
+      // when delay period was started, should be called `abort` method
+      expect(beforeRetry).toHaveBeenCalledTimes(1);
+      expect(beforeRetry.mock.calls[0][0]).toEqual({
         attempt: 1,
         delay: 999,
         forceRetry: expect.anything(),
+        abort: expect.anything(),
         lastError: expect.objectContaining({
-          message: expect.stringContaining('response timeout'),
+          message: 'Reached request timeout in 10 ms',
         }),
       });
 
-      await resPromise.catch(e => {
-        expect(e).toMatchObject({
-          message: expect.stringContaining('interrupted in onRetry() callback'),
-        });
-      });
+      await expect(resPromise).rejects.toThrow('Aborted in beforeRetry() callback');
 
       // we should not make second request
       expect(fetchMock.calls('/graphql')).toHaveLength(1);
