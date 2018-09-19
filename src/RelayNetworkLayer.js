@@ -24,6 +24,7 @@ export default class RelayNetworkLayer {
   _rawMiddlewares: MiddlewareRaw[];
   _middlewaresSync: RNLExecuteFunction[];
   execute: RNLExecuteFunction;
+  executeWithEvents: any;
   +fetchFn: FetchFunction;
   +subscribeFn: ?SubscribeFunction;
   +noThrow: boolean;
@@ -77,5 +78,6 @@ export default class RelayNetworkLayer {
 
     const network = Network.create(this.fetchFn, this.subscribeFn);
     this.execute = network.execute;
+    this.executeWithEvents = network.executeWithEvents;
   }
 }
