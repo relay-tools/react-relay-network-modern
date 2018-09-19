@@ -15,6 +15,7 @@ export type BeforeRetryCb = (meta: {|
   delay: number,
   attempt: number,
   lastError: ?Error,
+  req: RelayRequestAny,
 |}) => any;
 
 export type StatusCheckFn = (
@@ -170,6 +171,7 @@ async function makeRetriableRequest(
         attempt,
         delay,
         lastError,
+        req: o.req,
       });
     }
 
