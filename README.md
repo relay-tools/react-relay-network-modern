@@ -102,7 +102,13 @@ import { RelayNetworkLayer } from 'react-relay-network-modern/es';
   * `fetchTimeout` - number in milliseconds that defines in how much time will request timeout after it has been sent to the server again (default: `15000`).
   * `retryDelays` - array of millisecond that defines the values on which retries are based on (default: `[1000, 3000]`). Or it may be a function `(attempt: number) => number | false` which returns a timeout in milliseconds for retry or false for disabling retry.
   * `statusCodes` - array of response status codes which will fire up retryMiddleware. Or it may be a function `(statusCode: number, req, res) => boolean` which makes retry if returned true. (default: `status < 200 or status > 300`).
-  * `beforeRetry` - function(meta: { forceRetry: Function, abort: Function, delay: number, attempt: number, lastError: ?Error }), called before every retry attempt with `attemp` being the number of the attemp, `delay` with number of milliseconds while next retry will be, `forceRetry()` for proceeding request immediately, `abort()` for aborting retry request, `lastError` will keep Error from previous request.
+  * `beforeRetry` - function(meta: { forceRetry: Function, abort: Function, delay: number, attempt: number, lastError: ?Error, req: RelayRequest }) called before every retry attempt. You get one argument with following properties:
+    * `forceRetry()` - for proceeding request immediately
+    * `abort()` - for aborting retry request
+    * `attemp` - number of the attemp (starts from 0)
+    * `delay` - number of milliseconds when next retry will be called
+    * `lastError` - will keep Error from previous request
+    * `req` - retriable Request object
   * `allowMutations` - by default retries disabled for mutations, you may allow process retries for them passing `true`. (default: `false`)
   * `allowFormData` - by default retries disabled for file Uploads, you may enable it passing `true` (default: `false`)
   * `forceRetry` - deprecated, use `onRetry` instead (default: `false`).

@@ -295,6 +295,7 @@ describe('middlewares/retry', () => {
         lastError: expect.objectContaining({
           message: 'Reached request timeout in 10 ms',
         }),
+        req: expect.anything(),
       });
       // on 30 ms will be called `forceRetry` function
       await sleep(50);
@@ -358,6 +359,7 @@ describe('middlewares/retry', () => {
         lastError: expect.objectContaining({
           message: 'Reached request timeout in 10 ms',
         }),
+        req: expect.anything(),
       });
 
       await expect(resPromise).rejects.toThrow('Aborted in beforeRetry() callback');
