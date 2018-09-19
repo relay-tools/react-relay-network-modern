@@ -1,6 +1,7 @@
 /* @flow */
 
 import type { ConcreteBatch, Variables, CacheConfig, UploadableMap, FetchOpts } from './definition';
+import RRNLError from './RRNLError';
 
 function getFormDataInterface(): ?Class<FormData> {
   return (typeof window !== 'undefined' && window.FormData) || (global && global.FormData);
@@ -45,7 +46,7 @@ export default class RelayRequest {
     if (uploadables) {
       const _FormData_ = getFormDataInterface();
       if (!_FormData_) {
-        throw new Error('Uploading files without `FormData` interface does not supported.');
+        throw new RRNLError('Uploading files without `FormData` interface does not supported.');
       }
 
       const formData = new _FormData_();

@@ -1,10 +1,10 @@
 /* @flow */
 
 import RelayNetworkLayer from './RelayNetworkLayer';
-import batchMiddleware from './middlewares/batch';
-import retryMiddleware from './middlewares/retry';
+import batchMiddleware, { RRNLBatchMiddlewareError } from './middlewares/batch';
+import retryMiddleware, { RRNLRetryMiddlewareError } from './middlewares/retry';
 import urlMiddleware from './middlewares/url';
-import authMiddleware from './middlewares/auth';
+import authMiddleware, { RRNLAuthMiddlewareError } from './middlewares/auth';
 import perfMiddleware from './middlewares/perf';
 import loggerMiddleware from './middlewares/logger';
 import errorMiddleware from './middlewares/error';
@@ -14,6 +14,8 @@ import graphqlBatchHTTPWrapper from './express-middleware/graphqlBatchHTTPWrappe
 import RelayNetworkLayerRequest from './RelayRequest';
 import RelayNetworkLayerRequestBatch from './RelayRequestBatch';
 import RelayNetworkLayerResponse from './RelayResponse';
+import { RRNLRequestError } from './createRequestError';
+import RRNLError from './RRNLError';
 
 export {
   RelayNetworkLayer,
@@ -30,4 +32,9 @@ export {
   cacheMiddleware,
   progressMiddleware,
   graphqlBatchHTTPWrapper,
+  RRNLError,
+  RRNLRequestError,
+  RRNLRetryMiddlewareError,
+  RRNLAuthMiddlewareError,
+  RRNLBatchMiddlewareError,
 };

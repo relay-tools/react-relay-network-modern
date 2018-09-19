@@ -4,11 +4,12 @@
 import { isFunction } from '../utils';
 import type RelayResponse from '../RelayResponse';
 import type { Middleware, RelayRequestAny } from '../definition';
+import RRNLError from '../RRNLError';
 
-class WrongTokenError extends Error {
-  constructor(msg) {
+export class RRNLAuthMiddlewareError extends RRNLError {
+  constructor(msg: string) {
     super(msg);
-    this.name = 'WrongTokenError';
+    this.name = 'RRNLAuthMiddlewareError';
   }
 }
 
@@ -37,7 +38,7 @@ export default function authMiddleware(opts?: AuthMiddlewareOpts): Middleware {
       const token = await (isFunction(tokenOrThunk) ? tokenOrThunk(req) : tokenOrThunk);
 
       if (!token && tokenRefreshPromise && !allowEmptyToken) {
-        throw new WrongTokenError('Empty token');
+        throw new RRNLAuthMiddlewareError('Empty token');
       }
 
       if (token) {
