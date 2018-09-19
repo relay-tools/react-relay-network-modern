@@ -67,7 +67,12 @@ export default class RelayNetworkLayer {
       }
 
       const req = new RelayRequest(operation, variables, cacheConfig, uploadables);
-      return fetchWithMiddleware(req, this._middlewares, this._rawMiddlewares, this.noThrow);
+      const res = fetchWithMiddleware(req, this._middlewares, this._rawMiddlewares, this.noThrow);
+
+      // avoid unhandled promise rejection error
+      res.catch(() => {});
+
+      return res;
     };
 
     const network = Network.create(this.fetchFn, this.subscribeFn);
