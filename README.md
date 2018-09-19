@@ -173,8 +173,9 @@ const network = new RelayNetworkLayer(
     retryMiddleware({
       fetchTimeout: 15000,
       retryDelays: attempt => Math.pow(2, attempt + 4) * 100, // or simple array [3200, 6400, 12800, 25600, 51200, 102400, 204800, 409600],
-      forceRetry: (cb, delay) => {
-        window.forceRelayRetry = cb;
+      beforeRetry: ({ forceRetry, abort, delay, attempt, lastError, req }) => {
+        if (attempt > 10) abort();
+        window.forceRelayRetry = forceRetry;
         console.log('call `forceRelayRetry()` for immediately retry! Or wait ' + delay + ' ms.');
       },
       statusCodes: [500, 503, 504],
@@ -285,7 +286,7 @@ Middlewares use LIFO (last in, first out) stack. Or simply put - use `compose` f
 * call bubbling phase of `M1`
 * chain to `resPromise.then(res => res.json())` and pass this promise for resolving/rejecting Relay requests.
 
-### Batching several requests into one
+## Batching several requests into one
 
 Joseph Savona [wrote](https://github.com/facebook/relay/issues/1058#issuecomment-213592051): For legacy reasons, Relay splits "plural" root queries into individual queries. In general we want to diff each root value separately, since different fields may be missing for different root values.
 
@@ -293,9 +294,9 @@ Also if you use [react-relay-router](https://github.com/relay-tools/react-router
 
 So for avoiding multiple http-requests, the `ReactRelayNetworkModern` is the right way to combine it in single http-request.
 
-## Example how to enable batching
+### Example how to enable batching
 
-### ...on server
+#### ...on server
 
 Firstly, you should prepare **server** to proceed the batch request:
 
@@ -334,7 +335,7 @@ server.listen(port, () => {
 
 If you are on Koa@2, [koa-graphql-batch](https://github.com/mattecapu/koa-graphql-batch) provides the same functionality as `graphqlBatchHTTPWrapper` (see its docs for usage example).
 
-### ...on client
+#### ...on client
 
 And right after server side ready to accept batch queries, you may enable batching on the **client**:
 
@@ -354,8 +355,6 @@ Internally batching in NetworkLayer prepare list of queries `[ {id, query, varia
 
 I actively welcome pull requests with code and doc fixes.
 Also if you made great middleware and want share it within this module, please feel free to open PR.
-
-[CHANGELOG](https://github.com/relay-tools/react-relay-network-modern/blob/master/CHANGELOG.md)
 
 ## License
 
