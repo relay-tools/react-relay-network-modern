@@ -34,13 +34,13 @@
     "react-relay": ">=1.4.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.0.0",
-    "@babel/core": "^7.0.1",
-    "@babel/plugin-proposal-class-properties": "^7.0.0",
+    "@babel/cli": "^7.1.0",
+    "@babel/core": "^7.1.0",
+    "@babel/plugin-proposal-class-properties": "^7.1.0",
     "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
     "@babel/plugin-transform-flow-strip-types": "^7.0.0",
     "@babel/polyfill": "^7.0.0",
-    "@babel/preset-env": "^7.0.0",
+    "@babel/preset-env": "^7.1.0",
     "@babel/preset-flow": "^7.0.0",
     "@babel/register": "^7.0.0",
     "babel-core": "^7.0.0-bridge.0",
@@ -57,7 +57,7 @@
     "flow-bin": "^0.81.0",
     "form-data": "^2.3.2",
     "jest": "^23.6.0",
-    "prettier": "^1.14.2",
+    "prettier": "^1.14.3",
     "relay-runtime": "^1.6.2",
     "rimraf": "^2.6.2",
     "semantic-release": "^15.9.15"
