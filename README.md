@@ -111,7 +111,7 @@ import { RelayNetworkLayer } from 'react-relay-network-modern/es';
     * `req` - retriable Request object
   * `allowMutations` - by default retries disabled for mutations, you may allow process retries for them passing `true`. (default: `false`)
   * `allowFormData` - by default retries disabled for file Uploads, you may enable it passing `true` (default: `false`)
-  * `forceRetry` - deprecated, use `onRetry` instead (default: `false`).
+  * `forceRetry` - deprecated, use `beforeRetry` instead (default: `false`).
 * **batchMiddleware** - gather some period of time relay-requests and sends it as one http-request. You server must support batch request, [how to setup your server](https://github.com/relay-tools/react-relay-network-modern#example-how-to-enable-batching)
   * `batchUrl` - string. Url of the server endpoint for batch request execution. Can be function(requestMap) or Promise. (default: `/graphql/batch`)
   * `batchTimeout` - integer in milliseconds, period of time for gathering multiple requests before sending them to the server. Will delay sending of the requests on specified in this option period of time, so be careful and keep this value small. (default: `0`)
