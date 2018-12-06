@@ -148,6 +148,41 @@ describe('middlewares/retry', () => {
       expect(reqs).toMatchSnapshot();
     });
 
+    it('should allow fetchTimeout to specify a function or number', async () => {
+      // returns request after 30ms
+      // 3rd request should work
+      fetchMock.mock({
+        matcher: '/graphql',
+        response: () => {
+          return new Promise(resolve => {
+            setTimeout(
+              () =>
+                resolve({
+                  status: 200,
+                  body: { data: 'PAYLOAD' },
+                }),
+              30,
+            );
+          });
+        },
+        method: 'POST',
+      });
+
+      const rnl = new RelayNetworkLayer([
+        retryMiddleware({
+          fetchTimeout: (attempt) => attempt < 2 ? 5 : 100,
+          retryDelays: () => 1,
+          logger: false,
+        }),
+      ]);
+
+      const mockReqExecution = mockReq(1).execute(rnl);
+
+      await sleep(60);
+
+      expect(fetchMock.calls('/graphql')).toHaveLength(3);
+    });
+
     it('should throw error on timeout', async () => {
       // returns request after 100ms
       fetchMock.mock({

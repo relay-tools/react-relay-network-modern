@@ -7,6 +7,7 @@ import { isFunction } from '../utils';
 import RRNLError from '../RRNLError';
 
 export type RetryAfterFn = (attempt: number) => number | false;
+export type TimeoutAfterFn = (attempt: number) => number;
 export type ForceRetryFn = (runNow: Function, delay: number) => any;
 
 export type BeforeRetryCb = (meta: {|
@@ -25,7 +26,7 @@ export type StatusCheckFn = (
 ) => boolean;
 
 export type RetryMiddlewareOpts = {|
-  fetchTimeout?: number,
+  fetchTimeout?: number | TimeoutAfterFn,
   retryDelays?: number[] | RetryAfterFn,
   statusCodes?: number[] | false | StatusCheckFn,
   logger?: Function | false,
@@ -70,6 +71,13 @@ export default function retryMiddleware(options?: RetryMiddlewareOpts): Middlewa
     }
   }
 
+  let timeoutAfterMs: TimeoutAfterFn;
+  if (typeof timeout === 'number') {
+    timeoutAfterMs = () => timeout;
+  } else {
+    timeoutAfterMs = timeout;
+  }
+
   let retryOnStatusCode: StatusCheckFn = (status, req, res) => {
     return res.status < 200 || res.status > 300;
   };
@@ -93,7 +101,7 @@ export default function retryMiddleware(options?: RetryMiddlewareOpts): Middlewa
     return makeRetriableRequest({
       req,
       next,
-      timeout,
+      timeoutAfterMs,
       retryAfterMs,
       retryOnStatusCode,
       forceRetryFn,
@@ -107,7 +115,7 @@ async function makeRetriableRequest(
   o: {
     req: RelayRequestAny,
     next: MiddlewareNextFn,
-    timeout: number,
+    timeoutAfterMs: TimeoutAfterFn,
     retryAfterMs: RetryAfterFn,
     retryOnStatusCode: StatusCheckFn,
     forceRetryFn: ForceRetryFn | false,
@@ -130,8 +138,9 @@ async function makeRetriableRequest(
 
   const makeRequest = async () => {
     try {
-      return await promiseWithTimeout(o.next(o.req), o.timeout, () => {
-        const err = new RRNLRetryMiddlewareError(`Reached request timeout in ${o.timeout} ms`);
+      const timeout = o.timeoutAfterMs(attempt);
+      return await promiseWithTimeout(o.next(o.req), timeout, () => {
+        const err = new RRNLRetryMiddlewareError(`Reached request timeout in ${timeout} ms`);
         return makeRetry(err);
       });
     } catch (e) {
