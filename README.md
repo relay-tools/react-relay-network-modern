@@ -99,7 +99,7 @@ import { RelayNetworkLayer } from 'react-relay-network-modern/es';
   * `header` - name of the HTTP header to pass the token in (default: `'Authorization'`).
   * If you use `auth` middleware with `retry`, `retry` must be used before `auth`. Eg. if token expired when retries apply, then `retry` can call `auth` middleware again.
 * **retryMiddleware** - for request retry if the initial request fails.
-  * `fetchTimeout` - number in milliseconds that defines in how much time will request timeout after it has been sent to the server again (default: `15000`).
+  * `fetchTimeout` - number in milliseconds that defines in how much time will request timeout after it has been sent to the server again (default: `15000`). Or it may be a function `(attempt: number) => number` which returns a timeout in milliseconds (`attempt` starts from 0).
   * `retryDelays` - array of millisecond that defines the values on which retries are based on (default: `[1000, 3000]`). Or it may be a function `(attempt: number) => number | false` which returns a timeout in milliseconds for retry or false for disabling retry (`attempt` starts from 0).
   * `statusCodes` - array of response status codes which will fire up retryMiddleware. Or it may be a function `(statusCode: number, req, res) => boolean` which makes retry if returned true. (default: `status < 200 or status > 300`).
   * `beforeRetry` - function(meta: { forceRetry: Function, abort: Function, delay: number, attempt: number, lastError: ?Error, req: RelayRequest }) called before every retry attempt. You get one argument with following properties:
