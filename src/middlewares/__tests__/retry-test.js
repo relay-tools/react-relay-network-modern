@@ -161,7 +161,7 @@ describe('middlewares/retry', () => {
                   status: 200,
                   body: { data: 'PAYLOAD' },
                 }),
-              30,
+              30
             );
           });
         },
@@ -170,14 +170,13 @@ describe('middlewares/retry', () => {
 
       const rnl = new RelayNetworkLayer([
         retryMiddleware({
-          fetchTimeout: (attempt) => attempt < 2 ? 5 : 100,
+          fetchTimeout: attempt => (attempt < 2 ? 5 : 100),
           retryDelays: () => 1,
           logger: false,
         }),
       ]);
 
-      const mockReqExecution = mockReq(1).execute(rnl);
-
+      mockReq(1).execute(rnl);
       await sleep(60);
 
       expect(fetchMock.calls('/graphql')).toHaveLength(3);
