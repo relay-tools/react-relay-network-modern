@@ -4,6 +4,7 @@
 import fetchMock from 'fetch-mock';
 import fetchWithMiddleware from '../fetchWithMiddleware';
 import RelayRequest from '../RelayRequest';
+import RelayResponse from '../RelayResponse';
 
 describe('fetchWithMiddleware', () => {
   beforeEach(() => {
@@ -151,6 +152,23 @@ describe('fetchWithMiddleware', () => {
     } catch (e) {
       expect(e instanceof Error).toBeTruthy();
       expect(e.toString()).toMatch('Server return empty response.data');
+    }
+  });
+
+  it('should fail correctly with a response from a middleware cache', async () => {
+    const middleware = () => async () =>
+      RelayResponse.createFromGraphQL({
+        errors: [{ message: 'A GraphQL error occurred' }],
+      });
+
+    const req = new RelayRequest(({}: any), {}, {}, null);
+
+    expect.hasAssertions();
+    try {
+      await fetchWithMiddleware(req, [middleware], []);
+    } catch (e) {
+      expect(e instanceof Error).toBeTruthy();
+      expect(e.toString()).toMatch('A GraphQL error occurred');
     }
   });
 });
