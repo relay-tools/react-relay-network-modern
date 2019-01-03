@@ -58,16 +58,16 @@ export function createRequestError(req: RelayRequestAny, res?: RelayResponse) {
 
   if (!res) {
     errorReason = 'Server return empty response.';
-  } else if (!res.json) {
-    errorReason =
-      (res.text ? res.text : `Server return empty response with Status Code: ${res.status}.`) +
-      (res ? `\n\n${res.toString()}` : '');
   } else if (res.errors) {
     if (req instanceof RelayRequest) {
       errorReason = formatGraphQLErrors(req, res.errors);
     } else {
       errorReason = JSON.stringify(res.errors);
     }
+  } else if (!res.json) {
+    errorReason =
+      (res.text ? res.text : `Server return empty response with Status Code: ${res.status}.`) +
+      (res ? `\n\n${res.toString()}` : '');
   } else if (!res.data) {
     errorReason = 'Server return empty response.data.\n\n' + res.toString();
   }
