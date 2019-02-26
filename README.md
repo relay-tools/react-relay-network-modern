@@ -73,7 +73,7 @@ import { RelayNetworkLayer } from 'react-relay-network-modern/es';
 
 ## Middlewares
 
-### Build-in middlewares
+### Built-in middlewares
 
 * **your custom inline middleware** - [see example](https://github.com/relay-tools/react-relay-network-modern#example-of-injecting-networklayer-with-middlewares-on-the-client-side) below where added `credentials` and `headers` to the `fetch` method.
   * `next => req => { /* your modification of 'req' object */ return next(req); }`
