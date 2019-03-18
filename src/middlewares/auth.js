@@ -51,12 +51,15 @@ export default function authMiddleware(opts?: AuthMiddlewareOpts): Middleware {
         if (e.message === 'Empty token' || (e.res && e.res.status === 401)) {
           if (tokenRefreshPromise) {
             if (!tokenRefreshInProgress) {
-              tokenRefreshInProgress = Promise.resolve(tokenRefreshPromise(req, e.res)).then(
-                newToken => {
+              tokenRefreshInProgress = Promise.resolve(tokenRefreshPromise(req, e.res))
+                .then(newToken => {
                   tokenRefreshInProgress = null;
                   return newToken;
-                }
-              );
+                })
+                .catch(err => {
+                  tokenRefreshInProgress = null;
+                  throw err;
+                });
             }
 
             return tokenRefreshInProgress.then(newToken => {

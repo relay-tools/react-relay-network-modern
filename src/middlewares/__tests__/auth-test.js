@@ -96,4 +96,45 @@ describe('middlewares/auth', () => {
     expect(reqs[1][1].headers.Authorization).toBe('Bearer ValidToken');
     expect(fetchMock.calls('/graphql')).toMatchSnapshot();
   });
+
+  it('`tokenRefreshPromise` reset refresh token state', async () => {
+    fetchMock.mock({
+      matcher: '/graphql',
+      response: (_, opts) => {
+        if (opts.headers.Authorization === 'Bearer ValidToken') {
+          return {
+            status: 200,
+            body: { data: 'PAYLOAD' },
+          };
+        }
+        return { status: 401, body: '' };
+      },
+      method: 'POST',
+    });
+
+    let refershTokenSwitch = false;
+
+    const rnl = new RelayNetworkLayer([
+      authMiddleware({
+        token: '',
+        tokenRefreshPromise: () => {
+          if (!refershTokenSwitch) {
+            return Promise.reject(new Error('refresh token failed'));
+          }
+          return Promise.resolve('ValidToken');
+        },
+      }),
+    ]);
+
+    const req = mockReq(1);
+    try {
+      await req.execute(rnl);
+    } catch (error) {
+      expect(error.message).toBe('refresh token failed');
+    }
+    refershTokenSwitch = true;
+    await req.execute(rnl);
+    const reqs = fetchMock.calls('/graphql');
+    expect(reqs).toHaveLength(1);
+  });
 });
