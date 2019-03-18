@@ -56,7 +56,10 @@ export default function authMiddleware(opts?: AuthMiddlewareOpts): Middleware {
                   tokenRefreshInProgress = null;
                   return newToken;
                 }
-              );
+              ).catch(err => { 
+                tokenRefreshInProgress = null; 
+                throw err;
+              });
             }
 
             return tokenRefreshInProgress.then(newToken => {
