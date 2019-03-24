@@ -72,6 +72,7 @@ function compose(...funcs) {
   } else {
     const last = funcs[funcs.length - 1];
     const rest = funcs.slice(0, -1);
+    // $FlowFixMe - Suppress error about promise not being callable
     return (...args) => rest.reduceRight((composed, f) => f((composed: any)), last(...args));
   }
 }

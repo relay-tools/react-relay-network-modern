@@ -63,8 +63,8 @@ export default class RelayResponse {
       `   Url: ${this.url || ''}`,
       `   Status code: ${this.status || ''}`,
       `   Status text: ${this.statusText || ''}`,
-      `   Response headers: ${JSON.stringify(this.headers)}`,
-      `   Response body: ${JSON.stringify(this.json)}`,
+      `   Response headers: ${JSON.stringify(this.headers) || ''}`,
+      `   Response body: ${JSON.stringify(this.json) || ''}`,
     ].join('\n');
   }
 }
