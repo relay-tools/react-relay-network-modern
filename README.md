@@ -104,7 +104,7 @@ import { RelayNetworkLayer } from 'react-relay-network-modern/es';
   * `statusCodes` - array of response status codes which will fire up retryMiddleware. Or it may be a function `(statusCode: number, req, res) => boolean` which makes retry if returned true. (default: `status < 200 or status > 300`).
   * `beforeRetry` - function(meta: { forceRetry: Function, abort: Function, delay: number, attempt: number, lastError: ?Error, req: RelayRequest }) called before every retry attempt. You get one argument with following properties:
     * `forceRetry()` - for proceeding request immediately
-    * `abort()` - for aborting retry request
+    * `abort(abortMsg: string)` - for aborting retry request. (Default abort message is: `"Aborted in beforeRetry() callback"`)
     * `attempt` - number of the attemp (starts from 1)
     * `delay` - number of milliseconds when next retry will be called
     * `lastError` - will keep Error from previous request
