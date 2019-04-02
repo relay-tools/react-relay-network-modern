@@ -343,6 +343,7 @@ describe('middlewares/retry', () => {
       // First request will be fulfilled after 100ms delay
       // 2nd request and further - without delays
       let attempt = 0;
+      const customAbortedMsg = 'custom aborted in before beforeRetry';
       fetchMock.mock({
         matcher: '/graphql',
         response: () => {
@@ -363,7 +364,7 @@ describe('middlewares/retry', () => {
 
       // will call force retry after 30 ms
       const beforeRetry = jest.fn(({ abort }) => {
-        abort();
+        abort(customAbortedMsg);
       });
 
       const rnl = new RelayNetworkLayer([
@@ -397,7 +398,7 @@ describe('middlewares/retry', () => {
         req: expect.anything(),
       });
 
-      await expect(resPromise).rejects.toThrow('Aborted in beforeRetry() callback');
+      await expect(resPromise).rejects.toThrow(customAbortedMsg);
 
       // we should not make second request
       expect(fetchMock.calls('/graphql')).toHaveLength(1);

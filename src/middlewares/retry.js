@@ -9,10 +9,11 @@ import RRNLError from '../RRNLError';
 export type RetryAfterFn = (attempt: number) => number | false;
 export type TimeoutAfterFn = (attempt: number) => number;
 export type ForceRetryFn = (runNow: Function, delay: number) => any;
+export type AbortFn = (msg: ?string) => any;
 
 export type BeforeRetryCb = (meta: {|
   forceRetry: Function,
-  abort: Function,
+  abort: AbortFn,
   delay: number,
   attempt: number,
   lastError: ?Error,
@@ -214,12 +215,12 @@ export function delayedExecution<T>(
   const promise = new Promise((resolve, reject) => {
     let delayId;
 
-    abort = () => {
+    abort = msg => {
       if (delayId) {
         clearTimeout(delayId);
         delayId = null;
       }
-      reject(new RRNLRetryMiddlewareError('Aborted in beforeRetry() callback'));
+      reject(new RRNLRetryMiddlewareError(msg || 'Aborted in beforeRetry() callback'));
     };
 
     forceExec = () => {
