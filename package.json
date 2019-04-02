@@ -6,7 +6,8 @@
     "es",
     "lib",
     "mjs",
-    "node8"
+    "node8",
+    "index.d.ts"
   ],
   "main": "lib/index.js",
   "module": "mjs/index.mjs",
