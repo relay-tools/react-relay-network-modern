@@ -39,7 +39,7 @@ export default class RelayNetworkLayer {
     this.noThrow = false;
 
     const mws = Array.isArray(middlewares) ? (middlewares: any) : [middlewares];
-    mws.forEach(mw => {
+    mws.forEach((mw) => {
       if (mw) {
         if (mw.execute) {
           this._middlewaresSync.push(mw.execute);

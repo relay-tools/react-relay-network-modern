@@ -111,9 +111,9 @@ describe('middlewares/batch', () => {
     const req2 = mockReq(2);
     const req3 = mockReq(3);
     const [res1, res2, res3] = await Promise.all([
-      req1.execute(rnl).catch(e => e),
+      req1.execute(rnl).catch((e) => e),
       req2.execute(rnl),
-      req3.execute(rnl).catch(e => e),
+      req3.execute(rnl).catch((e) => e),
     ]);
 
     expect(res1).toBeInstanceOf(Error);
@@ -137,8 +137,8 @@ describe('middlewares/batch', () => {
     const req1 = mockReq(1);
     const req2 = mockReq(2);
     const [res1, res2] = await Promise.all([
-      req1.execute(rnl).catch(e => e),
-      req2.execute(rnl).catch(e => e),
+      req1.execute(rnl).catch((e) => e),
+      req2.execute(rnl).catch((e) => e),
     ]);
 
     expect(res1).toBeInstanceOf(Error);
@@ -200,9 +200,9 @@ describe('middlewares/batch', () => {
     const req3 = mockReq(3);
 
     const [res1, res2, res3] = await Promise.all([
-      req1.execute(rnl).catch(e => e),
-      req2.execute(rnl).catch(e => e),
-      req3.execute(rnl).catch(e => e),
+      req1.execute(rnl).catch((e) => e),
+      req2.execute(rnl).catch((e) => e),
+      req3.execute(rnl).catch((e) => e),
     ]);
 
     expect(res1.toString()).toMatch('Wrong response');

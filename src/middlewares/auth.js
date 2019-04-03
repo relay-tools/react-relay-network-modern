@@ -32,7 +32,7 @@ export default function authMiddleware(opts?: AuthMiddlewareOpts): Middleware {
 
   let tokenRefreshInProgress = null;
 
-  return next => async req => {
+  return (next) => async (req) => {
     try {
       // $FlowFixMe
       const token = await (isFunction(tokenOrThunk) ? tokenOrThunk(req) : tokenOrThunk);
@@ -52,17 +52,17 @@ export default function authMiddleware(opts?: AuthMiddlewareOpts): Middleware {
           if (tokenRefreshPromise) {
             if (!tokenRefreshInProgress) {
               tokenRefreshInProgress = Promise.resolve(tokenRefreshPromise(req, e.res))
-                .then(newToken => {
+                .then((newToken) => {
                   tokenRefreshInProgress = null;
                   return newToken;
                 })
-                .catch(err => {
+                .catch((err) => {
                   tokenRefreshInProgress = null;
                   throw err;
                 });
             }
 
-            return tokenRefreshInProgress.then(newToken => {
+            return tokenRefreshInProgress.then((newToken) => {
               const newReq = req.clone();
               newReq.fetchOpts.headers[header] = `${prefix}${newToken}`;
               return next(newReq); // re-run query with new token

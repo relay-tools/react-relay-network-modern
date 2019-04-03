@@ -22,7 +22,7 @@ export default function errorMiddleware(options?: GqlErrorMiddlewareOpts): Middl
     errors: GraphQLResponseErrors,
     reqRes: { req: RelayRequestAny, res: RelayResponse }
   ) {
-    return errors.forEach(error => {
+    return errors.forEach((error) => {
       const { message, stack, ...rest } = error;
 
       let msg = `${prefix}`;
@@ -53,8 +53,8 @@ export default function errorMiddleware(options?: GqlErrorMiddlewareOpts): Middl
     });
   }
 
-  return next => req => {
-    return next(req).then(res => {
+  return (next) => (req) => {
+    return next(req).then((res) => {
       if (req instanceof RelayRequest) {
         if (Array.isArray(res.errors)) {
           displayErrors(res.errors, { req, res });

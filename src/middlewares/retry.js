@@ -61,7 +61,7 @@ export default function retryMiddleware(options?: RetryMiddlewareOpts): Middlewa
   let retryAfterMs: RetryAfterFn = () => false;
   if (retryDelays) {
     if (Array.isArray(retryDelays)) {
-      retryAfterMs = attempt => {
+      retryAfterMs = (attempt) => {
         if (retryDelays.length >= attempt) {
           return retryDelays[attempt];
         }
@@ -90,7 +90,7 @@ export default function retryMiddleware(options?: RetryMiddlewareOpts): Middlewa
     }
   }
 
-  return next => req => {
+  return (next) => (req) => {
     if (req.isMutation() && !allowMutations) {
       return next(req);
     }
@@ -215,7 +215,7 @@ export function delayedExecution<T>(
   const promise = new Promise((resolve, reject) => {
     let delayId;
 
-    abort = msg => {
+    abort = (msg) => {
       if (delayId) {
         clearTimeout(delayId);
         delayId = null;
@@ -261,11 +261,11 @@ export function promiseWithTimeout<T>(
     }, timeoutMS);
 
     promise
-      .then(res => {
+      .then((res) => {
         clearTimeout(timeoutId);
         resolve(res);
       })
-      .catch(err => {
+      .catch((err) => {
         clearTimeout(timeoutId);
         reject(err);
       });

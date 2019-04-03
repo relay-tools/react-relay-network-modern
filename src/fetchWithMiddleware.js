@@ -25,7 +25,7 @@ function runFetch(req: RelayRequestAny): Promise<FetchResponse> {
 }
 
 // convert fetch response to RelayResponse object
-const convertResponse: (next: MiddlewareRawNextFn) => MiddlewareNextFn = next => async req => {
+const convertResponse: (next: MiddlewareRawNextFn) => MiddlewareNextFn = (next) => async (req) => {
   const resFromFetch = await next(req);
 
   const res = await RelayResponse.createFromFetch(resFromFetch);
@@ -48,7 +48,7 @@ export default function fetchWithMiddleware(
     ...rawFetchMiddlewares
   )((runFetch: any));
 
-  return wrappedFetch(req).then(res => {
+  return wrappedFetch(req).then((res) => {
     if (!noThrow && (!res || res.errors || !res.data)) {
       throw createRequestError(req, res);
     }
@@ -68,7 +68,7 @@ export default function fetchWithMiddleware(
  */
 function compose(...funcs) {
   if (funcs.length === 0) {
-    return arg => arg;
+    return (arg) => arg;
   } else {
     const last = funcs[funcs.length - 1];
     const rest = funcs.slice(0, -1);

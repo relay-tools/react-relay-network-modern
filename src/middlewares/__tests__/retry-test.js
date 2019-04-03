@@ -6,7 +6,7 @@ import { mockReq } from '../../__mocks__/mockReq';
 import retryMiddleware, { delayedExecution, promiseWithTimeout } from '../retry';
 
 async function sleep(timeout: number): Promise<void> {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     setTimeout(resolve, timeout);
   });
 }
@@ -20,7 +20,7 @@ describe('middlewares/retry', () => {
     });
 
     it('should run `onTimeout` when timout is reached', async () => {
-      const p = new Promise(resolve => {
+      const p = new Promise((resolve) => {
         setTimeout(() => {
           resolve(333);
         }, 20);
@@ -122,7 +122,7 @@ describe('middlewares/retry', () => {
         matcher: '/graphql',
         response: () => {
           attempt++;
-          return new Promise(resolve => {
+          return new Promise((resolve) => {
             setTimeout(
               () =>
                 resolve({
@@ -154,7 +154,7 @@ describe('middlewares/retry', () => {
       fetchMock.mock({
         matcher: '/graphql',
         response: () => {
-          return new Promise(resolve => {
+          return new Promise((resolve) => {
             setTimeout(
               () =>
                 resolve({
@@ -170,7 +170,7 @@ describe('middlewares/retry', () => {
 
       const rnl = new RelayNetworkLayer([
         retryMiddleware({
-          fetchTimeout: attempt => (attempt < 2 ? 5 : 100),
+          fetchTimeout: (attempt) => (attempt < 2 ? 5 : 100),
           retryDelays: () => 1,
           logger: false,
         }),
@@ -187,7 +187,7 @@ describe('middlewares/retry', () => {
       fetchMock.mock({
         matcher: '/graphql',
         response: () => {
-          return new Promise(resolve => {
+          return new Promise((resolve) => {
             setTimeout(
               () =>
                 resolve({
@@ -220,7 +220,7 @@ describe('middlewares/retry', () => {
         matcher: '/graphql',
         response: () => {
           attempt++;
-          return new Promise(resolve => {
+          return new Promise((resolve) => {
             setTimeout(
               () =>
                 resolve({
@@ -235,7 +235,7 @@ describe('middlewares/retry', () => {
       });
 
       // will call force retry after 30 ms
-      const forceRetry = jest.fn(runNow => {
+      const forceRetry = jest.fn((runNow) => {
         setTimeout(() => {
           runNow();
         }, 30);
@@ -281,7 +281,7 @@ describe('middlewares/retry', () => {
         matcher: '/graphql',
         response: () => {
           attempt++;
-          return new Promise(resolve => {
+          return new Promise((resolve) => {
             setTimeout(
               () =>
                 resolve({
@@ -348,7 +348,7 @@ describe('middlewares/retry', () => {
         matcher: '/graphql',
         response: () => {
           attempt++;
-          return new Promise(resolve => {
+          return new Promise((resolve) => {
             setTimeout(
               () =>
                 resolve({

@@ -21,8 +21,8 @@ const mockOperation: any = {
 
 describe('RelayNetworkLayer', () => {
   it('should call middlewares', async () => {
-    const mw1: any = jest.fn(next => next);
-    const mw2: any = jest.fn(next => next);
+    const mw1: any = jest.fn((next) => next);
+    const mw2: any = jest.fn((next) => next);
 
     const network = new RelayNetworkLayer([null, mw1, undefined, mw2]);
     await network.execute(mockOperation, {}, {});
@@ -32,7 +32,7 @@ describe('RelayNetworkLayer', () => {
 
   describe('sync middleware', () => {
     it('should return payload from sync middleware, without calling async middlewares', async () => {
-      const asyncMW: any = jest.fn(next => next);
+      const asyncMW: any = jest.fn((next) => next);
 
       const syncMW = {
         execute: () => ({ data: {} }),
@@ -43,7 +43,7 @@ describe('RelayNetworkLayer', () => {
     });
 
     it('should call async middlewares, if sync middleware returns undefined', async () => {
-      const asyncMW: any = jest.fn(next => next);
+      const asyncMW: any = jest.fn((next) => next);
 
       const syncMW = {
         execute: () => undefined,
@@ -57,7 +57,7 @@ describe('RelayNetworkLayer', () => {
 
   describe('beforeFetch option', () => {
     it('should return payload from beforeFetch, without calling async middlewares', async () => {
-      const asyncMW: any = jest.fn(next => next);
+      const asyncMW: any = jest.fn((next) => next);
 
       const network = new RelayNetworkLayer([asyncMW], {
         beforeFetch: () => ({ data: {} }),
@@ -67,7 +67,7 @@ describe('RelayNetworkLayer', () => {
     });
 
     it('should call async middlewares, if beforeFetch returns undefined', async () => {
-      const asyncMW: any = jest.fn(next => next);
+      const asyncMW: any = jest.fn((next) => next);
 
       const network = new RelayNetworkLayer([asyncMW], {
         beforeFetch: () => undefined,
@@ -90,7 +90,7 @@ describe('RelayNetworkLayer', () => {
       method: 'POST',
     });
 
-    const regularMiddleware = next => async req => {
+    const regularMiddleware = (next) => async (req) => {
       (req: any).fetchOpts.headers.reqId += ':regular';
       const res: any = await next(req);
       res.data.text += ':regular';
@@ -98,7 +98,7 @@ describe('RelayNetworkLayer', () => {
     };
 
     const createRawMiddleware = (id: number): any => {
-      const rawMiddleware = next => async req => {
+      const rawMiddleware = (next) => async (req) => {
         (req: any).fetchOpts.headers.reqId += `:raw${id}`;
         const res: any = await next(req);
         const parentJsonFN = res.json;

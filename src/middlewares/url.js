@@ -23,7 +23,7 @@ export default function urlMiddleware(opts?: UrlMiddlewareOpts): Middleware {
   const urlOrThunk: any = url || '/graphql';
   const headersOrThunk: any = headers;
 
-  return next => async req => {
+  return (next) => async (req) => {
     req.fetchOpts.url = await (isFunction(urlOrThunk) ? urlOrThunk(req) : urlOrThunk);
 
     if (headersOrThunk) {

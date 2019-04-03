@@ -43,7 +43,7 @@ export function formatGraphQLErrors(request: RelayRequest, errors: GraphQLRespon
                 queryLine.substr(column - 1 - offset, CONTEXT_LENGTH),
                 `${' '.repeat(Math.max(offset, 0))}^^^`,
               ]
-                .map(messageLine => indent + messageLine)
+                .map((messageLine) => indent + messageLine)
                 .join('\n');
             })
             .join('\n')

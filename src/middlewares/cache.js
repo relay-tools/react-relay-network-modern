@@ -26,7 +26,7 @@ export default function queryMiddleware(opts?: CacheMiddlewareOpts): Middleware 
     onInit(cache);
   }
 
-  return next => async req => {
+  return (next) => async (req) => {
     if (req.isMutation()) {
       if (clearOnMutation) {
         cache.clear();
