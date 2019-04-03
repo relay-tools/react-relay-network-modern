@@ -19,13 +19,13 @@ describe('fetchWithMiddleware', () => {
   });
 
   it('should make a successfull request with middlewares', async () => {
-    const numPlus5 = next => async req => {
+    const numPlus5 = (next) => async (req) => {
       (req: any).fetchOpts.headers.reqId += ':mw1';
       const res: any = await next(req);
       res.data.text += ':mw1';
       return res;
     };
-    const numMultiply10 = next => async req => {
+    const numMultiply10 = (next) => async (req) => {
       (req: any).fetchOpts.headers.reqId += ':mw2';
       const res: any = await next(req);
       res.data.text += ':mw2';

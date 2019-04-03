@@ -68,7 +68,7 @@ export default function batchMiddleware(options?: BatchMiddlewareOpts): Middlewa
   if (opts.redirect) fetchOpts.redirect = opts.redirect;
   if (opts.headers) fetchOpts.headersOrThunk = opts.headers;
 
-  return next => req => {
+  return (next) => (req) => {
     // do not batch mutations unless allowMutations = true
     if (req.isMutation() && !allowMutations) {
       return next(req);
@@ -121,15 +121,15 @@ function passThroughBatch(req: RelayRequest, next, opts) {
 
     const requestWrapper: RequestWrapper = {
       req,
-      completeOk: res => {
+      completeOk: (res) => {
         requestWrapper.done = true;
         resolve(res);
-        requestWrapper.duplicates.forEach(r => r.completeOk(res));
+        requestWrapper.duplicates.forEach((r) => r.completeOk(res));
       },
-      completeErr: err => {
+      completeErr: (err) => {
         requestWrapper.done = true;
         reject(err);
-        requestWrapper.duplicates.forEach(r => r.completeErr(err));
+        requestWrapper.duplicates.forEach((r) => r.completeErr(err));
       },
       done: false,
       duplicates: [],
@@ -177,12 +177,12 @@ async function sendRequests(requestMap: BatchRequestMap, next, opts) {
 
     const res = await next(request.req);
     request.completeOk(res);
-    request.duplicates.forEach(r => r.completeOk(res));
+    request.duplicates.forEach((r) => r.completeOk(res));
     return res;
   } else if (ids.length > 1) {
     // SEND AS BATCHED QUERY
 
-    const batchRequest = new RelayRequestBatch(ids.map(id => requestMap[id].req));
+    const batchRequest = new RelayRequestBatch(ids.map((id) => requestMap[id].req));
     // $FlowFixMe
     const url = await (isFunction(opts.batchUrl) ? opts.batchUrl(requestMap) : opts.batchUrl);
     batchRequest.setFetchOption('url', url);
@@ -216,7 +216,7 @@ async function sendRequests(requestMap: BatchRequestMap, next, opts) {
 
       return batchResponse;
     } catch (e) {
-      ids.forEach(id => {
+      ids.forEach((id) => {
         requestMap[id].completeErr(e);
       });
     }
@@ -227,7 +227,7 @@ async function sendRequests(requestMap: BatchRequestMap, next, opts) {
 
 // check that server returns responses for all requests
 function finalizeUncompleted(requestMap: BatchRequestMap) {
-  Object.keys(requestMap).forEach(id => {
+  Object.keys(requestMap).forEach((id) => {
     const request = requestMap[id];
     if (!request.done) {
       request.completeErr(

@@ -38,11 +38,11 @@ export default class RelayRequestBatch {
   }
 
   prepareBody(): string {
-    return `[${this.requests.map(r => r.getBody()).join(',')}]`;
+    return `[${this.requests.map((r) => r.getBody()).join(',')}]`;
   }
 
   getIds(): string[] {
-    return this.requests.map(r => r.getID());
+    return this.requests.map((r) => r.getID());
   }
 
   getID(): string {

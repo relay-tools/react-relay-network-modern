@@ -61,7 +61,11 @@
     "prettier": "^1.14.3",
     "relay-runtime": "^1.6.2",
     "rimraf": "^2.6.2",
-    "semantic-release": "^15.9.15"
+    "semantic-release": "^15.9.15",
+    "tslint": "^5.15.0",
+    "tslint-config-prettier": "^1.18.0",
+    "tslint-plugin-prettier": "^2.0.1",
+    "typescript": "^3.4.1"
   },
   "config": {
     "commitizen": {
@@ -81,7 +85,10 @@
     "build-es": "rimraf es && BABEL_ENV=es babel src --ignore __tests__,__mocks__ -d es && COPY_TO_FOLDER=es npm run build-flow",
     "build-node8": "rimraf node8 && BABEL_ENV=node8 babel src --ignore __tests__,__mocks__ -d node8 && COPY_TO_FOLDER=node8 npm run build-flow",
     "build-flow": "echo `$1` && find ./src -name '*.js' -not -path '*/__*' | while read filepath; do cp $filepath `echo ./${COPY_TO_FOLDER:-lib}$filepath | sed 's/.\\/src\\//\\//g'`.flow; done",
-    "lint": "eslint --ext .js ./src",
+    "lint": "npm run eslint && npm run tslint && npm run tscheck",
+    "eslint": "eslint --ext .js ./src",
+    "tslint": "tslint -p . \"src/**/*.d.ts\"",
+    "tscheck": "tsc --noEmit",
     "coverage": "jest --coverage --maxWorkers 2",
     "watch": "jest --watch",
     "flow": "flow",

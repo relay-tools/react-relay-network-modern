@@ -6,7 +6,7 @@ import { mockReq, mockMutationReq, mockFormDataReq } from '../../__mocks__/mockR
 import cacheMiddleware from '../cache';
 
 async function sleep(timeout: number): Promise<void> {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     setTimeout(resolve, timeout);
   });
 }

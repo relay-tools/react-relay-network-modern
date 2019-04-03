@@ -54,7 +54,7 @@ export default class RelayRequest {
       formData.append('query', this.getQueryString());
       formData.append('variables', JSON.stringify(this.getVariables()));
 
-      Object.keys(uploadables).forEach(key => {
+      Object.keys(uploadables).forEach((key) => {
         if (Object.prototype.hasOwnProperty.call(uploadables, key)) {
           formData.append(key, uploadables[key]);
         }

@@ -7,8 +7,8 @@ export default function(graphqlHTTPMiddleware: ExpressMiddleware): ExpressMiddle
     const subResponses = [];
     return Promise.all(
       req.body.map(
-        data =>
-          new Promise(resolve => {
+        (data) =>
+          new Promise((resolve) => {
             const subRequest = {
               __proto__: req.__proto__, // eslint-disable-line
               ...req,
@@ -51,7 +51,7 @@ export default function(graphqlHTTPMiddleware: ExpressMiddleware): ExpressMiddle
           })
       )
     )
-      .then(responses => {
+      .then((responses) => {
         let response = '';
         responses.forEach(({ status, id, payload }, idx) => {
           if (status) {
@@ -63,7 +63,7 @@ export default function(graphqlHTTPMiddleware: ExpressMiddleware): ExpressMiddle
         res.set('Content-Type', 'application/json');
         res.send(`[${response}]`);
       })
-      .catch(err => {
+      .catch((err) => {
         res.status(500).send({ error: err.message });
       });
   };

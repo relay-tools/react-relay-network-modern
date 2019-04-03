@@ -12,11 +12,11 @@ export type LoggerMiddlewareOpts = {|
 export default function loggerMiddleware(opts?: LoggerMiddlewareOpts): Middleware {
   const logger = (opts && opts.logger) || console.log.bind(console, '[RELAY-NETWORK]');
 
-  return next => req => {
+  return (next) => (req) => {
     const start = new Date().getTime();
 
     logger(`Run ${req.getID()}`, req);
-    return next(req).then(res => {
+    return next(req).then((res) => {
       const end = new Date().getTime();
 
       let queryId;
