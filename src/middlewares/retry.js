@@ -240,10 +240,10 @@ export function delayedExecution<T>(
 }
 
 /*
-* This function accepts a Promise and watch for it some period of time (timeoutMS)
-* if Promise completed in this period, then returns its result
-* if not - returns other Promise from onTimeout() callback
-*/
+ * This function accepts a Promise and watch for it some period of time (timeoutMS)
+ * if Promise completed in this period, then returns its result
+ * if not - returns other Promise from onTimeout() callback
+ */
 export function promiseWithTimeout<T>(
   promise: Promise<T>,
   timeoutMS: number,

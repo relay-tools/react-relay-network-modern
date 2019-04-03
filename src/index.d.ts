@@ -105,16 +105,14 @@ export type RetryAfterFn = (attempt: number) => number | false;
 export type ForceRetryFn = (runNow: Function, delay: number) => any;
 export type AbortFn = (msg?: string) => any;
 
-export type BeforeRetryCb = (
-  meta: {
-    forceRetry: Function;
-    abort: AbortFn;
-    delay: number;
-    attempt: number;
-    lastError: Error | null;
-    req: RelayRequestAny;
-  }
-) => any;
+export type BeforeRetryCb = (meta: {
+  forceRetry: Function;
+  abort: AbortFn;
+  delay: number;
+  attempt: number;
+  lastError: Error | null;
+  req: RelayRequestAny;
+}) => any;
 
 export type StatusCheckFn = (
   statusCode: number,

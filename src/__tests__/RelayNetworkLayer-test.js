@@ -6,11 +6,7 @@ import RelayNetworkLayer from '../RelayNetworkLayer';
 fetchMock.mock({
   matcher: '*',
   response: {
-    status: 200,
-    body: {
-      data: {},
-    },
-    sendAsJson: true,
+    data: {},
   },
 });
 
@@ -122,6 +118,6 @@ describe('RelayNetworkLayer', () => {
     const observable: any = network.execute(mockOperation, {}, {});
     const result = await observable.toPromise();
     expect(fetchMock.lastOptions().headers.reqId).toEqual('undefined:regular:raw1:raw2');
-    expect(result.response.data).toEqual({ text: 'undefined:raw2:raw1:regular' });
+    expect(result.data).toEqual({ text: 'undefined:raw2:raw1:regular' });
   });
 });
