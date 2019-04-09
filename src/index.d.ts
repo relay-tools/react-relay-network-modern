@@ -83,6 +83,12 @@ export interface LoggerMiddlewareOpts {
 
 export function loggerMiddleware(opts?: LoggerMiddlewareOpts): Middleware;
 
+export interface PerfMiddlewareOpts {
+  logger?: Function;
+}
+
+export function perfMiddleware(opts?: PerfMiddlewareOpts): Middleware;
+
 export interface AuthMiddlewareOpts {
   token?: string | Promise<string> | ((req: RelayRequestAny) => string | Promise<string>);
   tokenRefreshPromise?: (req: RelayRequestAny, res: RelayResponse) => string | Promise<string>;
