@@ -9,6 +9,7 @@ Object {
     "Content-Type": "application/json",
   },
   "method": "POST",
+  "signal": AbortSignal {},
 }
 `;
 
@@ -21,6 +22,7 @@ Object {
     "MyAuthorization": "MyBearer 333",
   },
   "method": "POST",
+  "signal": AbortSignal {},
 }
 `;
 
@@ -36,6 +38,7 @@ Array [
         "Content-Type": "application/json",
       },
       "method": "POST",
+      "signal": AbortSignal {},
     },
   ],
   Array [
@@ -48,6 +51,7 @@ Array [
         "Content-Type": "application/json",
       },
       "method": "POST",
+      "signal": AbortSignal {},
     },
   ],
 ]

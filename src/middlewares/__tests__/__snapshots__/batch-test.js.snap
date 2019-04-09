@@ -23,6 +23,7 @@ Array [
         "Content-Type": "application/json",
       },
       "method": "POST",
+      "signal": AbortSignal {},
     },
   ],
   Array [
@@ -34,6 +35,7 @@ Array [
         "Content-Type": "application/json",
       },
       "method": "POST",
+      "signal": AbortSignal {},
     },
   ],
 ]
@@ -136,6 +138,7 @@ Object {
     "Content-Type": "application/json",
   },
   "method": "POST",
+  "signal": AbortSignal {},
 }
 `;
 

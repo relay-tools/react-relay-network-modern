@@ -8,6 +8,7 @@ Object {
     "Content-Type": "application/json",
   },
   "method": "GET",
+  "signal": AbortSignal {},
   "url": "/get_url",
 }
 `;
@@ -20,6 +21,7 @@ Object {
     "Content-Type": "application/json",
   },
   "method": "POST",
+  "signal": AbortSignal {},
   "url": "/some_url",
 }
 `;
@@ -32,6 +34,7 @@ Object {
     "Content-Type": "application/json",
   },
   "method": "POST",
+  "signal": AbortSignal {},
   "url": "/thunk_url",
 }
 `;
@@ -44,6 +47,7 @@ Object {
     "Content-Type": "application/json",
   },
   "method": "POST",
+  "signal": AbortSignal {},
   "url": "/thunk_url_promise",
 }
 `;
