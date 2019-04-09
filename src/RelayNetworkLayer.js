@@ -68,12 +68,37 @@ export default class RelayNetworkLayer {
       }
 
       const req = new RelayRequest(operation, variables, cacheConfig, uploadables);
+
+      let controller = null;
+      if (window.AbortController) {
+        controller = new window.AbortController();
+        req.fetchOpts.signal = controller.signal;
+      }
+
       const res = fetchWithMiddleware(req, this._middlewares, this._rawMiddlewares, this.noThrow);
 
-      // avoid unhandled promise rejection error
-      res.catch(() => {});
+      return {
+        subscribe: (sink) => {
+          res
+            .then(
+              (value) => {
+                sink.next(value);
+                sink.complete();
+              },
+              (error) => {
+                if (error && error.name && error.name === 'AbortError') {
+                  sink.complete();
+                } else sink.error(error);
+              }
+            )
+            // avoid unhandled promise rejection error
+            .catch(() => {});
 
-      return res;
+          return () => {
+            if (controller) controller.abort();
+          };
+        },
+      };
     };
 
     const network = Network.create(this.fetchFn, this.subscribeFn);

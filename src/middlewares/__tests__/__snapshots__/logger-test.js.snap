@@ -13,6 +13,7 @@ Array [
           "Content-Type": "application/json",
         },
         "method": "POST",
+        "signal": AbortSignal {},
       },
       "id": "MyRequest",
       "operation": Object {

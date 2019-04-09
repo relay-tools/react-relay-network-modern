@@ -62,10 +62,19 @@ class MockReq {
 
     const res = (rnl.fetchFn(operation, variables, cacheConfig, uploadables): any);
 
+    const promise = new Promise((resolve, reject) => {
+      res.subscribe({
+        complete: () => {},
+        error: (error) => reject(error),
+        next: (value) => resolve(value),
+      });
+    });
+
     // avoid unhandled rejection in tests
-    res.catch(() => {});
+    promise.catch(() => {});
+
     // but allow to read rejected response
-    return res;
+    return promise;
   }
 }
 
