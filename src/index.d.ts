@@ -61,6 +61,11 @@ export class RelayRequestBatch {
 
 export type RelayRequestAny = RelayRequest | RelayRequestBatch;
 
+export type QueryResponseCache = {
+  size: number;
+  ttl: number;
+};
+
 export type MiddlewareNextFn = (req: RelayRequestAny) => Promise<RelayResponse>;
 export type Middleware = (next: MiddlewareNextFn) => MiddlewareNextFn;
 
@@ -98,6 +103,18 @@ export interface AuthMiddlewareOpts {
 }
 
 export function authMiddleware(opts?: AuthMiddlewareOpts): Middleware;
+
+export interface CacheMiddlewareOpts {
+  size?: number;
+  ttl?: number;
+  onInit?: (cache: QueryResponseCache) => any;
+  allowMutations?: boolean;
+  allowFormData?: boolean;
+  clearOnMutation?: boolean;
+  cacheErrors?: boolean;
+}
+
+export function cacheMiddleware(opts?: CacheMiddlewareOpts): Middleware;
 
 export interface GqlErrorMiddlewareOpts {
   logger?: Function;
