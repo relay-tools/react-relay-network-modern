@@ -6,6 +6,11 @@ Array [
     "Run MyRequest",
     RelayRequest {
       "cacheConfig": Object {},
+      "controller": AbortController {
+        Symbol(SameObject caches): Object {
+          "signal": AbortSignal {},
+        },
+      },
       "fetchOpts": Object {
         "body": "{\\"id\\":\\"MyRequest\\",\\"query\\":\\"\\",\\"variables\\":{}}",
         "headers": Object {

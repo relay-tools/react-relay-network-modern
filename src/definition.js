@@ -33,6 +33,7 @@ export type FetchOpts = {
   mode?: 'cors' | 'websocket' | 'navigate' | 'no-cors' | 'same-origin',
   cache?: 'default' | 'no-store' | 'reload' | 'no-cache' | 'force-cache' | 'only-if-cached',
   redirect?: 'follow' | 'error' | 'manual',
+  signal?: window.AbortSignal,
   [name: string]: mixed,
 };
 

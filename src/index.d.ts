@@ -19,6 +19,7 @@ export interface FetchOpts {
   mode?: 'cors' | 'websocket' | 'navigate' | 'no-cors' | 'same-origin';
   cache?: 'default' | 'no-store' | 'reload' | 'no-cache' | 'force-cache' | 'only-if-cached';
   redirect?: 'follow' | 'error' | 'manual';
+  signal?: AbortSignal;
   [name: string]: any;
 }
 
@@ -31,6 +32,7 @@ export class RelayRequest {
   variables: Variables;
   cacheConfig: CacheConfig;
   uploadables: UploadableMap | null;
+  controller: AbortController | null;
 
   getBody(): string | FormData;
   prepareBody(): string | FormData;
@@ -39,6 +41,7 @@ export class RelayRequest {
   getVariables(): Variables;
   isMutation(): boolean;
   isFormData(): boolean;
+  cancel(): boolean;
   clone(): RelayRequest;
 }
 
