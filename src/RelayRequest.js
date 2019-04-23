@@ -16,6 +16,7 @@ export default class RelayRequest {
   variables: Variables;
   cacheConfig: CacheConfig;
   uploadables: ?UploadableMap;
+  controller: ?window.AbortController;
 
   constructor(
     operation: ConcreteBatch,
@@ -30,11 +31,16 @@ export default class RelayRequest {
 
     this.id = this.operation.id || this.operation.name || this._generateID();
 
-    this.fetchOpts = {
+    const fetchOpts: FetchOpts = {
       method: 'POST',
       headers: {},
       body: this.prepareBody(),
     };
+
+    this.controller = window.AbortController ? new window.AbortController() : null;
+    if (this.controller) fetchOpts.signal = this.controller.signal;
+
+    this.fetchOpts = fetchOpts;
   }
 
   getBody(): string | FormData {
@@ -97,6 +103,14 @@ export default class RelayRequest {
   isFormData(): boolean {
     const _FormData_ = getFormDataInterface();
     return !!_FormData_ && this.fetchOpts.body instanceof _FormData_;
+  }
+
+  cancel(): boolean {
+    if (this.controller) {
+      this.controller.abort();
+      return true;
+    }
+    return false;
   }
 
   clone(): RelayRequest {

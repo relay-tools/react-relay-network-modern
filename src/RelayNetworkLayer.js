@@ -68,13 +68,6 @@ export default class RelayNetworkLayer {
       }
 
       const req = new RelayRequest(operation, variables, cacheConfig, uploadables);
-
-      let controller = null;
-      if (window.AbortController) {
-        controller = new window.AbortController();
-        req.fetchOpts.signal = controller.signal;
-      }
-
       const res = fetchWithMiddleware(req, this._middlewares, this._rawMiddlewares, this.noThrow);
 
       return {
@@ -95,7 +88,7 @@ export default class RelayNetworkLayer {
             .catch(() => {});
 
           return () => {
-            if (controller) controller.abort();
+            req.cancel();
           };
         },
       };
