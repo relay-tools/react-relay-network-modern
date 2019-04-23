@@ -98,8 +98,17 @@ export type QueryPayload =
       rerunVariables?: Variables,
     |}
   | RelayResponse;
+
+export type UnsubscribeFunction = () => void;
+export type Sink<T> = {
+  next: (value: T) => void,
+  complete: () => void,
+  error: (value: T) => void,
+};
 // this is workaround should be class from relay-runtime/network/RelayObservable.js
-export type RelayObservable<T> = Promise<T>;
+export type RelayObservable<T> = {
+  subscribe: (sink: Sink<T>) => UnsubscribeFunction,
+};
 // Note: This should accept Subscribable<T> instead of RelayObservable<T>,
 // however Flow cannot yet distinguish it from T.
 export type ObservableFromValue<T> = RelayObservable<T> | Promise<T> | T;
