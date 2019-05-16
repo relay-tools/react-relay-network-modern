@@ -227,10 +227,10 @@ export type PayloadData = { [key: string]: any };
 
 export type QueryPayload =
   | {
-    data?: PayloadData | null;
-    errors?: any[];
-    rerunVariables?: Variables;
-  }
+      data?: PayloadData | null;
+      errors?: any[];
+      rerunVariables?: Variables;
+    }
   | RelayResponse;
 
 export type MiddlewareSync = {
