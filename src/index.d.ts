@@ -107,6 +107,34 @@ export interface AuthMiddlewareOpts {
 
 export function authMiddleware(opts?: AuthMiddlewareOpts): Middleware;
 
+interface RequestWrapper {
+  req: RelayRequest,
+  completeOk: (res: Object) => void,
+  completeErr: (e: Error) => void,
+  done: boolean,
+  duplicates: Array<RequestWrapper>,
+}
+
+interface BatchRequestMap {
+  [reqId: string]: RequestWrapper
+}
+
+export type BatchMiddlewareOpts = {
+  batchUrl?: string | Promise<string> | ((requestMap: BatchRequestMap) => string | Promise<string>),
+  batchTimeout?: number,
+  maxBatchSize?: number,
+  allowMutations?: boolean,
+  method?: 'POST' | 'GET',
+  headers?: Headers | Promise<Headers> | ((req: RelayRequestBatch) => Headers | Promise<Headers>),
+  // Avaliable request modes in fetch options. For details see https://fetch.spec.whatwg.org/#requests
+  credentials?: FetchOpts["credentials"],
+  mode?: FetchOpts["mode"],
+  cache?: FetchOpts["cache"],
+  redirect?: FetchOpts["redirect"],
+};
+
+export function batchMiddleware(opts?: BatchMiddlewareOpts): Middleware;
+
 export interface CacheMiddlewareOpts {
   size?: number;
   ttl?: number;
@@ -199,10 +227,10 @@ export type PayloadData = { [key: string]: any };
 
 export type QueryPayload =
   | {
-      data?: PayloadData | null;
-      errors?: any[];
-      rerunVariables?: Variables;
-    }
+    data?: PayloadData | null;
+    errors?: any[];
+    rerunVariables?: Variables;
+  }
   | RelayResponse;
 
 export type MiddlewareSync = {
