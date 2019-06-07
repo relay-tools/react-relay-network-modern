@@ -70,32 +70,6 @@ describe('middlewares/batch', () => {
     expect(fetchMock.lastOptions()).toMatchSnapshot();
   });
 
-  it('should reject if server does not return response for request', async () => {
-    fetchMock.mock({
-      matcher: '/graphql/batch',
-      response: {
-        status: 200,
-        body: [{ data: { ok: 1 } }],
-      },
-      method: 'POST',
-    });
-
-    const rnl = new RelayNetworkLayer([batchMiddleware()]);
-    const req1 = mockReq(1);
-    const req2 = mockReq(2);
-
-    // prettier-ignore
-    const [res1, res2] = await Promise.all([
-      req1.execute(rnl),
-      req2.execute(rnl).catch(e => e),
-    ])
-
-    expect(res1.data).toEqual({ ok: 1 });
-    expect(res2).toBeInstanceOf(Error);
-    expect(res2.toString()).toMatch('Server does not return response for request');
-    expect(fetchMock.lastOptions()).toMatchSnapshot();
-  });
-
   it('should reject if server does not return response for duplicate request payloads', async () => {
     fetchMock.mock({
       matcher: '/graphql/batch',
