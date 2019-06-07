@@ -31,7 +31,7 @@ describe('middlewares/batch', () => {
       matcher: '/graphql/batch',
       response: {
         status: 200,
-        body: [{ id: 1, data: { ok: 1 } }, { id: 2, data: { ok: 2 } }],
+        body: [{ data: { ok: 1 } }, { data: { ok: 2 } }],
       },
       method: 'POST',
     });
@@ -44,19 +44,19 @@ describe('middlewares/batch', () => {
     expect(fetchMock.lastOptions()).toMatchSnapshot();
   });
 
-  it('should make a successfully batch request with duplicate request ids', async () => {
+  it('should make a successfully batch request with duplicate request payloads', async () => {
     fetchMock.mock({
       matcher: '/graphql/batch',
       response: {
         status: 200,
-        body: [{ id: 1, data: { ok: 1 } }, { id: 2, data: { ok: 2 } }],
+        body: [{ data: { ok: 1 } }, { data: { ok: 2 } }],
       },
       method: 'POST',
     });
     const rnl = new RelayNetworkLayer([batchMiddleware()]);
-    const req1 = mockReq(1);
-    const req2 = mockReq(2);
-    const req3 = mockReq(2);
+    const req1 = mockReq(2);
+    const req2 = mockReq(2, { query: 'duplicate', variables: { duplicate: true } });
+    const req3 = mockReq(2, { query: 'duplicate', variables: { duplicate: true } });
 
     const [res1, res2, res3] = await Promise.all([
       req1.execute(rnl),
@@ -75,7 +75,7 @@ describe('middlewares/batch', () => {
       matcher: '/graphql/batch',
       response: {
         status: 200,
-        body: [{ data: {} }, { id: 2, data: { ok: 2 } }],
+        body: [{ data: { ok: 1 } }],
       },
       method: 'POST',
     });
@@ -86,22 +86,22 @@ describe('middlewares/batch', () => {
 
     // prettier-ignore
     const [res1, res2] = await Promise.all([
-      req1.execute(rnl).catch(e => e),
-      req2.execute(rnl),
-    ]);
+      req1.execute(rnl),
+      req2.execute(rnl).catch(e => e),
+    ])
 
-    expect(res1).toBeInstanceOf(Error);
-    expect(res1.toString()).toMatch('Server does not return response for request');
-    expect(res2.data).toEqual({ ok: 2 });
+    expect(res1.data).toEqual({ ok: 1 });
+    expect(res2).toBeInstanceOf(Error);
+    expect(res2.toString()).toMatch('Server does not return response for request');
     expect(fetchMock.lastOptions()).toMatchSnapshot();
   });
 
-  it('should reject if server does not return response for duplicate request ids', async () => {
+  it('should reject if server does not return response for duplicate request payloads', async () => {
     fetchMock.mock({
       matcher: '/graphql/batch',
       response: {
         status: 200,
-        body: [{ data: {} }, { id: 2, data: { ok: 2 } }],
+        body: [{ data: { ok: 1 } }],
       },
       method: 'POST',
     });
@@ -111,14 +111,14 @@ describe('middlewares/batch', () => {
     const req2 = mockReq(2);
     const req3 = mockReq(3);
     const [res1, res2, res3] = await Promise.all([
-      req1.execute(rnl).catch((e) => e),
-      req2.execute(rnl),
+      req1.execute(rnl),
+      req2.execute(rnl).catch((e) => e),
       req3.execute(rnl).catch((e) => e),
     ]);
 
-    expect(res1).toBeInstanceOf(Error);
-    expect(res1.toString()).toMatch('Server does not return response for request');
-    expect(res2.data).toEqual({ ok: 2 });
+    expect(res1.data).toEqual({ ok: 1 });
+    expect(res2).toBeInstanceOf(Error);
+    expect(res2.toString()).toMatch('Server does not return response for request');
     expect(res3).toBeInstanceOf(Error);
     expect(res3.toString()).toMatch('Server does not return response for request');
     expect(fetchMock.lastOptions()).toMatchSnapshot();
@@ -155,12 +155,11 @@ describe('middlewares/batch', () => {
         status: 200,
         body: [
           {
-            id: 1,
             payload: {
               errors: [{ location: 1, message: 'major error' }],
             },
           },
-          { id: 2, payload: { data: { ok: 2 } } },
+          { payload: { data: { ok: 2 } } },
         ],
       },
       method: 'POST',
@@ -173,7 +172,7 @@ describe('middlewares/batch', () => {
     const [res1, res2] = await Promise.all([
       req1.execute(rnl).catch(e => e),
       req2.execute(rnl),
-    ]);
+    ])
 
     expect(res1).toBeInstanceOf(Error);
     expect(res1.toString()).toMatch('major error');
@@ -218,10 +217,9 @@ describe('middlewares/batch', () => {
         status: 200,
         body: [
           {
-            id: 1,
             errors: [{ location: 1, message: 'major error' }],
           },
-          { id: 2, data: { ok: 2 } },
+          { data: { ok: 2 } },
         ],
       },
       method: 'POST',
@@ -234,7 +232,7 @@ describe('middlewares/batch', () => {
     const [res1, res2] = await Promise.all([
       req1.execute(rnl).catch(e => e),
       req2.execute(rnl),
-    ]);
+    ])
 
     expect(res1).toBeInstanceOf(Error);
     expect(res1.toString()).toMatch('major error');
@@ -253,7 +251,7 @@ describe('middlewares/batch', () => {
         matcher: '/graphql/batch',
         response: {
           status: 200,
-          body: [{ id: 1, data: {} }, { id: 2, data: {} }, { id: 3, data: {} }],
+          body: [{ data: {} }, { data: {} }, { data: {} }],
         },
         method: 'POST',
       });
@@ -274,12 +272,7 @@ describe('middlewares/batch', () => {
         matcher: '/graphql/batch',
         response: {
           status: 200,
-          body: [
-            { id: 1, data: {} },
-            { id: 2, data: {} },
-            { id: 3, data: {} },
-            { id: 4, data: {} },
-          ],
+          body: [{ data: {} }, { data: {} }, { data: {} }, { data: {} }],
         },
         method: 'POST',
       });
@@ -315,7 +308,7 @@ describe('middlewares/batch', () => {
         matcher: '/graphql',
         response: {
           status: 200,
-          body: { id: 5, data: {} },
+          body: { data: {} },
         },
         method: 'POST',
       });
@@ -324,12 +317,7 @@ describe('middlewares/batch', () => {
         matcher: '/graphql/batch',
         response: {
           status: 200,
-          body: [
-            { id: 1, data: {} },
-            { id: 2, data: {} },
-            { id: 3, data: {} },
-            { id: 4, data: {} },
-          ],
+          body: [{ data: {} }, { data: {} }, { data: {} }, { data: {} }],
         },
         method: 'POST',
       });
@@ -366,7 +354,7 @@ describe('middlewares/batch', () => {
         matcher: '/graphql',
         response: {
           status: 200,
-          body: { id: 1, data: {} },
+          body: { data: {} },
         },
         method: 'POST',
       });
@@ -384,7 +372,7 @@ describe('middlewares/batch', () => {
         matcher: '/graphql',
         response: {
           status: 200,
-          body: { id: 1, data: {} },
+          body: { data: {} },
         },
         method: 'POST',
       });
@@ -401,7 +389,7 @@ describe('middlewares/batch', () => {
         matcher: '/graphql/batch',
         response: {
           status: 200,
-          body: [{ id: 1, data: {} }, { id: 2, data: {} }],
+          body: [{ data: {} }, { data: {} }],
         },
         method: 'POST',
       });
@@ -424,7 +412,7 @@ describe('middlewares/batch', () => {
         matcher: '/graphql',
         response: {
           status: 200,
-          body: { id: 1, data: {} },
+          body: { data: {} },
         },
         method: 'POST',
       });
@@ -448,7 +436,7 @@ describe('middlewares/batch', () => {
       matcher: '/graphql/batch',
       response: {
         status: 200,
-        body: [{ id: 1, data: {} }, { id: 2, data: {} }],
+        body: [{ data: {} }, { data: {} }],
       },
       method: 'POST',
     });
@@ -485,7 +473,7 @@ describe('middlewares/batch', () => {
         matcher: '/graphql/batch',
         response: {
           status: 200,
-          body: [{ id: 1, data: {} }, { id: 2, data: {} }],
+          body: [{ data: {} }, { data: {} }],
         },
         method: 'POST',
       });
@@ -511,7 +499,7 @@ describe('middlewares/batch', () => {
         matcher: '/graphql/batch',
         response: {
           status: 200,
-          body: [{ id: 1, data: {} }, { id: 2, data: {} }],
+          body: [{ data: {} }, { data: {} }],
         },
         method: 'POST',
       });
@@ -537,7 +525,7 @@ describe('middlewares/batch', () => {
         matcher: '/graphql/batch',
         response: {
           status: 200,
-          body: [{ id: 1, data: {} }, { id: 2, data: {} }],
+          body: [{ data: {} }, { data: {} }],
         },
         method: 'POST',
       });

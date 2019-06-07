@@ -14,7 +14,10 @@ const DEFAULT_BATCH_SIZE = 102400;
 type Headers = { [name: string]: string };
 
 export type BatchMiddlewareOpts = {|
-  batchUrl?: string | Promise<string> | ((requestMap: BatchRequestMap) => string | Promise<string>),
+  batchUrl?:
+    | string
+    | Promise<string>
+    | ((requestList: RequestWrapper[]) => string | Promise<string>),
   batchTimeout?: number,
   maxBatchSize?: number,
   allowMutations?: boolean,
@@ -27,10 +30,6 @@ export type BatchMiddlewareOpts = {|
   redirect?: $PropertyType<FetchOpts, 'redirect'>,
 |};
 
-export type BatchRequestMap = {
-  [reqId: string]: RequestWrapper,
-};
-
 export type RequestWrapper = {|
   req: RelayRequest,
   completeOk: (res: Object) => void,
@@ -41,7 +40,7 @@ export type RequestWrapper = {|
 
 type Batcher = {
   bodySize: number,
-  requestMap: BatchRequestMap,
+  requestList: RequestWrapper[],
   acceptRequests: boolean,
 };
 
@@ -98,7 +97,7 @@ export default function batchMiddleware(options?: BatchMiddlewareOpts): Middlewa
 function passThroughBatch(req: RelayRequest, next, opts) {
   const { singleton } = opts;
 
-  const bodyLength = (req.fetchOpts.body: any).length;
+  const bodyLength = (req.getBody(): any).length;
   if (!bodyLength) {
     return next(req);
   }
@@ -116,8 +115,7 @@ function passThroughBatch(req: RelayRequest, next, opts) {
 
   // queue request
   return new Promise((resolve, reject) => {
-    const relayReqId = req.getID();
-    const { requestMap } = singleton.batcher;
+    const { requestList } = singleton.batcher;
 
     const requestWrapper: RequestWrapper = {
       req,
@@ -135,7 +133,11 @@ function passThroughBatch(req: RelayRequest, next, opts) {
       duplicates: [],
     };
 
-    if (requestMap[relayReqId]) {
+    const duplicateIndex = requestList.findIndex(
+      (wrapper) => req.getBody() === wrapper.req.getBody()
+    );
+
+    if (duplicateIndex !== -1) {
       /*
         I've run into a scenario with Relay Classic where if you have 2 components
         that make the exact same query, Relay will dedup the queries and reuse
@@ -144,47 +146,47 @@ function passThroughBatch(req: RelayRequest, next, opts) {
         the duplicate requests
         https://github.com/nodkz/react-relay-network-layer/pull/52
       */
-      requestMap[relayReqId].duplicates.push(requestWrapper);
+      requestList[duplicateIndex].duplicates.push(requestWrapper);
     } else {
-      requestMap[relayReqId] = requestWrapper;
+      requestList.push(requestWrapper);
     }
   });
 }
 
+function requestIdHashFor(req: RelayRequest) {}
+
 function prepareNewBatcher(next, opts): Batcher {
   const batcher: Batcher = {
     bodySize: 2, // account for '[]'
-    requestMap: {},
+    requestList: [],
     acceptRequests: true,
   };
 
   setTimeout(() => {
     batcher.acceptRequests = false;
-    sendRequests(batcher.requestMap, next, opts)
-      .then(() => finalizeUncompleted(batcher.requestMap))
-      .catch(() => finalizeUncompleted(batcher.requestMap));
+    sendRequests(batcher.requestList, next, opts)
+      .then(() => finalizeUncompleted(batcher.requestList))
+      .catch(() => finalizeUncompleted(batcher.requestList));
   }, opts.batchTimeout);
 
   return batcher;
 }
 
-async function sendRequests(requestMap: BatchRequestMap, next, opts) {
-  const ids = Object.keys(requestMap);
-
-  if (ids.length === 1) {
+async function sendRequests(requestList: RequestWrapper[], next, opts) {
+  if (requestList.length === 1) {
     // SEND AS SINGLE QUERY
-    const request = requestMap[ids[0]];
+    const wrapper = requestList[0];
 
-    const res = await next(request.req);
-    request.completeOk(res);
-    request.duplicates.forEach((r) => r.completeOk(res));
+    const res = await next(wrapper.req);
+    wrapper.completeOk(res);
+    wrapper.duplicates.forEach((r) => r.completeOk(res));
     return res;
-  } else if (ids.length > 1) {
+  } else if (requestList.length > 1) {
     // SEND AS BATCHED QUERY
 
-    const batchRequest = new RelayRequestBatch(ids.map((id) => requestMap[id].req));
+    const batchRequest = new RelayRequestBatch(requestList.map((wrapper) => wrapper.req));
     // $FlowFixMe
-    const url = await (isFunction(opts.batchUrl) ? opts.batchUrl(requestMap) : opts.batchUrl);
+    const url = await (isFunction(opts.batchUrl) ? opts.batchUrl(requestList) : opts.batchUrl);
     batchRequest.setFetchOption('url', url);
 
     const { headersOrThunk, ...fetchOpts } = opts.fetchOpts;
@@ -205,9 +207,9 @@ async function sendRequests(requestMap: BatchRequestMap, next, opts) {
         );
       }
 
-      batchResponse.json.forEach((payload: any) => {
+      batchResponse.json.forEach((payload: any, index) => {
         if (!payload) return;
-        const request = requestMap[payload.id];
+        const request = requestList[index];
         if (request) {
           const res = createSingleResponse(batchResponse, payload);
           request.completeOk(res);
@@ -216,9 +218,7 @@ async function sendRequests(requestMap: BatchRequestMap, next, opts) {
 
       return batchResponse;
     } catch (e) {
-      ids.forEach((id) => {
-        requestMap[id].completeErr(e);
-      });
+      requestList.forEach((request) => request.completeErr(e));
     }
   }
 
@@ -226,14 +226,13 @@ async function sendRequests(requestMap: BatchRequestMap, next, opts) {
 }
 
 // check that server returns responses for all requests
-function finalizeUncompleted(requestMap: BatchRequestMap) {
-  Object.keys(requestMap).forEach((id) => {
-    const request = requestMap[id];
+function finalizeUncompleted(requestList: RequestWrapper[]) {
+  requestList.forEach((request, index) => {
     if (!request.done) {
       request.completeErr(
         new RRNLBatchMiddlewareError(
-          `Server does not return response for request with id ${id} \n` +
-            `Response should have following shape { "id": "${id}", "data": {} }`
+          `Server does not return response for request at index ${index}.\n` +
+            `Response should have an array with ${requestList.length} item(s).`
         )
       );
     }

@@ -43,7 +43,7 @@ Array [
 
 exports[`middlewares/batch option \`batchTimeout\` should gather different requests into one batch request 1`] = `
 Object {
-  "body": "[{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"2\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"3\\",\\"query\\":\\"\\",\\"variables\\":{}}]",
+  "body": "[{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"3\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"2\\",\\"query\\":\\"\\",\\"variables\\":{}}]",
   "headers": Object {
     "Accept": "*/*",
     "Content-Type": "application/json",
@@ -166,7 +166,31 @@ Object {
 }
 `;
 
+exports[`middlewares/batch should make a successfully batch request with duplicate request payloads 1`] = `
+Object {
+  "body": "[{\\"id\\":\\"2\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"2\\",\\"query\\":\\"duplicate\\",\\"variables\\":{\\"duplicate\\":true}}]",
+  "headers": Object {
+    "Accept": "*/*",
+    "Content-Type": "application/json",
+  },
+  "method": "POST",
+  "url": "/graphql/batch",
+}
+`;
+
 exports[`middlewares/batch should reject if server does not return response for duplicate request ids 1`] = `
+Object {
+  "body": "[{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"2\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"3\\",\\"query\\":\\"\\",\\"variables\\":{}}]",
+  "headers": Object {
+    "Accept": "*/*",
+    "Content-Type": "application/json",
+  },
+  "method": "POST",
+  "url": "/graphql/batch",
+}
+`;
+
+exports[`middlewares/batch should reject if server does not return response for duplicate request payloads 1`] = `
 Object {
   "body": "[{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"2\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"3\\",\\"query\\":\\"\\",\\"variables\\":{}}]",
   "headers": Object {
@@ -180,7 +204,7 @@ Object {
 
 exports[`middlewares/batch should reject if server does not return response for request 1`] = `
 Object {
-  "body": "[{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"2\\",\\"query\\":\\"\\",\\"variables\\":{}}]",
+  "body": "[{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}}}]",
   "headers": Object {
     "Accept": "*/*",
     "Content-Type": "application/json",
