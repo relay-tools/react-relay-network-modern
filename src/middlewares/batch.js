@@ -153,8 +153,6 @@ function passThroughBatch(req: RelayRequest, next, opts) {
   });
 }
 
-function requestIdHashFor(req: RelayRequest) {}
-
 function prepareNewBatcher(next, opts): Batcher {
   const batcher: Batcher = {
     bodySize: 2, // account for '[]'
