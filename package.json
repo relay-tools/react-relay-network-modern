@@ -59,7 +59,7 @@
     "form-data": "^2.3.3",
     "jest": "^24.7.0",
     "prettier": "^1.16.4",
-    "relay-runtime": "^3.0.0",
+    "relay-runtime": "^4.0.0",
     "rimraf": "^2.6.3",
     "semantic-release": "^15.13.3",
     "tslint": "^5.15.0",
