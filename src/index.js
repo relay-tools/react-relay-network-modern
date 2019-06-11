@@ -2,6 +2,7 @@
 
 import RelayNetworkLayer from './RelayNetworkLayer';
 import batchMiddleware, { RRNLBatchMiddlewareError } from './middlewares/batch';
+import legacyBatchMiddleware from './middlewares/legacyBatch';
 import retryMiddleware, { RRNLRetryMiddlewareError } from './middlewares/retry';
 import urlMiddleware from './middlewares/url';
 import authMiddleware, { RRNLAuthMiddlewareError } from './middlewares/auth';
@@ -23,6 +24,7 @@ export {
   RelayNetworkLayerRequestBatch,
   RelayNetworkLayerResponse,
   batchMiddleware,
+  legacyBatchMiddleware,
   retryMiddleware,
   urlMiddleware,
   authMiddleware,
