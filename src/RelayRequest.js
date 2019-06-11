@@ -37,7 +37,8 @@ export default class RelayRequest {
       body: this.prepareBody(),
     };
 
-    this.controller = (typeof window !== 'undefined' && window.AbortController) ? new window.AbortController() : null;
+    this.controller =
+      typeof window !== 'undefined' && window.AbortController ? new window.AbortController() : null;
     if (this.controller) fetchOpts.signal = this.controller.signal;
 
     this.fetchOpts = fetchOpts;

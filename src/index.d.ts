@@ -108,29 +108,29 @@ export interface AuthMiddlewareOpts {
 export function authMiddleware(opts?: AuthMiddlewareOpts): Middleware;
 
 interface RequestWrapper {
-  req: RelayRequest,
-  completeOk: (res: Object) => void,
-  completeErr: (e: Error) => void,
-  done: boolean,
-  duplicates: Array<RequestWrapper>,
+  req: RelayRequest;
+  completeOk: (res: object) => void;
+  completeErr: (e: Error) => void;
+  done: boolean;
+  duplicates: RequestWrapper[];
 }
 
 interface BatchRequestMap {
-  [reqId: string]: RequestWrapper
+  [reqId: string]: RequestWrapper;
 }
 
 export type BatchMiddlewareOpts = {
-  batchUrl?: string | Promise<string> | ((requestMap: BatchRequestMap) => string | Promise<string>),
-  batchTimeout?: number,
-  maxBatchSize?: number,
-  allowMutations?: boolean,
-  method?: 'POST' | 'GET',
-  headers?: Headers | Promise<Headers> | ((req: RelayRequestBatch) => Headers | Promise<Headers>),
+  batchUrl?: string | Promise<string> | ((requestMap: BatchRequestMap) => string | Promise<string>);
+  batchTimeout?: number;
+  maxBatchSize?: number;
+  allowMutations?: boolean;
+  method?: 'POST' | 'GET';
+  headers?: Headers | Promise<Headers> | ((req: RelayRequestBatch) => Headers | Promise<Headers>);
   // Avaliable request modes in fetch options. For details see https://fetch.spec.whatwg.org/#requests
-  credentials?: FetchOpts["credentials"],
-  mode?: FetchOpts["mode"],
-  cache?: FetchOpts["cache"],
-  redirect?: FetchOpts["redirect"],
+  credentials?: FetchOpts['credentials'];
+  mode?: FetchOpts['mode'];
+  cache?: FetchOpts['cache'];
+  redirect?: FetchOpts['redirect'];
 };
 
 export function batchMiddleware(opts?: BatchMiddlewareOpts): Middleware;

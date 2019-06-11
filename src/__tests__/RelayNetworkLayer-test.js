@@ -86,7 +86,7 @@ describe('RelayNetworkLayer', () => {
       method: 'POST',
     });
 
-    const regularMiddleware = (next) => async (req) => {
+    const regularMiddleware: any = (next) => async (req) => {
       (req: any).fetchOpts.headers.reqId += ':regular';
       const res: any = await next(req);
       res.data.text += ':regular';
