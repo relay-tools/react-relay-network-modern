@@ -112,15 +112,16 @@ import { RelayNetworkLayer } from 'react-relay-network-modern/es';
   - `allowMutations` - by default retries disabled for mutations, you may allow process retries for them passing `true`. (default: `false`)
   - `allowFormData` - by default retries disabled for file Uploads, you may enable it passing `true` (default: `false`)
   - `forceRetry` - deprecated, use `beforeRetry` instead (default: `false`).
-- **batchMiddleware** - gather some period of time relay-requests and sends it as one http-request. You server must support batch request, [how to setup your server](https://github.com/relay-tools/react-relay-network-modern#example-how-to-enable-batching)
+- **batchMiddleware** - gather some period of time relay-requests and sends it as one http-request. You server must support batch request and return results in the same order they were requested. [See how to setup your server.](https://github.com/relay-tools/react-relay-network-modern#example-how-to-enable-batching)
   - `batchUrl` - string. Url of the server endpoint for batch request execution. Can be function(requestList) or Promise. (default: `/graphql/batch`)
   - `batchTimeout` - integer in milliseconds, period of time for gathering multiple requests before sending them to the server. Will delay sending of the requests on specified in this option period of time, so be careful and keep this value small. (default: `0`)
   - `maxBatchSize` - integer representing maximum size of request to be sent in a single batch. Once a request hits the provided size in length a new batch request is ran. Actual for hardcoded limit in 100kb per request in [express-graphql](https://github.com/graphql/express-graphql/blob/master/src/parseBody.js#L112) module. (default: `102400` characters, roughly 100kb for 1-byte characters or 200kb for 2-byte characters)
   - `allowMutations` - by default batching disabled for mutations, you may enable it passing `true` (default: `false`)
   - `method` - string, for request method type (default: `POST`)
-  - headers - Object with headers for fetch. Can be Promise or function(req).
-  - credentials - string, setting for fetch method, eg. 'same-origin' (default: empty).
+  - `headers` - Object with headers for fetch. Can be Promise or function(req).
+  - `credentials` - string, setting for fetch method, eg. 'same-origin' (default: empty).
   - also you may provide `mode`, `cache`, `redirect` options for fetch method, for details see [fetch spec](https://fetch.spec.whatwg.org/#requests).
+  - alternatively, you can use _legacyBatchMiddleware_, which sends a request ID with each query and expects the GraphQL server to include the request ID with each result.
 - **loggerMiddleware** - for logging requests and responses.
   - `logger` - log function (default: `console.log.bind(console, '[RELAY-NETWORK]')`)
   - An example of req/res output in console: <img width="968" alt="screen shot 2017-11-19 at 23 05 19" src="https://user-images.githubusercontent.com/1946920/33159466-557517e0-d03d-11e7-9711-ebdfe6e789c8.png">
@@ -145,6 +146,7 @@ import {
   RelayNetworkLayer,
   urlMiddleware,
   batchMiddleware,
+  // legacyBatchMiddleware,
   loggerMiddleware,
   errorMiddleware,
   perfMiddleware,
@@ -163,6 +165,11 @@ const network = new RelayNetworkLayer(
     urlMiddleware({
       url: (req) => Promise.resolve('/graphql'),
     }),
+    // Deprecated batch middleware
+    // legacyBatchMiddleware({
+    //   batchUrl: (requestMap) => Promise.resolve('/graphql/batch'),
+    //   batchTimeout: 10,
+    // }),
     batchMiddleware({
       batchUrl: (requestList) => Promise.resolve('/graphql/batch'),
       batchTimeout: 10,
@@ -298,7 +305,7 @@ So for avoiding multiple http-requests, the `ReactRelayNetworkModern` is the rig
 
 #### ...on server
 
-Firstly, you should prepare **server** to proceed the batch request:
+Firstly, you should prepare **server** to process the batch request:
 
 ```js
 import express from 'express';
@@ -341,6 +348,10 @@ And right after server side ready to accept batch queries, you may enable batchi
 
 ```js
 const network = new RelayNetworkLayer([
+  // deprecated "legacy" batch middleware
+  // legacyBatchMiddleware({
+  //   batchUrl: '/graphql/batch', // <--- route for batch queries
+  // }),
   batchMiddleware({
     batchUrl: '/graphql/batch', // <--- route for batch queries
   }),
@@ -349,7 +360,9 @@ const network = new RelayNetworkLayer([
 
 ### How batching works internally
 
-Internally batching in NetworkLayer prepare list of queries `[ {id, query, variables}, ...]` sends it to server. And server returns list of responces `[ {id, payload}, ...]`, (where `id` is the same value as client requested for identifying which data goes with which query, and `payload` is standard response of GraphQL server: `{ data, error }`).
+Internally batching in `NetworkLayer` prepare list of queries `[ {query, variables}, ...]` sends it to server. And server returns list of results `[ {data}, ...]`. The server is expected to return the results in the same order as the requests.
+
+As of v4.0.0, the batch middleware utilizing request IDs in queries and corresponding results has been renamed `legacyBatchMiddleware`. The legacy middleware included a request ID with each query included in the batch and expected the server to return each result with the corresponding request ID. The new `batchMiddleware` simply expects results be returned in the same order as the batched queries.
 
 ## Contribute
 
