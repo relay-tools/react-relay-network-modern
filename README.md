@@ -364,6 +364,8 @@ Internally batching in `NetworkLayer` prepare list of queries `[ {query, variabl
 
 As of v4.0.0, the batch middleware utilizing request IDs in queries and corresponding results has been renamed `legacyBatchMiddleware`. The legacy middleware included a request ID with each query included in the batch and expected the server to return each result with the corresponding request ID. The new `batchMiddleware` simply expects results be returned in the same order as the batched queries.
 
+**NOTE:** `legacyBatchMiddleware` does not correctly deduplicate queries when batched because query variables may be ignored in a comparison. This means that two identical queries with _different_ variables will show the same results due to a bug ([#31](https://github.com/relay-tools/react-relay-network-modern/issues/31)). It is highly encouraged to use the new order-based `batchMiddleware`, which still deduplicates queries, but includes the variables in the comparison.
+
 ## Contribute
 
 I actively welcome pull requests with code and doc fixes.
