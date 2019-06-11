@@ -6,7 +6,7 @@ import RelayRequestBatch from '../RelayRequestBatch';
 import RelayRequest from '../RelayRequest';
 import type RelayResponse from '../RelayResponse';
 import type { Middleware, FetchOpts } from '../definition';
-import RRNLError from '../RRNLError';
+import { RRNLBatchMiddlewareError } from './batch';
 
 // Max out at roughly 100kb (express-graphql imposed max)
 const DEFAULT_BATCH_SIZE = 102400;
@@ -45,14 +45,7 @@ type Batcher = {
   acceptRequests: boolean,
 };
 
-export class RRNLBatchMiddlewareError extends RRNLError {
-  constructor(msg: string) {
-    super(msg);
-    this.name = 'RRNLBatchMiddlewareError';
-  }
-}
-
-export default function batchMiddlewareLegacy(options?: BatchMiddlewareOpts): Middleware {
+export default function legacyBatchMiddleware(options?: BatchMiddlewareOpts): Middleware {
   const opts = options || {};
   const batchTimeout = opts.batchTimeout || 0; // 0 is the same as nextTick in nodeJS
   const allowMutations = opts.allowMutations || false;
