@@ -1,13 +1,13 @@
 export type FetchResponse = Response;
 export type Variables = { [name: string]: any };
 
-export class RelayResponse {
-  static createFromFetch(res: FetchResponse): Promise<RelayResponse>;
+export class RelayNetworkLayerResponse {
+  static createFromFetch(res: FetchResponse): Promise<RelayNetworkLayerResponse>;
 
-  static createFromGraphQL(res: { errors?: any; data?: any }): Promise<RelayResponse>;
+  static createFromGraphQL(res: { errors?: any; data?: any }): Promise<RelayNetworkLayerResponse>;
 
   processJsonData(json: any): void;
-  clone(): RelayResponse;
+  clone(): RelayNetworkLayerResponse;
 }
 
 export interface FetchOpts {
@@ -23,7 +23,7 @@ export interface FetchOpts {
   [name: string]: any;
 }
 
-export class RelayRequest {
+export class RelayNetworkLayerRequest {
   static lastGenId: number;
   id: string;
   fetchOpts: FetchOpts;
@@ -42,12 +42,12 @@ export class RelayRequest {
   isMutation(): boolean;
   isFormData(): boolean;
   cancel(): boolean;
-  clone(): RelayRequest;
+  clone(): RelayNetworkLayerRequest;
 }
 
-export class RelayRequestBatch {
+export class RelayNetworkLayerRequestBatch {
   fetchOpts: FetchOpts;
-  requests: RelayRequest[];
+  requests: RelayNetworkLayerRequest[];
 
   setFetchOption(name: string, value: any): void;
   setFetchOptions(opts: {}): void;
@@ -57,25 +57,25 @@ export class RelayRequestBatch {
   getID(): string;
   isMutation(): boolean;
   isFormData(): boolean;
-  clone(): RelayRequestBatch;
+  clone(): RelayNetworkLayerRequestBatch;
   getVariables(): Variables;
   getQueryString(): string;
 }
 
-export type RelayRequestAny = RelayRequest | RelayRequestBatch;
+export type RelayRequestAny = RelayNetworkLayerRequest | RelayNetworkLayerRequestBatch;
 
 export type QueryResponseCache = {
   size: number;
   ttl: number;
 };
 
-export type MiddlewareNextFn = (req: RelayRequestAny) => Promise<RelayResponse>;
+export type MiddlewareNextFn = (req: RelayRequestAny) => Promise<RelayNetworkLayerResponse>;
 export type Middleware = (next: MiddlewareNextFn) => MiddlewareNextFn;
 
 export type UrlMiddlewareOpts = {
-  url: string | Promise<string> | ((req: RelayRequest) => string | Promise<string>);
+  url: string | Promise<string> | ((req: RelayNetworkLayerRequest) => string | Promise<string>);
   method?: 'POST' | 'GET';
-  headers?: Headers | Promise<Headers> | ((req: RelayRequest) => Headers | Promise<Headers>);
+  headers?: Headers | Promise<Headers> | ((req: RelayNetworkLayerRequest) => Headers | Promise<Headers>);
   // Avaliable request modes in fetch options. For details see https://fetch.spec.whatwg.org/#requests
   credentials?: FetchOpts['credentials'];
   mode?: FetchOpts['mode'];
@@ -99,7 +99,7 @@ export function perfMiddleware(opts?: PerfMiddlewareOpts): Middleware;
 
 export interface AuthMiddlewareOpts {
   token?: string | Promise<string> | ((req: RelayRequestAny) => string | Promise<string>);
-  tokenRefreshPromise?: (req: RelayRequestAny, res: RelayResponse) => string | Promise<string>;
+  tokenRefreshPromise?: (req: RelayRequestAny, res: RelayNetworkLayerResponse) => string | Promise<string>;
   allowEmptyToken?: boolean;
   prefix?: string;
   header?: string;
@@ -108,7 +108,7 @@ export interface AuthMiddlewareOpts {
 export function authMiddleware(opts?: AuthMiddlewareOpts): Middleware;
 
 interface RequestWrapper {
-  req: RelayRequest;
+  req: RelayNetworkLayerRequest;
   completeOk: (res: object) => void;
   completeErr: (e: Error) => void;
   done: boolean;
@@ -125,7 +125,7 @@ export type BatchMiddlewareOpts = {
   maxBatchSize?: number;
   allowMutations?: boolean;
   method?: 'POST' | 'GET';
-  headers?: Headers | Promise<Headers> | ((req: RelayRequestBatch) => Headers | Promise<Headers>);
+  headers?: Headers | Promise<Headers> | ((req: RelayNetworkLayerRequestBatch) => Headers | Promise<Headers>);
   // Avaliable request modes in fetch options. For details see https://fetch.spec.whatwg.org/#requests
   credentials?: FetchOpts['credentials'];
   mode?: FetchOpts['mode'];
@@ -171,7 +171,7 @@ export type BeforeRetryCb = (meta: {
 export type StatusCheckFn = (
   statusCode: number,
   req: RelayRequestAny,
-  res: RelayResponse
+  res: RelayNetworkLayerResponse
 ) => boolean;
 
 export interface RetryMiddlewareOpts {
@@ -231,7 +231,7 @@ export type QueryPayload =
       errors?: any[];
       rerunVariables?: Variables;
     }
-  | RelayResponse;
+  | RelayNetworkLayerResponse;
 
 export type MiddlewareSync = {
   execute: (
