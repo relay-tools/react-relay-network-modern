@@ -67,11 +67,11 @@ export default class RelayNetworkLayer {
         if (res) return res;
       }
 
-      const req = new RelayRequest(operation, variables, cacheConfig, uploadables);
-      const res = fetchWithMiddleware(req, this._middlewares, this._rawMiddlewares, this.noThrow);
-
       return {
         subscribe: (sink) => {
+          const req = new RelayRequest(operation, variables, cacheConfig, uploadables);
+          const res = fetchWithMiddleware(req, this._middlewares, this._rawMiddlewares, this.noThrow);
+
           res
             .then(
               (value) => {
