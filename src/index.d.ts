@@ -1,14 +1,15 @@
 export type FetchResponse = Response;
 export type Variables = { [name: string]: any };
 
-export class RelayNetworkLayerResponse {
-  static createFromFetch(res: FetchResponse): Promise<RelayNetworkLayerResponse>;
+declare class RelayResponse {
+  static createFromFetch(res: FetchResponse): Promise<RelayResponse>;
 
-  static createFromGraphQL(res: { errors?: any; data?: any }): Promise<RelayNetworkLayerResponse>;
+  static createFromGraphQL(res: { errors?: any; data?: any }): Promise<RelayResponse>;
 
   processJsonData(json: any): void;
-  clone(): RelayNetworkLayerResponse;
+  clone(): RelayResponse;
 }
+export { RelayResponse as RelayNetworkLayerResponse };
 
 export interface FetchOpts {
   url?: string;
@@ -23,7 +24,7 @@ export interface FetchOpts {
   [name: string]: any;
 }
 
-export class RelayNetworkLayerRequest {
+declare class RelayRequest {
   static lastGenId: number;
   id: string;
   fetchOpts: FetchOpts;
@@ -42,12 +43,13 @@ export class RelayNetworkLayerRequest {
   isMutation(): boolean;
   isFormData(): boolean;
   cancel(): boolean;
-  clone(): RelayNetworkLayerRequest;
+  clone(): RelayRequest;
 }
+export { RelayRequest as RelayNetworkLayerRequest };
 
-export class RelayNetworkLayerRequestBatch {
+declare class RelayRequestBatch {
   fetchOpts: FetchOpts;
-  requests: RelayNetworkLayerRequest[];
+  requests: RelayRequest[];
 
   setFetchOption(name: string, value: any): void;
   setFetchOptions(opts: {}): void;
@@ -57,25 +59,26 @@ export class RelayNetworkLayerRequestBatch {
   getID(): string;
   isMutation(): boolean;
   isFormData(): boolean;
-  clone(): RelayNetworkLayerRequestBatch;
+  clone(): RelayRequestBatch;
   getVariables(): Variables;
   getQueryString(): string;
 }
+export { RelayRequestBatch as RelayNetworkLayerRequestBatch };
 
-export type RelayRequestAny = RelayNetworkLayerRequest | RelayNetworkLayerRequestBatch;
+export type RelayRequestAny = RelayRequest | RelayRequestBatch;
 
 export type QueryResponseCache = {
   size: number;
   ttl: number;
 };
 
-export type MiddlewareNextFn = (req: RelayRequestAny) => Promise<RelayNetworkLayerResponse>;
+export type MiddlewareNextFn = (req: RelayRequestAny) => Promise<RelayResponse>;
 export type Middleware = (next: MiddlewareNextFn) => MiddlewareNextFn;
 
 export type UrlMiddlewareOpts = {
-  url: string | Promise<string> | ((req: RelayNetworkLayerRequest) => string | Promise<string>);
+  url: string | Promise<string> | ((req: RelayRequest) => string | Promise<string>);
   method?: 'POST' | 'GET';
-  headers?: Headers | Promise<Headers> | ((req: RelayNetworkLayerRequest) => Headers | Promise<Headers>);
+  headers?: Headers | Promise<Headers> | ((req: RelayRequest) => Headers | Promise<Headers>);
   // Avaliable request modes in fetch options. For details see https://fetch.spec.whatwg.org/#requests
   credentials?: FetchOpts['credentials'];
   mode?: FetchOpts['mode'];
@@ -99,7 +102,7 @@ export function perfMiddleware(opts?: PerfMiddlewareOpts): Middleware;
 
 export interface AuthMiddlewareOpts {
   token?: string | Promise<string> | ((req: RelayRequestAny) => string | Promise<string>);
-  tokenRefreshPromise?: (req: RelayRequestAny, res: RelayNetworkLayerResponse) => string | Promise<string>;
+  tokenRefreshPromise?: (req: RelayRequestAny, res: RelayResponse) => string | Promise<string>;
   allowEmptyToken?: boolean;
   prefix?: string;
   header?: string;
@@ -108,7 +111,7 @@ export interface AuthMiddlewareOpts {
 export function authMiddleware(opts?: AuthMiddlewareOpts): Middleware;
 
 interface RequestWrapper {
-  req: RelayNetworkLayerRequest;
+  req: RelayRequest;
   completeOk: (res: object) => void;
   completeErr: (e: Error) => void;
   done: boolean;
@@ -125,7 +128,7 @@ export type BatchMiddlewareOpts = {
   maxBatchSize?: number;
   allowMutations?: boolean;
   method?: 'POST' | 'GET';
-  headers?: Headers | Promise<Headers> | ((req: RelayNetworkLayerRequestBatch) => Headers | Promise<Headers>);
+  headers?: Headers | Promise<Headers> | ((req: RelayRequestBatch) => Headers | Promise<Headers>);
   // Avaliable request modes in fetch options. For details see https://fetch.spec.whatwg.org/#requests
   credentials?: FetchOpts['credentials'];
   mode?: FetchOpts['mode'];
@@ -171,7 +174,7 @@ export type BeforeRetryCb = (meta: {
 export type StatusCheckFn = (
   statusCode: number,
   req: RelayRequestAny,
-  res: RelayNetworkLayerResponse
+  res: RelayResponse
 ) => boolean;
 
 export interface RetryMiddlewareOpts {
@@ -231,7 +234,7 @@ export type QueryPayload =
       errors?: any[];
       rerunVariables?: Variables;
     }
-  | RelayNetworkLayerResponse;
+  | RelayResponse;
 
 export type MiddlewareSync = {
   execute: (
