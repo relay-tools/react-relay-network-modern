@@ -98,7 +98,7 @@ export default class RelayRequest {
   }
 
   isMutation(): boolean {
-    return this.getQueryString().startsWith('mutation');
+    return this.operation.operationKind === 'mutation';
   }
 
   isFormData(): boolean {
