@@ -52,9 +52,12 @@ class MockReq {
   }
 
   execute(rnl: RelayNetworkLayer): Promise<RelayResponse> {
+    const text = this.getQueryString() || '';
+    const operationKind = text.startsWith('mutation') ? 'mutation' : 'query';
     const operation = ({
       id: this.getID(),
-      text: this.getQueryString() || '',
+      text,
+      operationKind,
     }: any);
     const variables = this.getVariables() || {};
     const cacheConfig = {};

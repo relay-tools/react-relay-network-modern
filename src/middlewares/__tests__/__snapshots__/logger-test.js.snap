@@ -23,6 +23,7 @@ Array [
       "id": "MyRequest",
       "operation": Object {
         "id": "MyRequest",
+        "operationKind": "query",
         "text": "",
       },
       "uploadables": undefined,
