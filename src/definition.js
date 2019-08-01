@@ -82,6 +82,7 @@ export type ConcreteBatch = {
   name: string,
   query: any,
   text: ?string,
+  operationKind: string,
 };
 export type CacheConfig = {
   force?: ?boolean,
