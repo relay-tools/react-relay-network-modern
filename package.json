@@ -31,11 +31,9 @@
   },
   "homepage": "https://github.com/relay-tools/react-relay-network-modern#readme",
   "dependencies": {},
-  "peerDependencies": {
-    "react-relay": ">=1.4.0"
-  },
   "optionalDependencies": {
-    "@types/relay-runtime": "^5.0.3"
+    "@types/relay-runtime": "^5.0.3",
+    "react-relay": ">=1.4.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.4.4",
