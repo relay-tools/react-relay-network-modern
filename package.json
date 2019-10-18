@@ -5,11 +5,9 @@
   "files": [
     "es",
     "lib",
-    "mjs",
     "node8"
   ],
   "main": "lib/index.js",
-  "module": "mjs/index.mjs",
   "types": "lib/index.d.ts",
   "repository": {
     "type": "git",
@@ -81,10 +79,8 @@
     ]
   },
   "scripts": {
-    "build": "npm run build-lib && npm run build-mjs && npm run build-es && npm run build-node8",
+    "build": "npm run build-lib && npm run build-es && npm run build-node8",
     "build-lib": "rimraf lib && BABEL_ENV=lib babel src --ignore __tests__,__mocks__ -d lib && COPY_TO_FOLDER=lib npm run build-flow && COPY_TO_FOLDER=lib npm run build-dts ",
-    "build-mjs": "rimraf mjs && BABEL_ENV=mjs babel src --ignore __tests__,__mocks__ -d mjs && yarn build-mjs-rename && COPY_TO_FOLDER=mjs npm run build-flow && COPY_TO_FOLDER=mjs npm run build-dts",
-    "build-mjs-rename": "find ./mjs -name \"*.js\" -exec bash -c 'mv \"$1\" \"${1%.js}\".mjs' - '{}' \\;",
     "build-es": "rimraf es && BABEL_ENV=es babel src --ignore __tests__,__mocks__ -d es && COPY_TO_FOLDER=es npm run build-flow && COPY_TO_FOLDER=es npm run build-dts",
     "build-node8": "rimraf node8 && BABEL_ENV=node8 babel src --ignore __tests__,__mocks__ -d node8 && COPY_TO_FOLDER=node8 npm run build-flow && COPY_TO_FOLDER=node8 npm run build-dts",
     "build-flow": "echo `$1` && find ./src -name '*.js' -not -path '*/__*' | while read filepath; do cp $filepath `echo ./${COPY_TO_FOLDER:-lib}$filepath | sed 's/.\\/src\\//\\//g'`.flow; done",
