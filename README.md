@@ -24,24 +24,6 @@ OR
 npm install react-relay-network-modern --save
 ```
 
-If using with Webpack 4, make sure that you're equipped to parse .mjs files correctly. (If using Webpack 3, can omit the `module` definition.)
-
-```javascript
-module: {
-  rules: [
-    // See: https://github.com/aws/aws-amplify/issues/686#issuecomment-387710340
-    {
-      test: /\.mjs$/,
-      include: /node_modules\/react-relay-network-modern/,
-      type: 'javascript/auto',
-    },
-  ]
-},
-resolve: {
- extensions: ['.mjs', '.js']
-}
-```
-
 ### What if `regeneratorRuntime is not defined`?
 
 <img width="493" alt="screen shot 2018-02-20 at 20 07 45" src="https://user-images.githubusercontent.com/1946920/36428334-da402a6e-1679-11e8-9897-7e730ab3123e.png">

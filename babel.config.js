@@ -21,21 +21,6 @@ module.exports = {
     es: {
       plugins: ['@babel/plugin-proposal-class-properties'],
     },
-    mjs: {
-      plugins: ['@babel/plugin-proposal-class-properties'],
-      presets: [
-        [
-          '@babel/preset-env',
-          {
-            targets: {
-              browsers: ['last 5 versions', 'ie 9', 'defaults'],
-            },
-            loose: true,
-            modules: false,
-          },
-        ],
-      ],
-    },
     node8: {
       presets: [
         [
