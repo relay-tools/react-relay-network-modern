@@ -11,6 +11,7 @@ import loggerMiddleware from './middlewares/logger';
 import errorMiddleware from './middlewares/error';
 import cacheMiddleware from './middlewares/cache';
 import progressMiddleware from './middlewares/progress';
+import uploadMiddleware from './middlewares/upload';
 import graphqlBatchHTTPWrapper from './express-middleware/graphqlBatchHTTPWrapper';
 import RelayNetworkLayerRequest from './RelayRequest';
 import RelayNetworkLayerRequestBatch from './RelayRequestBatch';
@@ -33,6 +34,7 @@ export {
   errorMiddleware,
   cacheMiddleware,
   progressMiddleware,
+  uploadMiddleware,
   graphqlBatchHTTPWrapper,
   RRNLError,
   RRNLRequestError,

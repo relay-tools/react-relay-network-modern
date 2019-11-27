@@ -133,6 +133,7 @@ import { RelayNetworkLayer } from 'react-relay-network-modern/es';
 - **progressMiddleware** - enable onProgress callback for modern browsers with support for Stream API.
   - `onProgress` - on progress callback function (`function(bytesCurrent: number, bytesTotal: number | null) => void`, total size will be null if size header is not set)
   - `sizeHeader` - response header with total size of response (default: `Content-Length`, useful when `Transfer-Encoding: chunked` is set)
+- **uploadMiddleware** - extracts [`File`](https://developer.mozilla.org/docs/web/api/file), [`Blob`](https://developer.mozilla.org/docs/web/api/blob) and [`ReactNativeFile`](#class-reactnativefile) instances from query variables to be consumed with [graphql-upload](https://github.com/jaydenseric/graphql-upload)
 
 ### Standalone package middlewares
 
@@ -154,6 +155,7 @@ import {
   authMiddleware,
   cacheMiddleware,
   progressMiddleware,
+  uploadMiddleware,
 } from 'react-relay-network-modern';
 
 const network = new RelayNetworkLayer(
@@ -206,6 +208,7 @@ const network = new RelayNetworkLayer(
         console.log('Downloaded: ' + current + ' B, total: ' + total + ' B');
       },
     }),
+    uploadMiddleware(),
 
     // example of the custom inline middleware
     (next) => async (req) => {
