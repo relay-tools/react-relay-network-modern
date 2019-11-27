@@ -199,6 +199,8 @@ export interface ProgressOpts {
 
 export function progressMiddleware(opts?: ProgressOpts): Middleware;
 
+export function uploadMiddleware(): Middleware;
+
 export type MiddlewareRawNextFn = (req: RelayRequestAny) => Promise<FetchResponse>;
 
 export type MiddlewareRaw = {
