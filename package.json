@@ -31,9 +31,6 @@
   "dependencies": {
     "extract-files": "^5.0.1"
   },
-  "optionalDependencies": {
-    "@types/relay-runtime": "^5.0.3"
-  },
   "peerDependencies": {
     "relay-runtime": ">=1.4.0"
   },
