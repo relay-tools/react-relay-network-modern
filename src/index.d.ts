@@ -13,10 +13,11 @@ declare class RelayResponse {
 }
 export { RelayResponse as RelayNetworkLayerResponse };
 
+export type Headers = { [name: string]: string };
 export interface FetchOpts {
   url?: string;
   method: 'POST' | 'GET';
-  headers: { [name: string]: string };
+  headers: Headers;
   body: string | FormData;
   credentials?: 'same-origin' | 'include' | 'omit';
   mode?: 'cors' | 'websocket' | 'navigate' | 'no-cors' | 'same-origin';
