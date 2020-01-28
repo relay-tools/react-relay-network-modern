@@ -1,12 +1,12 @@
 /* @flow */
 
-import type { PayloadData, FetchResponse } from './definition';
+import type { FetchResponse, GraphQLResponseErrors, PayloadData } from './definition';
 
 export default class RelayResponse {
   _res: any; // response from low-level method, eg. fetch
 
   data: ?PayloadData;
-  errors: ?Array<any>;
+  errors: ?GraphQLResponseErrors;
 
   ok: any;
   status: number;
