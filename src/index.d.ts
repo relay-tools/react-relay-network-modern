@@ -7,7 +7,7 @@ declare class RelayResponse {
   _res: any;
 
   data?: PayloadData;
-  errors?: any[];
+  errors?: GraphQLResponseErrors;
 
   ok: any;
   status: number;
@@ -146,7 +146,7 @@ export type BatchMiddlewareOpts = {
   allowMutations?: boolean;
   method?: 'POST' | 'GET';
   headers?: Headers | Promise<Headers> | ((req: RelayRequestBatch) => Headers | Promise<Headers>);
-  // Avaliable request modes in fetch options. For details see https://fetch.spec.whatwg.org/#requests
+  // Available request modes in fetch options. For details see https://fetch.spec.whatwg.org/#requests
   credentials?: FetchOpts['credentials'];
   mode?: FetchOpts['mode'];
   cache?: FetchOpts['cache'];
@@ -296,3 +296,12 @@ export class RelayNetworkLayer {
 
   execute: ExecuteFunction;
 }
+
+export type GraphQLResponseErrors = Array<{
+  message: string;
+  locations?: [{ column: number; line: number }];
+  stack?: string[];
+}>;
+
+export function createRequestError(request: RelayRequestAny, response?: RelayResponse);
+export function formatGraphQLErrors(request: RelayRequest, errors: GraphQLResponseErrors);
