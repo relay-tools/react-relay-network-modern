@@ -4,12 +4,26 @@ export type FetchResponse = Response;
 export type Variables = { [name: string]: any };
 
 declare class RelayResponse {
+  _res: any;
+
+  data?: PayloadData;
+  errors?: any[];
+
+  ok: any;
+  status: number;
+  statusText?: string;
+  headers?: Headers;
+  url?: string;
+  text?: string;
+  json: unknown;
+
   static createFromFetch(res: FetchResponse): Promise<RelayResponse>;
 
   static createFromGraphQL(res: { errors?: any; data?: any }): Promise<RelayResponse>;
 
-  processJsonData(json: any): void;
+  processJsonData(json: unknown): void;
   clone(): RelayResponse;
+  toString(): string;
 }
 export { RelayResponse as RelayNetworkLayerResponse };
 
