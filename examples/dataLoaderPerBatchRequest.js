@@ -6,7 +6,7 @@ within a single HTTP-request.
 Tuned for performance, to avoid creating unnecessary functions per request.
 */
 
-import express from 'express';
+import express, { Router } from 'express';
 import graphqlHTTP from 'express-graphql';
 import { graphqlBatchHTTPWrapper } from 'react-relay-network-modern';
 import bodyParser from 'body-parser';
@@ -36,47 +36,45 @@ const initDataLoaders = () => {
   };
 };
 
-// for performance reasons, create a single error function converter (rather than every request)
-const formatError = error => ({
-  // better errors for development. `stack` used in `gqErrors` middleware
-  message: error.message,
-  stack: process.env.NODE_ENV === 'development' ? error.stack.split('\n') : null,
-});
-
-// prepare `graphqlHTTP` express-middleware per request settings
-const graphqlSettingsPerRequest = req => ({
+// Prepare `graphqlHTTP` express-middleware (by default provides the request as the context)
+const graphqlMiddleware = graphqlHTTP({
   schema: myGraphqlSchema,
   graphiql: true,
-  formatError,
+  formatError: error => ({
+    // better errors for development. `stack` used in `gqErrors` middleware
+    message: error.message,
+    stack: process.env.NODE_ENV === 'development' ? error.stack.split('\n') : null,
+  }),
   pretty: true,
-  context: {
-    request: req, // just for example, pass request to context
-    dataLoaders: initDataLoaders(),
-  },
 });
 
-// Declare route for batch query
+// Create middleware to inject dataLoaders into request (and thereby into the graphql context, see above)
+const injectDataLoaders = (req, res, next) => {
+  req.dataLoaders = initDataLoaders();
+  next();
+};
 
-// `graphqlBatchHTTPWrapper` and `graphqlHTTP` return arrow functions.
-// For performance reasons, declare it once outside (req, res, next) => {} block,
-// rather than for every request. Otherwise, it will result in the garbage collector
-// being invoked way more than necessary.
-const graphqlBatchMiddleware = graphqlBatchHTTPWrapper(
-  graphqlHTTP(req => req.graphqlServerSettings)
-);
-server.use(
-  '/graphql/batch', // NB: should be before `server.use('/graphql', ...)`
+// Create router for graphql endpoints, ensuring they share the same basic middleware
+// Might as well add session checks or similiar things here
+const graphqlRouter = Router();
+graphqlRouter.use(injectDataLoaders);
+
+// Declare route for batch query
+graphqlRouter.use(
+  '/batch', // NB: should be before `graphqlRouter.use('/', ...)`
   bodyParser.json(),
-  (req, res, next) => {
-    req.graphqlServerSettings = graphqlSettingsPerRequest(req); // eslint-disable-line
-    graphqlBatchMiddleware(req, res, next);
-  }
+  graphqlBatchHTTPWrapper(graphqlMiddleware)
 );
 
 // Declare standard graphql route
+graphqlRouter.use(
+  '/', // NB: should be after `graphqlRouter.use('/batch', ...)`)
+  graphqlMiddleware
+);
+
 server.use(
-  '/graphql', // NB: should be after `server.use('/graphql/batch', ...)`)
-  graphqlHTTP(graphqlSettingsPerRequest)
+  '/graphql',
+  graphqlRouter
 );
 
 server.listen(port, () => {
