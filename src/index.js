@@ -16,7 +16,7 @@ import graphqlBatchHTTPWrapper from './express-middleware/graphqlBatchHTTPWrappe
 import RelayNetworkLayerRequest from './RelayRequest';
 import RelayNetworkLayerRequestBatch from './RelayRequestBatch';
 import RelayNetworkLayerResponse from './RelayResponse';
-import { RRNLRequestError } from './createRequestError';
+import { createRequestError, formatGraphQLErrors, RRNLRequestError } from './createRequestError';
 import RRNLError from './RRNLError';
 
 export {
@@ -36,6 +36,8 @@ export {
   progressMiddleware,
   uploadMiddleware,
   graphqlBatchHTTPWrapper,
+  createRequestError,
+  formatGraphQLErrors,
   RRNLError,
   RRNLRequestError,
   RRNLRetryMiddlewareError,
