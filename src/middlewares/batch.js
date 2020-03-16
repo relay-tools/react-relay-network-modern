@@ -164,7 +164,13 @@ function prepareNewBatcher(next, opts): Batcher {
     batcher.acceptRequests = false;
     sendRequests(batcher.requestList, next, opts)
       .then(() => finalizeUncompleted(batcher.requestList))
-      .catch(() => finalizeUncompleted(batcher.requestList));
+      .catch((e) => {
+        if (e && e.name === 'AbortError') {
+          finalizeCanceled(batcher.requestList, e);
+        } else {
+          finalizeUncompleted(batcher.requestList);
+        }
+      });
   }, opts.batchTimeout);
 
   return batcher;
@@ -221,6 +227,11 @@ async function sendRequests(requestList: RequestWrapper[], next, opts) {
   }
 
   return Promise.resolve();
+}
+
+// check that server returns responses for all requests
+function finalizeCanceled(requestList: RequestWrapper[], error: Error) {
+  requestList.forEach((request) => request.completeErr(error));
 }
 
 // check that server returns responses for all requests

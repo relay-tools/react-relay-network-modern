@@ -146,7 +146,7 @@ async function makeRetriableRequest(
       });
     } catch (e) {
       // no response from server (no internet connection), make new attempt
-      if (e && !e.res && !(e instanceof RRNLRetryMiddlewareError)) {
+      if (e && !e.res && !(e instanceof RRNLRetryMiddlewareError) && e.name !== 'AbortError') {
         return makeRetry(e);
       }
 
