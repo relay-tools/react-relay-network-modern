@@ -303,7 +303,7 @@ export type GraphQLResponseErrors = Array<{
   stack?: string[];
 }>;
 
-export default class RRNLError extends Error {
+export class RRNLError extends Error {
   constructor(msg: string);
 }
 
