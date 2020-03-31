@@ -303,5 +303,16 @@ export type GraphQLResponseErrors = Array<{
   stack?: string[];
 }>;
 
-export function createRequestError(request: RelayRequestAny, response?: RelayResponse);
-export function formatGraphQLErrors(request: RelayRequest, errors: GraphQLResponseErrors);
+export default class RRNLError extends Error {
+  constructor(msg: string);
+}
+
+export class RRNLRequestError extends RRNLError {
+  req: RelayRequestAny;
+  res?: RelayResponse;
+
+  constructor(msg: string);
+}
+
+export function createRequestError(request: RelayRequestAny, response?: RelayResponse): RRNLRequestError;
+export function formatGraphQLErrors(request: RelayRequest, errors: GraphQLResponseErrors): string;
