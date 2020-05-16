@@ -3,10 +3,12 @@
 
 import type RelayNetworkLayer from '../RelayNetworkLayer';
 import type RelayResponse from '../RelayResponse';
+import type { CacheConfig } from '../definition';
 
 type ReqData = {
   query?: string,
   variables?: Object,
+  cacheConfig?: CacheConfig,
   files?: any,
 };
 
@@ -17,6 +19,7 @@ class MockReq {
   reqData: ReqData;
   error: Error;
   payload: Object;
+  cacheConfig: Object;
 
   constructor(reqid?: ReqId, reqData?: ReqData = {}) {
     this.reqid = reqid || Math.random().toString();
@@ -60,7 +63,7 @@ class MockReq {
       operationKind,
     }: any);
     const variables = this.getVariables() || {};
-    const cacheConfig = {};
+    const cacheConfig = this.reqData.cacheConfig || {};
     const uploadables = this.getFiles();
 
     const res = (rnl.fetchFn(operation, variables, cacheConfig, uploadables): any);

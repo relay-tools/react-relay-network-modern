@@ -215,6 +215,39 @@ describe('middlewares/batch', () => {
     expect(fetchMock.lastOptions()).toMatchSnapshot();
   });
 
+  it('should not batch requests cacheConfig `skipBatch=true`', async () => {
+    fetchMock.mock({
+      matcher: '/graphql',
+      response: {
+        status: 200,
+        body: { data: { ok: 1 } },
+      },
+      method: 'POST',
+    });
+
+    fetchMock.mock({
+      matcher: '/graphql/batch',
+      response: {
+        status: 200,
+        body: [{ data: { ok: 2 } }, { data: { ok: 3 } }],
+      },
+      method: 'POST',
+    });
+
+    const rnl = new RelayNetworkLayer([batchMiddleware()]);
+    const req1 = mockReq(1, { cacheConfig: { skipBatch: true } });
+    const req2 = mockReq(2);
+    const req3 = mockReq(3);
+    const [res1, res2, res3] = await Promise.all([
+      req1.execute(rnl),
+      req2.execute(rnl),
+      req3.execute(rnl),
+    ]);
+    expect(res1.data).toEqual({ ok: 1 });
+    expect(res2.data).toEqual({ ok: 2 });
+    expect(res3.data).toEqual({ ok: 3 });
+  });
+
   describe('option `batchTimeout`', () => {
     beforeEach(() => {
       fetchMock.restore();

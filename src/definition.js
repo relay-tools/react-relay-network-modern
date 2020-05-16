@@ -88,6 +88,7 @@ export type CacheConfig = {
   force?: ?boolean,
   poll?: ?number,
   rerunParamExperimental?: ?any,
+  skipBatch?: ?boolean,
 };
 export type Disposable = { dispose(): void };
 export type Uploadable = File | Blob;
