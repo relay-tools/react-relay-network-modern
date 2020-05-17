@@ -84,6 +84,11 @@ export default function batchMiddleware(options?: BatchMiddlewareOpts): Middlewa
       return next(req);
     }
 
+    // skip batching if request explicitly opts out
+    if (req.cacheConfig.skipBatch) {
+      return next(req);
+    }
+
     return passThroughBatch(req, next, {
       batchTimeout,
       batchUrl,
