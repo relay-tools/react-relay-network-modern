@@ -14,7 +14,7 @@ type CacheMiddlewareOpts = {|
   cacheErrors?: boolean,
 |};
 
-export default function queryMiddleware(opts?: CacheMiddlewareOpts): Middleware {
+export default function cacheMiddleware(opts?: CacheMiddlewareOpts): Middleware {
   const { size, ttl, onInit, allowMutations, allowFormData, clearOnMutation, cacheErrors } =
     opts || {};
   const cache = new QueryResponseCache({
