@@ -231,6 +231,7 @@ export type ConcreteBatch = {
   name: string;
   query: any;
   text: string | null;
+  operationKind: string;
 };
 export type CacheConfig = {
   force?: boolean;
