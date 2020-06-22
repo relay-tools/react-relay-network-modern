@@ -37,6 +37,18 @@ import 'regenerator-runtime/runtime';
 import { RelayNetworkLayer } from 'react-relay-network-modern';
 ```
 
+### What if Webpack errors with `Error: Cannot find module 'core-js/modules/es6.*'`?
+
+`core-js` is not an explicit dependency as it adds [30kb for client bundles](https://bundlephobia.com/result?p=core-js@2.6.9).
+
+If this error occurs you can do one of the following:
+
+- Explicitly install core-js v2. E.g.
+  - `yarn add core-js@2.6.11
+- Try referencing one of the non default imports:
+  - `import { RelayNetworkLayer } from 'react-relay-network-modern/node8';`
+  - `import { RelayNetworkLayer } from 'react-relay-network-modern/es';`
+
 ### Different builds
 
 This library contains different builds for any purposes:
