@@ -13,7 +13,7 @@ import type {
   RNLExecuteFunction,
 } from './definition';
 
-type RelayNetworkLayerOpts = {|
+export type RelayNetworkLayerOpts = {|
   subscribeFn?: SubscribeFunction,
   beforeFetch?: FetchHookFunction,
   noThrow?: boolean,

@@ -283,7 +283,7 @@ export type SubscribeFunction = (
   observer: any
 ) => RelayObservable<QueryPayload> | Disposable;
 
-type RelayNetworkLayerOpts = {
+export type RelayNetworkLayerOpts = {
   subscribeFn?: SubscribeFunction;
   beforeFetch?: FetchHookFunction;
   noThrow?: boolean;
