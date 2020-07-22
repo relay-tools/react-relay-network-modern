@@ -1,4 +1,6 @@
-import { ExecuteFunction } from "relay-runtime";
+import { ExecuteFunction, QueryResponseCache } from "relay-runtime";
+
+export { QueryResponseCache };
 
 export type FetchResponse = Response;
 export type Variables = { [name: string]: any };
@@ -84,11 +86,6 @@ export { RelayRequestBatch as RelayNetworkLayerRequestBatch };
 
 export type RelayRequestAny = RelayRequest | RelayRequestBatch;
 
-export type QueryResponseCache = {
-  size: number;
-  ttl: number;
-};
-
 export type MiddlewareNextFn = (req: RelayRequestAny) => Promise<RelayResponse>;
 export type Middleware = (next: MiddlewareNextFn) => MiddlewareNextFn;
 
@@ -158,7 +155,7 @@ export function batchMiddleware(opts?: BatchMiddlewareOpts): Middleware;
 export interface CacheMiddlewareOpts {
   size?: number;
   ttl?: number;
-  onInit?: (cache: QueryResponseCache) => any;
+  onInit?: (cache: QueryResponseCache) => void;
   allowMutations?: boolean;
   allowFormData?: boolean;
   clearOnMutation?: boolean;
