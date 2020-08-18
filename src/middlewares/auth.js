@@ -63,8 +63,17 @@ export default function authMiddleware(opts?: AuthMiddlewareOpts): Middleware {
             }
 
             return tokenRefreshInProgress.then((newToken) => {
+              if (!newToken && !allowEmptyToken) {
+                throw new RRNLAuthMiddlewareError('Empty token');
+              }
+
               const newReq = req.clone();
-              newReq.fetchOpts.headers[header] = `${prefix}${newToken}`;
+              if (newToken) {
+                newReq.fetchOpts.headers[header] = `${prefix}${newToken}`;
+              } else {
+                delete newReq.fetchOpts.headers[header];
+              }
+
               return next(newReq); // re-run query with new token
             });
           }
