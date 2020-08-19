@@ -26,13 +26,13 @@ export function formatGraphQLErrors(request: RelayRequest, errors: GraphQLRespon
     return errors.join('\n');
   }
 
+  let queryLines = [];
   const queryString = request.getQueryString();
-  if (!queryString) {
+  if (queryString) {
     // When using persisted query, queryString is an empty string.
-    return errors.join('\n');
+    queryLines = queryString.split('\n');
   }
 
-  const queryLines = queryString.split('\n');
   return errors
     .map(({ locations, message }, ii) => {
       const prefix = `${ii + 1}. `;
