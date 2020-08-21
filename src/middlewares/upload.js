@@ -37,6 +37,7 @@ export default function uploadMiddleware(): Middleware {
 
       req.fetchOpts.method = 'POST';
       req.fetchOpts.body = formData;
+      delete req.fetchOpts.headers['Content-Type'];
     }
 
     const res = await next(req);
