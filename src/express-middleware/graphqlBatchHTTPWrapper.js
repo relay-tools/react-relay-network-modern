@@ -15,6 +15,7 @@ export default function(graphqlHTTPMiddleware: ExpressMiddleware): ExpressMiddle
               body: data,
             };
             const subResponse = {
+              ...res,
               status(st) {
                 this.statusCode = st;
                 return this;
