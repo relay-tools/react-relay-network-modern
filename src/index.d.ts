@@ -314,3 +314,6 @@ export class RRNLRequestError extends RRNLError {
 
 export function createRequestError(request: RelayRequestAny, response?: RelayResponse): RRNLRequestError;
 export function formatGraphQLErrors(request: RelayRequest, errors: GraphQLResponseErrors): string;
+
+type ExpressMiddleware = (req: any, res: any) => any;
+export function graphqlBatchHTTPWrapper(middleware: ExpressMiddleware): ExpressMiddleware;
