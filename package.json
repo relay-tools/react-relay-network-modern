@@ -29,6 +29,7 @@
   },
   "homepage": "https://github.com/relay-tools/react-relay-network-modern#readme",
   "dependencies": {
+    "core-js": "3",
     "extract-files": "^5.0.1"
   },
   "peerDependencies": {

@@ -11,9 +11,8 @@ module.exports = {
           '@babel/preset-env',
           {
             targets: {
-              browsers: ['last 5 versions', 'ie 9', 'defaults'],
+              browsers: ['last 5 versions', 'ie 11', 'defaults'],
             },
-            useBuiltIns: 'usage',
           },
         ],
       ],
