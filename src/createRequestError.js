@@ -26,9 +26,10 @@ export function formatGraphQLErrors(request: RelayRequest, errors: GraphQLRespon
     return errors.join('\n');
   }
 
-  const queryString = request.getQueryString();
   let queryLines = [];
+  const queryString = request.getQueryString();
   if (queryString) {
+    // When using persisted query, queryString is an empty string.
     queryLines = queryString.split('\n');
   }
 
