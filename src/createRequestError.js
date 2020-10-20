@@ -26,12 +26,11 @@ export function formatGraphQLErrors(request: RelayRequest, errors: GraphQLRespon
     return errors.join('\n');
   }
 
-  let queryLines = [];
   const queryString = request.getQueryString();
-  if (queryString) {
-    // When using persisted query, queryString is an empty string.
-    queryLines = queryString.split('\n');
+  if (!queryString) {
+    return errors.join('\n');
   }
+  const queryLines = [];
 
   return errors
     .map(({ locations, message }, ii) => {
