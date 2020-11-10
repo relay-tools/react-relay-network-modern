@@ -2,6 +2,9 @@
   "name": "react-relay-network-modern",
   "version": "0.0.0-semantically-released",
   "description": "Network Layer for React Relay and Express (Batch Queries, AuthToken, Logging, Retry)",
+  "engines": {
+    "node": ">=10.17.0"
+  },
   "files": [
     "es",
     "lib",
@@ -29,7 +32,7 @@
   },
   "homepage": "https://github.com/relay-tools/react-relay-network-modern#readme",
   "dependencies": {
-    "core-js": "3",
+    "core-js": "^3.0.0",
     "extract-files": "^9.0.0"
   },
   "peerDependencies": {

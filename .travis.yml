@@ -7,8 +7,9 @@ cache:
 notifications:
   email: true
 node_js:
-  - "10"
-  - "8"
+  - '10'
+  - '12'
+  - '14'
 script:
   - yarn run coverage
   - yarn run build
