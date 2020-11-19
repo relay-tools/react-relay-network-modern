@@ -26,7 +26,8 @@ export default class RelayResponse {
 
     if (res.status < 200 || res.status >= 300) {
       r.text = await res.text();
-    } else {
+      // eslint-disable-next-line no-bitwise
+    } else if (~r.headers.get('content-type').indexOf('application/json')) {
       r.processJsonData(await res.json());
     }
 

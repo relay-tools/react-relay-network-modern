@@ -59,12 +59,15 @@
     "eslint-module-utils": "^2.4.0",
     "eslint-plugin-import": "^2.17.3",
     "eslint-plugin-prettier": "^3.1.0",
-    "fetch-mock": "^7.3.3",
+    "fetch-mock": "^9.10.7",
     "flow-bin": "0.101.0",
     "form-data": "^2.3.3",
+    "graphql": "^15.4.0",
     "jest": "^24.8.0",
     "prettier": "^1.18.2",
     "relay-runtime": "^4.0.0",
+    "relay-test-utils": "^10.1.0",
+    "relay-test-utils-internal": "^10.1.0",
     "rimraf": "^2.6.3",
     "semantic-release": "^15.13.12",
     "tslint": "^5.17.0",
@@ -80,6 +83,9 @@
   "jest": {
     "roots": [
       "<rootDir>/src"
+    ],
+    "setupFiles": [
+      "./jest-setup"
     ]
   },
   "scripts": {

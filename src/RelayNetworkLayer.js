@@ -1,7 +1,7 @@
 /* @flow */
 
 import { Network } from 'relay-runtime';
-import { meros } from 'meros';
+import { meros } from 'meros/browser';
 import RelayRequest from './RelayRequest';
 import fetchWithMiddleware from './fetchWithMiddleware';
 import type {
@@ -92,15 +92,18 @@ export default class RelayNetworkLayer {
                     throw new RRNLError(
                       'failed parsing part:\n- this could either mean the multipart body had an incorrect Content-Type\n- or lack thereof'
                     );
-                  const { data, path, hasNext, label } = body;
-                  sink.next({
+                  const { data, path, hasNext, label, errors } = body;
+                  const payload = {
                     data,
                     path,
                     label,
+                    errors,
                     extensions: {
                       is_final: !hasNext,
                     },
-                  });
+                  };
+                  shouldHandleError(req, payload);
+                  sink.next(payload);
                 }
               } else {
                 shouldHandleError(req, value);

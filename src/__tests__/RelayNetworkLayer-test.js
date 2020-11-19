@@ -1,6 +1,7 @@
 /* @flow */
 
 import fetchMock from 'fetch-mock';
+import { generateAndCompile } from 'relay-test-utils-internal';
 import RelayNetworkLayer from '../RelayNetworkLayer';
 
 fetchMock.mock({
@@ -74,35 +75,108 @@ describe('RelayNetworkLayer', () => {
   });
 
   describe('multipart responses', () => {
+    afterAll(() => {
+      fetchMock.restore();
+    });
+
     it('should successful return data across parts', async () => {
-      fetchMock.mock({
-        matcher: '/graphql',
-        response: {
-          body: [
-            '',
-            '---',
-            'Content-Type: application/json',
-            '',
-            JSON.stringify({ data: { id: 1 } }),
-            '---',
-            'Content-Type: application/json',
-            '',
-            JSON.stringify({ path: ['viewer'], data: { managed_groups: [{ id: 1 }] } }),
-            '-----',
-          ].join('\r\n'),
+      global.fetch = async () => {
+        return {
+          body: {
+            getReader() {
+              return {
+                async read() {
+                  return {
+                    value: Buffer.from(
+                      [
+                        '',
+                        '---',
+                        'Content-Type: application/json',
+                        '',
+                        JSON.stringify({
+                          data: { viewer: { actor: { name: 'Marais' } } },
+                          hasNext: true,
+                        }),
+                        '---',
+                        'Content-Type: application/json',
+                        '',
+                        JSON.stringify({
+                          path: ['viewer'],
+                          data: { account_user: { name: 'Zuck' } },
+                          label: 'RelayNetworkLayerTestQuery$defer$UserFragment',
+                          hasNext: false,
+                        }),
+                        '-----',
+                      ].join('\r\n')
+                    ),
+                    done: false,
+                  };
+                },
+                releaseLock() {
+                  // no op
+                },
+              };
+            },
+          },
           status: 200,
-        },
-        headers: {
-          'content-type': 'multipart/mixed; boundary="-"',
-        },
-        sendAsJson: false,
-        method: 'POST',
-      });
+          ok: true,
+          bodyUsed: false,
+          headers: new Map([['content-type', 'multipart/mixed; boundary="-"']]),
+        };
+      };
+
+      const { RelayNetworkLayerTestQuery } = generateAndCompile(`
+      query RelayNetworkLayerTestQuery {
+          viewer {
+              actor {
+                  name
+              }
+              account_user {
+                  ...UserFragment @defer
+              }
+          }
+      }
+       fragment UserFragment on User {
+          name
+        }
+      `);
 
       const network = new RelayNetworkLayer();
-      const observable: any = network.execute(mockOperation, {}, {});
-      const result = await observable.toPromise();
-      expect(result.data).toEqual({ viewer: { id: 1, managed_groups: [{ id: 1 }] } });
+      const payloads = await new Promise((resolve, reject) => {
+        // eslint-disable-next-line no-shadow
+        const payloads = [];
+        network.execute(RelayNetworkLayerTestQuery, {}, {}).subscribe({
+          next(value) {
+            payloads.push(value);
+          },
+          complete() {
+            resolve(payloads);
+          },
+          error(err) {
+            reject(err);
+          },
+        });
+      });
+      expect(payloads).toEqual([
+        {
+          data: { viewer: { actor: { name: 'Marais' } } },
+          errors: undefined,
+          path: undefined,
+          label: undefined,
+          extensions: {
+            is_final: false,
+          },
+        },
+        {
+          path: ['viewer'],
+          data: { account_user: { name: 'Zuck' } },
+          label: 'RelayNetworkLayerTestQuery$defer$UserFragment',
+          errors: undefined,
+          extensions: {
+            is_final: true,
+          },
+        },
+      ]);
     });
   });
 
