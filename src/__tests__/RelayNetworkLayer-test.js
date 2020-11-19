@@ -73,6 +73,39 @@ describe('RelayNetworkLayer', () => {
     });
   });
 
+  describe('multipart responses', () => {
+    it('should successful return data across parts', async () => {
+      fetchMock.mock({
+        matcher: '/graphql',
+        response: {
+          body: [
+            '',
+            '---',
+            'Content-Type: application/json',
+            '',
+            JSON.stringify({ data: { id: 1 } }),
+            '---',
+            'Content-Type: application/json',
+            '',
+            JSON.stringify({ path: ['viewer'], data: { managed_groups: [{ id: 1 }] } }),
+            '-----',
+          ].join('\r\n'),
+          status: 200,
+        },
+        headers: {
+          'content-type': 'multipart/mixed; boundary="-"',
+        },
+        sendAsJson: false,
+        method: 'POST',
+      });
+
+      const network = new RelayNetworkLayer();
+      const observable: any = network.execute(mockOperation, {}, {});
+      const result = await observable.toPromise();
+      expect(result.data).toEqual({ viewer: { id: 1, managed_groups: [{ id: 1 }] } });
+    });
+  });
+
   it('should correctly call raw middlewares', async () => {
     fetchMock.mock({
       matcher: '/graphql',

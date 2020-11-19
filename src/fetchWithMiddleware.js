@@ -38,8 +38,7 @@ const convertResponse: (next: MiddlewareRawNextFn) => MiddlewareNextFn = (next) 
 export default function fetchWithMiddleware(
   req: RelayRequestAny,
   middlewares: Middleware[], // works with RelayResponse
-  rawFetchMiddlewares: MiddlewareRaw[], // works with raw fetch response
-  noThrow?: boolean
+  rawFetchMiddlewares: MiddlewareRaw[] // works with raw fetch response
 ): Promise<RelayResponse> {
   // $FlowFixMe
   const wrappedFetch: MiddlewareNextFn = compose(
@@ -48,12 +47,7 @@ export default function fetchWithMiddleware(
     ...rawFetchMiddlewares
   )((runFetch: any));
 
-  return wrappedFetch(req).then((res) => {
-    if (!noThrow && (!res || res.errors || !res.data)) {
-      throw createRequestError(req, res);
-    }
-    return res;
-  });
+  return wrappedFetch(req);
 }
 
 /**
