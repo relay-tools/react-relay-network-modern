@@ -7,7 +7,7 @@
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
 ![FlowType compatible](https://img.shields.io/badge/flowtype-compatible-brightgreen.svg)
 
-The `ReactRelayNetworkModern` is a [Network Layer for Relay Modern](https://facebook.github.io/relay/docs/network-layer.html)
+The `ReactRelayNetworkModern` is a [Network Layer for Relay Modern](https://relay.dev/docs/guides/network-layer/)
 with various middlewares which can manipulate requests/responses on the fly (change auth headers, request url or perform some fallback if request fails), batch several relay request by timeout into one http request, cache queries and server-side rendering.
 
 Network Layer for Relay Classic can be found [here](https://github.com/relay-tools/react-relay-network-layer).
