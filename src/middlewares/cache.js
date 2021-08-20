@@ -12,11 +12,20 @@ type CacheMiddlewareOpts = {|
   allowFormData?: boolean,
   clearOnMutation?: boolean,
   cacheErrors?: boolean,
+  updateTTLOnGet?: boolean,
 |};
 
 export default function cacheMiddleware(opts?: CacheMiddlewareOpts): Middleware {
-  const { size, ttl, onInit, allowMutations, allowFormData, clearOnMutation, cacheErrors } =
-    opts || {};
+  const {
+    size,
+    ttl,
+    onInit,
+    allowMutations,
+    allowFormData,
+    clearOnMutation,
+    cacheErrors,
+    updateTTLOnGet,
+  } = opts || {};
   const cache = new QueryResponseCache({
     size: size || 100, // 100 requests
     ttl: ttl || 15 * 60 * 1000, // 15 minutes
@@ -57,6 +66,10 @@ export default function cacheMiddleware(opts?: CacheMiddlewareOpts): Middleware 
 
       const cachedRes = cache.get(queryId, variables);
       if (cachedRes) {
+        if (updateTTLOnGet) {
+          cache.set(queryId, variables, cachedRes);
+        }
+
         return cachedRes;
       }
 
