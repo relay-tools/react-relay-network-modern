@@ -1,4 +1,4 @@
-import { ExecuteFunction, QueryResponseCache } from 'relay-runtime';
+import { ExecuteFunction, QueryResponseCache } from "relay-runtime";
 
 export { QueryResponseCache };
 
@@ -248,10 +248,10 @@ export type PayloadData = { [key: string]: any };
 
 export type QueryPayload =
   | {
-      data?: PayloadData | null;
-      errors?: any[];
-      rerunVariables?: Variables;
-    }
+    data?: PayloadData | null;
+    errors?: any[];
+    rerunVariables?: Variables;
+  }
   | RelayResponse;
 
 export type MiddlewareSync = {
@@ -288,11 +288,12 @@ export type RelayNetworkLayerOpts = {
 };
 
 export class RelayNetworkLayer {
-  execute: ExecuteFunction;
   constructor(
     middlewares: Array<Middleware | MiddlewareSync | MiddlewareRaw | null>,
     opts?: RelayNetworkLayerOpts
   );
+
+  execute: ExecuteFunction;
 }
 
 export type GraphQLResponseErrors = Array<{
@@ -312,10 +313,7 @@ export class RRNLRequestError extends RRNLError {
   constructor(msg: string);
 }
 
-export function createRequestError(
-  request: RelayRequestAny,
-  response?: RelayResponse
-): RRNLRequestError;
+export function createRequestError(request: RelayRequestAny, response?: RelayResponse): RRNLRequestError;
 export function formatGraphQLErrors(request: RelayRequest, errors: GraphQLResponseErrors): string;
 
 type ExpressMiddleware = (req: any, res: any) => any;
