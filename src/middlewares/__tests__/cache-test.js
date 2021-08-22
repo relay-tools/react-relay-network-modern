@@ -184,4 +184,41 @@ describe('middlewares/cache', () => {
     await expect(mockReq('FirstQuery').execute(rnl)).rejects.toThrow();
     expect(fetchMock.calls('/graphql')).toHaveLength(1);
   });
+
+  it('updates ttl on get if updateTTLOnGet is set', async () => {
+    fetchMock.mock({
+      matcher: '/graphql',
+      response: {
+        status: 200,
+        body: { data: 'PAYLOAD' },
+      },
+      method: 'POST',
+    });
+
+    const rnl = new RelayNetworkLayer([
+      cacheMiddleware({
+        ttl: 30,
+        updateTTLOnGet: true,
+      }),
+    ]);
+
+    // data from fetch
+    const res1 = await mockReq('FirstQuery').execute(rnl);
+    expect(res1.data).toBe('PAYLOAD');
+    expect(fetchMock.calls('/graphql')).toHaveLength(1);
+
+    await sleep(20);
+
+    // data from cache
+    const res2 = await mockReq('FirstQuery').execute(rnl);
+    expect(res2.data).toBe('PAYLOAD');
+    expect(fetchMock.calls('/graphql')).toHaveLength(1);
+
+    await sleep(20);
+
+    // data from cache 40ms after 30ms initial cache
+    const res3 = await mockReq('FirstQuery').execute(rnl);
+    expect(res3.data).toBe('PAYLOAD');
+    expect(fetchMock.calls('/graphql')).toHaveLength(1);
+  });
 });

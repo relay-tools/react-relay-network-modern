@@ -160,6 +160,7 @@ export interface CacheMiddlewareOpts {
   allowFormData?: boolean;
   clearOnMutation?: boolean;
   cacheErrors?: boolean;
+  updateTTLOnGet?: boolean;
 }
 
 export function cacheMiddleware(opts?: CacheMiddlewareOpts): Middleware;
