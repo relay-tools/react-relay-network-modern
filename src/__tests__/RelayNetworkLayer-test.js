@@ -21,7 +21,7 @@ describe('RelayNetworkLayer', () => {
     const mw2: any = jest.fn((next) => next);
 
     const network = new RelayNetworkLayer([null, mw1, undefined, mw2]);
-    await network.execute(mockOperation, {}, {}).toPromise();
+    await (network.execute(mockOperation, {}, {}): any).toPromise();
     expect(mw1).toHaveBeenCalled();
     expect(mw2).toHaveBeenCalled();
   });
@@ -34,7 +34,7 @@ describe('RelayNetworkLayer', () => {
         execute: () => ({ data: {} }),
       };
       const network = new RelayNetworkLayer([syncMW, asyncMW]);
-      await network.execute(mockOperation, {}, {}).toPromise();
+      await (network.execute(mockOperation, {}, {}): any).toPromise();
       expect(asyncMW).not.toHaveBeenCalled();
     });
 
@@ -46,7 +46,7 @@ describe('RelayNetworkLayer', () => {
       };
 
       const network = new RelayNetworkLayer([syncMW, asyncMW]);
-      await network.execute(mockOperation, {}, {}).toPromise();
+      await (network.execute(mockOperation, {}, {}): any).toPromise();
       expect(asyncMW).toHaveBeenCalled();
     });
   });
@@ -58,7 +58,7 @@ describe('RelayNetworkLayer', () => {
       const network = new RelayNetworkLayer([asyncMW], {
         beforeFetch: () => ({ data: {} }),
       });
-      await network.execute(mockOperation, {}, {}).toPromise();
+      await (network.execute(mockOperation, {}, {}): any).toPromise();
       expect(asyncMW).not.toHaveBeenCalled();
     });
 
@@ -68,7 +68,7 @@ describe('RelayNetworkLayer', () => {
       const network = new RelayNetworkLayer([asyncMW], {
         beforeFetch: () => undefined,
       });
-      await network.execute(mockOperation, {}, {}).toPromise();
+      await (network.execute(mockOperation, {}, {}): any).toPromise();
       expect(asyncMW).toHaveBeenCalled();
     });
   });

@@ -1,4 +1,4 @@
-import { ExecuteFunction, QueryResponseCache } from "relay-runtime";
+import { ExecuteFunction, QueryResponseCache } from 'relay-runtime';
 
 export { QueryResponseCache };
 
@@ -93,7 +93,7 @@ export type UrlMiddlewareOpts = {
   url: string | Promise<string> | ((req: RelayRequest) => string | Promise<string>);
   method?: 'POST' | 'GET';
   headers?: Headers | Promise<Headers> | ((req: RelayRequest) => Headers | Promise<Headers>);
-  // Avaliable request modes in fetch options. For details see https://fetch.spec.whatwg.org/#requests
+  // Available request modes in fetch options. For details see https://fetch.spec.whatwg.org/#requests
   credentials?: FetchOpts['credentials'];
   mode?: FetchOpts['mode'];
   cache?: FetchOpts['cache'];
@@ -248,10 +248,10 @@ export type PayloadData = { [key: string]: any };
 
 export type QueryPayload =
   | {
-    data?: PayloadData | null;
-    errors?: any[];
-    rerunVariables?: Variables;
-  }
+      data?: PayloadData | null;
+      errors?: any[];
+      rerunVariables?: Variables;
+    }
   | RelayResponse;
 
 export type MiddlewareSync = {
@@ -288,12 +288,12 @@ export type RelayNetworkLayerOpts = {
 };
 
 export class RelayNetworkLayer {
+  execute: ExecuteFunction;
+
   constructor(
     middlewares: Array<Middleware | MiddlewareSync | MiddlewareRaw | null>,
     opts?: RelayNetworkLayerOpts
   );
-
-  execute: ExecuteFunction;
 }
 
 export type GraphQLResponseErrors = Array<{
@@ -313,7 +313,10 @@ export class RRNLRequestError extends RRNLError {
   constructor(msg: string);
 }
 
-export function createRequestError(request: RelayRequestAny, response?: RelayResponse): RRNLRequestError;
+export function createRequestError(
+  request: RelayRequestAny,
+  response?: RelayResponse
+): RRNLRequestError;
 export function formatGraphQLErrors(request: RelayRequest, errors: GraphQLResponseErrors): string;
 
 type ExpressMiddleware = (req: any, res: any) => any;
