@@ -31,7 +31,10 @@ describe('middlewares/legacyBatch', () => {
       matcher: '/graphql/batch',
       response: {
         status: 200,
-        body: [{ id: 1, data: { ok: 1 } }, { id: 2, data: { ok: 2 } }],
+        body: [
+          { id: 1, data: { ok: 1 } },
+          { id: 2, data: { ok: 2 } },
+        ],
       },
       method: 'POST',
     });
@@ -49,7 +52,10 @@ describe('middlewares/legacyBatch', () => {
       matcher: '/graphql/batch',
       response: {
         status: 200,
-        body: [{ id: 1, data: { ok: 1 } }, { id: 2, data: { ok: 2 } }],
+        body: [
+          { id: 1, data: { ok: 1 } },
+          { id: 2, data: { ok: 2 } },
+        ],
       },
       method: 'POST',
     });
@@ -253,7 +259,11 @@ describe('middlewares/legacyBatch', () => {
         matcher: '/graphql/batch',
         response: {
           status: 200,
-          body: [{ id: 1, data: {} }, { id: 2, data: {} }, { id: 3, data: {} }],
+          body: [
+            { id: 1, data: {} },
+            { id: 2, data: {} },
+            { id: 3, data: {} },
+          ],
         },
         method: 'POST',
       });
@@ -401,7 +411,10 @@ describe('middlewares/legacyBatch', () => {
         matcher: '/graphql/batch',
         response: {
           status: 200,
-          body: [{ id: 1, data: {} }, { id: 2, data: {} }],
+          body: [
+            { id: 1, data: {} },
+            { id: 2, data: {} },
+          ],
         },
         method: 'POST',
       });
@@ -448,7 +461,10 @@ describe('middlewares/legacyBatch', () => {
       matcher: '/graphql/batch',
       response: {
         status: 200,
-        body: [{ id: 1, data: {} }, { id: 2, data: {} }],
+        body: [
+          { id: 1, data: {} },
+          { id: 2, data: {} },
+        ],
       },
       method: 'POST',
     });
@@ -485,7 +501,10 @@ describe('middlewares/legacyBatch', () => {
         matcher: '/graphql/batch',
         response: {
           status: 200,
-          body: [{ id: 1, data: {} }, { id: 2, data: {} }],
+          body: [
+            { id: 1, data: {} },
+            { id: 2, data: {} },
+          ],
         },
         method: 'POST',
       });
@@ -511,7 +530,10 @@ describe('middlewares/legacyBatch', () => {
         matcher: '/graphql/batch',
         response: {
           status: 200,
-          body: [{ id: 1, data: {} }, { id: 2, data: {} }],
+          body: [
+            { id: 1, data: {} },
+            { id: 2, data: {} },
+          ],
         },
         method: 'POST',
       });
@@ -537,7 +559,10 @@ describe('middlewares/legacyBatch', () => {
         matcher: '/graphql/batch',
         response: {
           status: 200,
-          body: [{ id: 1, data: {} }, { id: 2, data: {} }],
+          body: [
+            { id: 1, data: {} },
+            { id: 2, data: {} },
+          ],
         },
         method: 'POST',
       });
