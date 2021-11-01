@@ -28,7 +28,6 @@ module.exports = {
             targets: {
               node: '8.0.0',
             },
-            loose: true,
             modules: 'commonjs',
           },
         ],
