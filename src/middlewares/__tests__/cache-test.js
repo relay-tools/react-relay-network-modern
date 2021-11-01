@@ -197,7 +197,7 @@ describe('middlewares/cache', () => {
 
     const rnl = new RelayNetworkLayer([
       cacheMiddleware({
-        ttl: 30,
+        ttl: 40,
         updateTTLOnGet: true,
       }),
     ]);
