@@ -108,6 +108,12 @@ export interface LoggerMiddlewareOpts {
 
 export function loggerMiddleware(opts?: LoggerMiddlewareOpts): Middleware;
 
+export interface PersistedQueriesMiddlewareOpts {
+  hash: string
+}
+
+export function persistedQueriesMiddleware(opts?: PersistedQueriesMiddlewareOpts): Middleware;
+
 export interface PerfMiddlewareOpts {
   logger?: Function;
 }

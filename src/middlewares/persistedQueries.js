@@ -55,9 +55,13 @@ async function makePersistedQueryRequestWithFallback(
   return makeRequest();
 }
 
-export default (options?: PersistedQueriesMiddlewareOptions): Middleware => (next) => (req) =>
-  makePersistedQueryRequestWithFallback({
-    req,
-    next,
-    options,
-  });
+export default function persistedQueriesMiddleware(
+  options?: PersistedQueriesMiddlewareOptions
+): Middleware {
+  return (next) => (req) =>
+    makePersistedQueryRequestWithFallback({
+      req,
+      next,
+      options,
+    });
+}
