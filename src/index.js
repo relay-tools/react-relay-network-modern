@@ -8,6 +8,7 @@ import urlMiddleware from './middlewares/url';
 import authMiddleware, { RRNLAuthMiddlewareError } from './middlewares/auth';
 import perfMiddleware from './middlewares/perf';
 import loggerMiddleware from './middlewares/logger';
+import persistedQueriesMiddleware from './middlewares/persistedQueries';
 import errorMiddleware from './middlewares/error';
 import cacheMiddleware from './middlewares/cache';
 import progressMiddleware from './middlewares/progress';
@@ -31,6 +32,7 @@ export {
   authMiddleware,
   perfMiddleware,
   loggerMiddleware,
+  persistedQueriesMiddleware,
   errorMiddleware,
   cacheMiddleware,
   progressMiddleware,
