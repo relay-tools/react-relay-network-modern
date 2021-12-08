@@ -8,7 +8,6 @@ Object {
     "Content-Type": "application/json",
   },
   "method": "POST",
-  "url": "/graphql/batch",
 }
 `;
 
@@ -49,7 +48,6 @@ Object {
     "Content-Type": "application/json",
   },
   "method": "POST",
-  "url": "/graphql/batch",
 }
 `;
 
@@ -64,7 +62,6 @@ Array [
         "Content-Type": "application/json",
       },
       "method": "POST",
-      "url": "/graphql/batch",
     },
   ],
   Array [
@@ -76,7 +73,6 @@ Array [
         "Content-Type": "application/json",
       },
       "method": "POST",
-      "url": "/graphql/batch",
     },
   ],
 ]
@@ -90,7 +86,6 @@ Object {
     "Content-Type": "application/json",
   },
   "method": "POST",
-  "url": "/graphql/batch",
 }
 `;
 
@@ -102,7 +97,6 @@ Object {
     "Content-Type": "application/json",
   },
   "method": "POST",
-  "url": "/graphql/batch",
 }
 `;
 
@@ -114,7 +108,6 @@ Object {
     "Content-Type": "application/json",
   },
   "method": "POST",
-  "url": "/graphql/batch",
 }
 `;
 
@@ -126,7 +119,6 @@ Object {
     "Content-Type": "application/json",
   },
   "method": "POST",
-  "url": "/graphql/batch",
 }
 `;
 
@@ -150,7 +142,6 @@ Object {
     "Content-Type": "application/json",
   },
   "method": "POST",
-  "url": "/graphql/batch",
 }
 `;
 
@@ -162,7 +153,6 @@ Object {
     "Content-Type": "application/json",
   },
   "method": "POST",
-  "url": "/graphql/batch",
 }
 `;
 
@@ -174,7 +164,6 @@ Object {
     "Content-Type": "application/json",
   },
   "method": "POST",
-  "url": "/graphql/batch",
 }
 `;
 
@@ -186,6 +175,5 @@ Object {
     "Content-Type": "application/json",
   },
   "method": "POST",
-  "url": "/graphql/batch",
 }
 `;

@@ -2,14 +2,11 @@
 
 exports[`middlewares/url \`method\` option 1`] = `
 Object {
-  "body": "{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}}",
   "headers": Object {
     "Accept": "*/*",
-    "Content-Type": "application/json",
   },
   "method": "GET",
   "signal": AbortSignal {},
-  "url": "/get_url",
 }
 `;
 
@@ -22,7 +19,6 @@ Object {
   },
   "method": "POST",
   "signal": AbortSignal {},
-  "url": "/some_url",
 }
 `;
 
@@ -35,7 +31,6 @@ Object {
   },
   "method": "POST",
   "signal": AbortSignal {},
-  "url": "/thunk_url",
 }
 `;
 
@@ -48,6 +43,5 @@ Object {
   },
   "method": "POST",
   "signal": AbortSignal {},
-  "url": "/thunk_url_promise",
 }
 `;
