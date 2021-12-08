@@ -13,15 +13,20 @@ import type {
 } from './definition';
 
 function runFetch(req: RelayRequestAny): Promise<FetchResponse> {
-  let { url } = req.fetchOpts;
+  let { url, body, ...fetchOpts } = req.fetchOpts;
   if (!url) url = '/graphql';
 
-  if (!req.fetchOpts.headers.Accept) req.fetchOpts.headers.Accept = '*/*';
-  if (!req.fetchOpts.headers['Content-Type'] && !req.isFormData()) {
-    req.fetchOpts.headers['Content-Type'] = 'application/json';
+  if (!fetchOpts.headers.Accept) fetchOpts.headers.Accept = '*/*';
+
+  if (fetchOpts.method === 'GET') {
+    return fetch(url, (fetchOpts: any));
   }
 
-  return fetch(url, (req.fetchOpts: any));
+  if (!fetchOpts.headers['Content-Type'] && !req.isFormData()) {
+    fetchOpts.headers['Content-Type'] = 'application/json';
+  }
+
+  return fetch(url, ({ ...fetchOpts, body }: any));
 }
 
 // convert fetch response to RelayResponse object
