@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "lib": [
+        "es6",
+        "dom"
+    ],
+    "strict": true,
+    "noEmit": true,
+    "types": [],
+    "baseUrl": ".",
+    "paths": { 
+      "react-relay-network-modern": ["./"],
+      "react-relay-network-modern/es": ["./es"],
+      "react-relay-network-modern/node": ["./node"] 
+    },
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["./**/*.d.ts", "./**/*.ts"]
+}

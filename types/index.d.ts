@@ -3,7 +3,9 @@ import { ExecuteFunction, QueryResponseCache } from 'relay-runtime';
 export { QueryResponseCache };
 
 export type FetchResponse = Response;
-export type Variables = { [name: string]: any };
+export interface Variables {
+  [name: string]: any;
+}
 
 declare class RelayResponse {
   _res: any;
@@ -29,7 +31,9 @@ declare class RelayResponse {
 }
 export { RelayResponse as RelayNetworkLayerResponse };
 
-export type Headers = { [name: string]: string };
+export interface Headers {
+  [name: string]: string;
+}
 export interface FetchOpts {
   url?: string;
   method: 'POST' | 'GET';
@@ -89,7 +93,7 @@ export type RelayRequestAny = RelayRequest | RelayRequestBatch;
 export type MiddlewareNextFn = (req: RelayRequestAny) => Promise<RelayResponse>;
 export type Middleware = (next: MiddlewareNextFn) => MiddlewareNextFn;
 
-export type UrlMiddlewareOpts = {
+export interface UrlMiddlewareOpts {
   url: string | Promise<string> | ((req: RelayRequest) => string | Promise<string>);
   method?: 'POST' | 'GET';
   headers?: Headers | Promise<Headers> | ((req: RelayRequest) => Headers | Promise<Headers>);
@@ -98,12 +102,12 @@ export type UrlMiddlewareOpts = {
   mode?: FetchOpts['mode'];
   cache?: FetchOpts['cache'];
   redirect?: FetchOpts['redirect'];
-};
+}
 
 export function urlMiddleware(opts?: UrlMiddlewareOpts): Middleware;
 
 export interface LoggerMiddlewareOpts {
-  logger?: Function;
+  logger?: (...args: any[]) => void;
 }
 
 export function loggerMiddleware(opts?: LoggerMiddlewareOpts): Middleware;
@@ -115,7 +119,7 @@ export interface PersistedQueriesMiddlewareOpts {
 export function persistedQueriesMiddleware(opts?: PersistedQueriesMiddlewareOpts): Middleware;
 
 export interface PerfMiddlewareOpts {
-  logger?: Function;
+  logger?: (...args: any[]) => void;
 }
 
 export function perfMiddleware(opts?: PerfMiddlewareOpts): Middleware;
@@ -142,7 +146,7 @@ interface BatchRequestMap {
   [reqId: string]: RequestWrapper;
 }
 
-export type BatchMiddlewareOpts = {
+export interface BatchMiddlewareOpts {
   batchUrl?: string | Promise<string> | ((requestMap: BatchRequestMap) => string | Promise<string>);
   batchTimeout?: number;
   maxBatchSize?: number;
@@ -154,7 +158,7 @@ export type BatchMiddlewareOpts = {
   mode?: FetchOpts['mode'];
   cache?: FetchOpts['cache'];
   redirect?: FetchOpts['redirect'];
-};
+}
 
 export function batchMiddleware(opts?: BatchMiddlewareOpts): Middleware;
 
@@ -172,7 +176,7 @@ export interface CacheMiddlewareOpts {
 export function cacheMiddleware(opts?: CacheMiddlewareOpts): Middleware;
 
 export interface GqlErrorMiddlewareOpts {
-  logger?: Function;
+  logger?: (...args: any[]) => void;
   prefix?: string;
   disableServerMiddlewareTip?: boolean;
 }
@@ -180,11 +184,12 @@ export interface GqlErrorMiddlewareOpts {
 export function errorMiddleware(opts?: GqlErrorMiddlewareOpts): Middleware;
 
 export type RetryAfterFn = (attempt: number) => number | false;
-export type ForceRetryFn = (runNow: Function, delay: number) => any;
+export type TimeoutAfterFn = (attempt: number) => number;
+export type ForceRetryFn = (runNow: (...args: any[]) => void, delay: number) => any;
 export type AbortFn = (msg?: string) => any;
 
 export type BeforeRetryCb = (meta: {
-  forceRetry: Function;
+  forceRetry: ForceRetryFn;
   abort: AbortFn;
   delay: number;
   attempt: number;
@@ -199,10 +204,10 @@ export type StatusCheckFn = (
 ) => boolean;
 
 export interface RetryMiddlewareOpts {
-  fetchTimeout?: number;
+  fetchTimeout?: number | TimeoutAfterFn;
   retryDelays?: number[] | RetryAfterFn;
   statusCodes?: number[] | false | StatusCheckFn;
-  logger?: Function | false;
+  logger?: (...args: any[]) => void | false;
   allowMutations?: boolean;
   allowFormData?: boolean;
   forceRetry?: ForceRetryFn | false; // DEPRECATED in favor `beforeRetry`
@@ -222,12 +227,12 @@ export function uploadMiddleware(): Middleware;
 
 export type MiddlewareRawNextFn = (req: RelayRequestAny) => Promise<FetchResponse>;
 
-export type MiddlewareRaw = {
+export interface MiddlewareRaw {
   isRawMiddleware: true;
   (): (next: MiddlewareRawNextFn) => MiddlewareRawNextFn;
-};
+}
 
-export type ConcreteBatch = {
+export interface ConcreteBatch {
   kind: 'Batch';
   fragment: any;
   id: string | null;
@@ -236,21 +241,25 @@ export type ConcreteBatch = {
   query: any;
   text: string | null;
   operationKind: string;
-};
-export type CacheConfig = {
+}
+export interface CacheConfig {
   force?: boolean;
   poll?: number;
   // rerunParamExperimental?: any;
-};
+}
 
 export type Uploadable = File | Blob;
-export type UploadableMap = { [key: string]: Uploadable };
+export interface UploadableMap {
+  [key: string]: Uploadable;
+}
 
 export type RelayObservable<T> = Promise<T>;
 
 export type ObservableFromValue<T> = RelayObservable<T> | Promise<T> | T;
 
-export type PayloadData = { [key: string]: any };
+export interface PayloadData {
+  [key: string]: any;
+}
 
 export type QueryPayload =
   | {
@@ -260,14 +269,14 @@ export type QueryPayload =
     }
   | RelayResponse;
 
-export type MiddlewareSync = {
+export interface MiddlewareSync {
   execute: (
     operation: ConcreteBatch,
     variables: Variables,
     cacheConfig: CacheConfig,
     uploadables: UploadableMap | null
   ) => ObservableFromValue<QueryPayload> | null;
-};
+}
 
 export type FetchHookFunction = (
   operation: ConcreteBatch,
@@ -287,11 +296,11 @@ export type SubscribeFunction = (
   observer: any
 ) => RelayObservable<QueryPayload> | Disposable;
 
-export type RelayNetworkLayerOpts = {
+export interface RelayNetworkLayerOpts {
   subscribeFn?: SubscribeFunction;
   beforeFetch?: FetchHookFunction;
   noThrow?: boolean;
-};
+}
 
 export class RelayNetworkLayer {
   execute: ExecuteFunction;
