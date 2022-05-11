@@ -155,6 +155,8 @@ async function makeRetriableRequest(
         const err = new RRNLRetryMiddlewareError(
           `Wrong response status ${e.res.status}, retrying...`
         );
+        err.req = o.req;
+        err.res = e.res;
         return makeRetry(err);
       }
 
