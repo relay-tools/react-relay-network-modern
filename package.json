@@ -8,10 +8,12 @@
   "files": [
     "es",
     "lib",
-    "node8"
+    "node8",
+    "ie11"
   ],
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
+  "module": "es/index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/relay-tools/react-relay-network-modern.git"
@@ -32,6 +34,7 @@
   },
   "homepage": "https://github.com/relay-tools/react-relay-network-modern#readme",
   "dependencies": {
+    "@babel/runtime": "^7.0.0",
     "core-js": "^3.0.0",
     "extract-files": "^9.0.0"
   },
@@ -39,18 +42,13 @@
     "relay-runtime": ">=1.4.0"
   },
   "devDependencies": {
-    "@babel/cli": "7.16.0",
-    "@babel/core": "7.16.0",
-    "@babel/plugin-proposal-class-properties": "7.16.0",
-    "@babel/plugin-proposal-object-rest-spread": "7.16.0",
-    "@babel/plugin-proposal-optional-chaining": "^7.4.4",
-    "@babel/plugin-transform-flow-strip-types": "7.16.0",
-    "@babel/polyfill": "7.12.1",
-    "@babel/preset-env": "7.16.0",
-    "@babel/preset-flow": "7.16.0",
-    "@babel/register": "7.16.0",
+    "@babel/cli": "^7.19.3",
+    "@babel/core": "^7.19.6",
+    "@babel/plugin-transform-runtime": "^7.19.6",
+    "@babel/preset-env": "^7.19.4",
+    "@babel/preset-flow": "^7.18.6",
     "babel-core": "^7.0.0-bridge.0",
-    "babel-eslint": "10.1.0",
+    "babel-eslint": "^10.1.0",
     "babel-jest": "^24.8.0",
     "cz-conventional-changelog": "^2.1.0",
     "eslint": "^5.16.0",
@@ -83,10 +81,11 @@
     ]
   },
   "scripts": {
-    "build": "npm run build-lib && npm run build-es && npm run build-node8",
+    "build": "npm run build-lib && npm run build-es && npm run build-node8 && npm run build-ie11",
     "build-lib": "rimraf lib && BABEL_ENV=lib babel src --ignore __tests__,__mocks__ -d lib && COPY_TO_FOLDER=lib npm run build-flow && COPY_TO_FOLDER=lib npm run build-dts ",
     "build-es": "rimraf es && BABEL_ENV=es babel src --ignore __tests__,__mocks__ -d es && COPY_TO_FOLDER=es npm run build-flow && COPY_TO_FOLDER=es npm run build-dts",
     "build-node8": "rimraf node8 && BABEL_ENV=node8 babel src --ignore __tests__,__mocks__ -d node8 && COPY_TO_FOLDER=node8 npm run build-flow && COPY_TO_FOLDER=node8 npm run build-dts",
+    "build-ie11": "rimraf ie11 && BABEL_ENV=ie11 babel src --ignore __tests__,__mocks__ -d ie11 && COPY_TO_FOLDER=ie11 npm run build-flow && COPY_TO_FOLDER=ie11 npm run build-dts",
     "build-flow": "echo `$1` && find ./src -name '*.js' -not -path '*/__*' | while read filepath; do cp $filepath `echo ./${COPY_TO_FOLDER:-lib}$filepath | sed 's/.\\/src\\//\\//g'`.flow; done",
     "build-dts": "echo `$1` && find ./src -name '*d.ts' -not -path '*/__*' | while read filepath; do cp $filepath `echo ./${COPY_TO_FOLDER:-lib}$filepath | sed 's/.\\/src\\//\\//g'`; done",
     "lint": "npm run eslint && npm run tslint && npm run tscheck",

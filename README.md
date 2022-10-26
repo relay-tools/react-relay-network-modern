@@ -24,19 +24,6 @@ OR
 npm install react-relay-network-modern --save
 ```
 
-### What if `regeneratorRuntime is not defined`?
-
-<img width="493" alt="screen shot 2018-02-20 at 20 07 45" src="https://user-images.githubusercontent.com/1946920/36428334-da402a6e-1679-11e8-9897-7e730ab3123e.png">
-
-I don't want to bundle regenerator-runtime with the library - it's a largish dependency and there's a good chance that the user is already including code which depends on it (eg. via `babel-polyfill`). If we bundle it they'll get a duplicate copy and that's bad.
-
-So if you got `regeneratorRuntime is not defined` you should do the following:
-
-```js
-import 'regenerator-runtime/runtime';
-import { RelayNetworkLayer } from 'react-relay-network-modern';
-```
-
 ### What if Webpack errors with `Error: Cannot find module 'core-js/modules/es6.*'`?
 
 `core-js` is not an explicit dependency as it adds [30kb for client bundles](https://bundlephobia.com/result?p=core-js@2.6.9).
@@ -54,15 +41,15 @@ If this error occurs you can do one of the following:
 This library contains different builds for any purposes:
 
 ```js
-// Default import for using in any browser
-// last 5 versions, ie 9, defaults
+// Default import for using in modern browsers
+// last 5 version and not dead, defaults
 import { RelayNetworkLayer } from 'react-relay-network-modern';
+
+// For IE11
+import { RelayNetworkLayer } from 'react-relay-network-modern/ie11';
 
 // For SSR on node 8 and above (native async/await)
 import { RelayNetworkLayer } from 'react-relay-network-modern/node8';
-
-// Source code without Flowtype declarations
-import { RelayNetworkLayer } from 'react-relay-network-modern/es';
 ```
 
 ## Middlewares

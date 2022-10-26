@@ -43,6 +43,7 @@ node_modules
 /lib
 /node8
 /mjs
+/ie11
 
 coverage
 .nyc_output

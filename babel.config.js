@@ -1,24 +1,31 @@
 module.exports = {
-  plugins: [
-    '@babel/plugin-proposal-object-rest-spread',
-    '@babel/plugin-transform-flow-strip-types',
-  ],
+  plugins: ['@babel/plugin-transform-runtime'],
+  presets: ['@babel/preset-flow'],
   env: {
     lib: {
-      plugins: ['@babel/plugin-proposal-class-properties'],
       presets: [
         [
           '@babel/preset-env',
           {
             targets: {
-              browsers: ['last 5 versions', 'ie 11', 'defaults'],
+              browsers: ['last 5 versions and not dead', 'defaults'],
             },
           },
         ],
       ],
     },
     es: {
-      plugins: ['@babel/plugin-proposal-class-properties'],
+      presets: [
+        [
+          '@babel/preset-env',
+          {
+            targets: {
+              browsers: ['last 5 versions and not dead', 'defaults'],
+            },
+            modules: false,
+          },
+        ],
+      ],
     },
     node8: {
       presets: [
@@ -29,6 +36,18 @@ module.exports = {
               node: '8.0.0',
             },
             modules: 'commonjs',
+          },
+        ],
+      ],
+    },
+    ie11: {
+      presets: [
+        [
+          '@babel/preset-env',
+          {
+            targets: {
+              browsers: ['ie 11'],
+            },
           },
         ],
       ],
