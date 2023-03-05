@@ -2,15 +2,15 @@
 
 exports[`middlewares/perf measure request time for request 1`] = `
 RelayRequest {
-  "cacheConfig": Object {},
+  "cacheConfig": {},
   "controller": AbortController {
-    Symbol(SameObject caches): Object {
+    Symbol(SameObject caches): {
       "signal": AbortSignal {},
     },
   },
-  "fetchOpts": Object {
-    "body": "{\\"id\\":\\"MyRequest\\",\\"query\\":\\"\\",\\"variables\\":{}}",
-    "headers": Object {
+  "fetchOpts": {
+    "body": "{"id":"MyRequest","query":"","variables":{}}",
+    "headers": {
       "Accept": "*/*",
       "Content-Type": "application/json",
     },
@@ -18,12 +18,12 @@ RelayRequest {
     "signal": AbortSignal {},
   },
   "id": "MyRequest",
-  "operation": Object {
+  "operation": {
     "id": "MyRequest",
     "operationKind": "query",
     "text": "",
   },
   "uploadables": undefined,
-  "variables": Object {},
+  "variables": {},
 }
 `;

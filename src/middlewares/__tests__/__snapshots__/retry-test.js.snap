@@ -1,12 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`middlewares/retry middleware should make retries 1`] = `
-Array [
-  Array [
+[
+  [
     "/graphql",
-    Object {
-      "body": "{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}}",
-      "headers": Object {
+    {
+      "body": "{"id":"1","query":"","variables":{}}",
+      "headers": {
         "Accept": "*/*",
         "Content-Type": "application/json",
       },
@@ -14,11 +14,11 @@ Array [
       "signal": AbortSignal {},
     },
   ],
-  Array [
+  [
     "/graphql",
-    Object {
-      "body": "{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}}",
-      "headers": Object {
+    {
+      "body": "{"id":"1","query":"","variables":{}}",
+      "headers": {
         "Accept": "*/*",
         "Content-Type": "application/json",
       },
@@ -26,11 +26,11 @@ Array [
       "signal": AbortSignal {},
     },
   ],
-  Array [
+  [
     "/graphql",
-    Object {
-      "body": "{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}}",
-      "headers": Object {
+    {
+      "body": "{"id":"1","query":"","variables":{}}",
+      "headers": {
         "Accept": "*/*",
         "Content-Type": "application/json",
       },
@@ -42,12 +42,12 @@ Array [
 `;
 
 exports[`middlewares/retry middleware should retry request on timeout 1`] = `
-Array [
-  Array [
+[
+  [
     "/graphql",
-    Object {
-      "body": "{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}}",
-      "headers": Object {
+    {
+      "body": "{"id":"1","query":"","variables":{}}",
+      "headers": {
         "Accept": "*/*",
         "Content-Type": "application/json",
       },
@@ -55,11 +55,11 @@ Array [
       "signal": AbortSignal {},
     },
   ],
-  Array [
+  [
     "/graphql",
-    Object {
-      "body": "{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}}",
-      "headers": Object {
+    {
+      "body": "{"id":"1","query":"","variables":{}}",
+      "headers": {
         "Accept": "*/*",
         "Content-Type": "application/json",
       },
@@ -67,11 +67,11 @@ Array [
       "signal": AbortSignal {},
     },
   ],
-  Array [
+  [
     "/graphql",
-    Object {
-      "body": "{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}}",
-      "headers": Object {
+    {
+      "body": "{"id":"1","query":"","variables":{}}",
+      "headers": {
         "Accept": "*/*",
         "Content-Type": "application/json",
       },

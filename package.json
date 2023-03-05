@@ -64,6 +64,7 @@
     "flow-bin": "0.201.0",
     "form-data": "^4.0.0",
     "jest": "^29.4.3",
+    "jest-environment-jsdom": "^29.4.3",
     "prettier": "^2.8.4",
     "relay-runtime": "^14.1.0",
     "rimraf": "^4.3.0",
@@ -79,6 +80,7 @@
     }
   },
   "jest": {
+    "testEnvironment": "jsdom",
     "roots": [
       "<rootDir>/src"
     ]
@@ -91,7 +93,7 @@
     "build-flow": "echo `$1` && find ./src -name '*.js' -not -path '*/__*' | while read filepath; do cp $filepath `echo ./${COPY_TO_FOLDER:-lib}$filepath | sed 's/.\\/src\\//\\//g'`.flow; done",
     "build-dts": "echo `$1` && find ./src -name '*d.ts' -not -path '*/__*' | while read filepath; do cp $filepath `echo ./${COPY_TO_FOLDER:-lib}$filepath | sed 's/.\\/src\\//\\//g'`; done",
     "lint": "npm run eslint && npm run tslint && npm run tscheck",
-    "eslint": "eslint --ext .js ./src --fix",
+    "eslint": "eslint --ext .js ./src",
     "tslint": "tslint -p . \"src/**/*.d.ts\"",
     "tscheck": "tsc --noEmit",
     "coverage": "jest --coverage --maxWorkers 2",

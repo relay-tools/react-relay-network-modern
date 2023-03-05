@@ -1,9 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`middlewares/batch option \`allowMutations\` should batch mutations if \`allowMutations=true\` 1`] = `
-Object {
-  "body": "[{\\"id\\":\\"1\\",\\"query\\":\\"mutation {}\\",\\"variables\\":{}},{\\"id\\":\\"2\\",\\"query\\":\\"mutation {}\\",\\"variables\\":{}}]",
-  "headers": Object {
+{
+  "body": "[{"id":"1","query":"mutation {}","variables":{}},{"id":"2","query":"mutation {}","variables":{}}]",
+  "headers": {
     "Accept": "*/*",
     "Content-Type": "application/json",
   },
@@ -13,12 +13,12 @@ Object {
 `;
 
 exports[`middlewares/batch option \`allowMutations\` should not batch mutations by default 1`] = `
-Array [
-  Array [
+[
+  [
     "/graphql",
-    Object {
-      "body": "{\\"id\\":\\"1\\",\\"query\\":\\"mutation {}\\",\\"variables\\":{}}",
-      "headers": Object {
+    {
+      "body": "{"id":"1","query":"mutation {}","variables":{}}",
+      "headers": {
         "Accept": "*/*",
         "Content-Type": "application/json",
       },
@@ -26,11 +26,11 @@ Array [
       "signal": AbortSignal {},
     },
   ],
-  Array [
+  [
     "/graphql",
-    Object {
-      "body": "{\\"id\\":\\"1\\",\\"query\\":\\"mutation {}\\",\\"variables\\":{}}",
-      "headers": Object {
+    {
+      "body": "{"id":"1","query":"mutation {}","variables":{}}",
+      "headers": {
         "Accept": "*/*",
         "Content-Type": "application/json",
       },
@@ -42,9 +42,9 @@ Array [
 `;
 
 exports[`middlewares/batch option \`batchTimeout\` should gather different requests into one batch request 1`] = `
-Object {
-  "body": "[{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"3\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"2\\",\\"query\\":\\"\\",\\"variables\\":{}}]",
-  "headers": Object {
+{
+  "body": "[{"id":"1","query":"","variables":{}},{"id":"3","query":"","variables":{}},{"id":"2","query":"","variables":{}}]",
+  "headers": {
     "Accept": "*/*",
     "Content-Type": "application/json",
   },
@@ -54,12 +54,12 @@ Object {
 `;
 
 exports[`middlewares/batch option \`batchTimeout\` should gather different requests into two batch request 1`] = `
-Array [
-  Array [
+[
+  [
     "/graphql/batch",
-    Object {
-      "body": "[{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"4\\",\\"query\\":\\"\\",\\"variables\\":{}}]",
-      "headers": Object {
+    {
+      "body": "[{"id":"1","query":"","variables":{}},{"id":"4","query":"","variables":{}}]",
+      "headers": {
         "Accept": "*/*",
         "Content-Type": "application/json",
       },
@@ -67,11 +67,11 @@ Array [
       "url": "/graphql/batch",
     },
   ],
-  Array [
+  [
     "/graphql/batch",
-    Object {
-      "body": "[{\\"id\\":\\"2\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"3\\",\\"query\\":\\"\\",\\"variables\\":{}}]",
-      "headers": Object {
+    {
+      "body": "[{"id":"2","query":"","variables":{}},{"id":"3","query":"","variables":{}}]",
+      "headers": {
         "Accept": "*/*",
         "Content-Type": "application/json",
       },
@@ -83,9 +83,9 @@ Array [
 `;
 
 exports[`middlewares/batch should handle network failure 1`] = `
-Object {
-  "body": "[{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"2\\",\\"query\\":\\"\\",\\"variables\\":{}}]",
-  "headers": Object {
+{
+  "body": "[{"id":"1","query":"","variables":{}},{"id":"2","query":"","variables":{}}]",
+  "headers": {
     "Accept": "*/*",
     "Content-Type": "application/json",
   },
@@ -95,9 +95,9 @@ Object {
 `;
 
 exports[`middlewares/batch should handle responses without payload wrapper 1`] = `
-Object {
-  "body": "[{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"2\\",\\"query\\":\\"\\",\\"variables\\":{}}]",
-  "headers": Object {
+{
+  "body": "[{"id":"1","query":"","variables":{}},{"id":"2","query":"","variables":{}}]",
+  "headers": {
     "Accept": "*/*",
     "Content-Type": "application/json",
   },
@@ -107,9 +107,9 @@ Object {
 `;
 
 exports[`middlewares/batch should handle server errors for all requests 1`] = `
-Object {
-  "body": "[{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"2\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"3\\",\\"query\\":\\"\\",\\"variables\\":{}}]",
-  "headers": Object {
+{
+  "body": "[{"id":"1","query":"","variables":{}},{"id":"2","query":"","variables":{}},{"id":"3","query":"","variables":{}}]",
+  "headers": {
     "Accept": "*/*",
     "Content-Type": "application/json",
   },
@@ -119,9 +119,9 @@ Object {
 `;
 
 exports[`middlewares/batch should handle server errors for one request 1`] = `
-Object {
-  "body": "[{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"2\\",\\"query\\":\\"\\",\\"variables\\":{}}]",
-  "headers": Object {
+{
+  "body": "[{"id":"1","query":"","variables":{}},{"id":"2","query":"","variables":{}}]",
+  "headers": {
     "Accept": "*/*",
     "Content-Type": "application/json",
   },
@@ -131,9 +131,9 @@ Object {
 `;
 
 exports[`middlewares/batch should make a successfull single request 1`] = `
-Object {
-  "body": "{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}}",
-  "headers": Object {
+{
+  "body": "{"id":"1","query":"","variables":{}}",
+  "headers": {
     "Accept": "*/*",
     "Content-Type": "application/json",
   },
@@ -143,9 +143,9 @@ Object {
 `;
 
 exports[`middlewares/batch should make a successfully batch request 1`] = `
-Object {
-  "body": "[{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"2\\",\\"query\\":\\"\\",\\"variables\\":{}}]",
-  "headers": Object {
+{
+  "body": "[{"id":"1","query":"","variables":{}},{"id":"2","query":"","variables":{}}]",
+  "headers": {
     "Accept": "*/*",
     "Content-Type": "application/json",
   },
@@ -155,9 +155,9 @@ Object {
 `;
 
 exports[`middlewares/batch should make a successfully batch request with duplicate request payloads 1`] = `
-Object {
-  "body": "[{\\"id\\":\\"2\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"2\\",\\"query\\":\\"duplicate\\",\\"variables\\":{\\"duplicate\\":true}}]",
-  "headers": Object {
+{
+  "body": "[{"id":"2","query":"","variables":{}},{"id":"2","query":"duplicate","variables":{"duplicate":true}}]",
+  "headers": {
     "Accept": "*/*",
     "Content-Type": "application/json",
   },
@@ -167,9 +167,9 @@ Object {
 `;
 
 exports[`middlewares/batch should reject if server does not return response for duplicate request payloads 1`] = `
-Object {
-  "body": "[{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"2\\",\\"query\\":\\"\\",\\"variables\\":{}},{\\"id\\":\\"3\\",\\"query\\":\\"\\",\\"variables\\":{}}]",
-  "headers": Object {
+{
+  "body": "[{"id":"1","query":"","variables":{}},{"id":"2","query":"","variables":{}},{"id":"3","query":"","variables":{}}]",
+  "headers": {
     "Accept": "*/*",
     "Content-Type": "application/json",
   },
