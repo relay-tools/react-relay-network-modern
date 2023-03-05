@@ -46,7 +46,6 @@ If this error occurs you can do one of the following:
 - Explicitly install core-js v2. E.g.
   - `yarn add core-js@2.6.11
 - Try referencing one of the non default imports:
-  - `import { RelayNetworkLayer } from 'react-relay-network-modern/node8';`
   - `import { RelayNetworkLayer } from 'react-relay-network-modern/es';`
 
 ### Different builds
@@ -57,9 +56,6 @@ This library contains different builds for any purposes:
 // Default import for using in any browser
 // last 5 versions, ie 9, defaults
 import { RelayNetworkLayer } from 'react-relay-network-modern';
-
-// For SSR on node 8 and above (native async/await)
-import { RelayNetworkLayer } from 'react-relay-network-modern/node8';
 
 // Source code without Flowtype declarations
 import { RelayNetworkLayer } from 'react-relay-network-modern/es';
