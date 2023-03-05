@@ -255,9 +255,7 @@ export function promiseWithTimeout<T>(
 
   return new Promise((resolve, reject) => {
     const timeoutId = setTimeout(() => {
-      onTimeout()
-        .then(resolve)
-        .catch(reject);
+      onTimeout().then(resolve).catch(reject);
     }, timeoutMS);
 
     promise
