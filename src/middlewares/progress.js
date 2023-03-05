@@ -52,13 +52,13 @@ function createProgressHandler(opts: ProgressOpts) {
 export default function progressMiddleware(opts: ProgressOpts): MiddlewareRaw {
   const progressHandler = createProgressHandler(opts);
 
-  const mw = (next: MiddlewareRawNextFn) => async (
-    req: RelayRequestAny
-  ): Promise<FetchResponse> => {
-    const res: FetchResponse = await next(req);
-    progressHandler(res.clone());
-    return res;
-  };
+  const mw =
+    (next: MiddlewareRawNextFn) =>
+    async (req: RelayRequestAny): Promise<FetchResponse> => {
+      const res: FetchResponse = await next(req);
+      progressHandler(res.clone());
+      return res;
+    };
 
   mw.isRawMiddleware = true;
   return (mw: any);
