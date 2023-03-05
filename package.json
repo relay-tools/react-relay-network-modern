@@ -7,8 +7,7 @@
   },
   "files": [
     "es",
-    "lib",
-    "node8"
+    "lib"
   ],
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -86,10 +85,9 @@
     ]
   },
   "scripts": {
-    "build": "npm run build-lib && npm run build-es && npm run build-node8",
+    "build": "npm run build-lib && npm run build-es",
     "build-lib": "rimraf lib && BABEL_ENV=lib babel src --ignore __tests__,__mocks__ -d lib && COPY_TO_FOLDER=lib npm run build-flow && COPY_TO_FOLDER=lib npm run build-dts ",
     "build-es": "rimraf es && BABEL_ENV=es babel src --ignore __tests__,__mocks__ -d es && COPY_TO_FOLDER=es npm run build-flow && COPY_TO_FOLDER=es npm run build-dts",
-    "build-node8": "rimraf node8 && BABEL_ENV=node8 babel src --ignore __tests__,__mocks__ -d node8 && COPY_TO_FOLDER=node8 npm run build-flow && COPY_TO_FOLDER=node8 npm run build-dts",
     "build-flow": "echo `$1` && find ./src -name '*.js' -not -path '*/__*' | while read filepath; do cp $filepath `echo ./${COPY_TO_FOLDER:-lib}$filepath | sed 's/.\\/src\\//\\//g'`.flow; done",
     "build-dts": "echo `$1` && find ./src -name '*d.ts' -not -path '*/__*' | while read filepath; do cp $filepath `echo ./${COPY_TO_FOLDER:-lib}$filepath | sed 's/.\\/src\\//\\//g'`; done",
     "lint": "npm run eslint && npm run tslint && npm run tscheck",

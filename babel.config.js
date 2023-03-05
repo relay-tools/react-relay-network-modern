@@ -20,19 +20,6 @@ module.exports = {
     es: {
       plugins: ['@babel/plugin-proposal-class-properties'],
     },
-    node8: {
-      presets: [
-        [
-          '@babel/preset-env',
-          {
-            targets: {
-              node: '8.0.0',
-            },
-            modules: 'commonjs',
-          },
-        ],
-      ],
-    },
     test: {
       presets: [
         [
