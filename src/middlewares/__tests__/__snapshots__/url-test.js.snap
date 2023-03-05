@@ -1,9 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`middlewares/url \`method\` option 1`] = `
-Object {
-  "body": "{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}}",
-  "headers": Object {
+{
+  "body": "{"id":"1","query":"","variables":{}}",
+  "headers": {
     "Accept": "*/*",
     "Content-Type": "application/json",
   },
@@ -14,9 +14,9 @@ Object {
 `;
 
 exports[`middlewares/url \`url\` option as string 1`] = `
-Object {
-  "body": "{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}}",
-  "headers": Object {
+{
+  "body": "{"id":"1","query":"","variables":{}}",
+  "headers": {
     "Accept": "*/*",
     "Content-Type": "application/json",
   },
@@ -27,9 +27,9 @@ Object {
 `;
 
 exports[`middlewares/url \`url\` option as thunk 1`] = `
-Object {
-  "body": "{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}}",
-  "headers": Object {
+{
+  "body": "{"id":"1","query":"","variables":{}}",
+  "headers": {
     "Accept": "*/*",
     "Content-Type": "application/json",
   },
@@ -40,9 +40,9 @@ Object {
 `;
 
 exports[`middlewares/url \`url\` option as thunk with Promise 1`] = `
-Object {
-  "body": "{\\"id\\":\\"1\\",\\"query\\":\\"\\",\\"variables\\":{}}",
-  "headers": Object {
+{
+  "body": "{"id":"1","query":"","variables":{}}",
+  "headers": {
     "Accept": "*/*",
     "Content-Type": "application/json",
   },

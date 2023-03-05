@@ -1,19 +1,19 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`middlewares/logger measure request time for request 1`] = `
-Array [
-  Array [
+[
+  [
     "Run MyRequest",
     RelayRequest {
-      "cacheConfig": Object {},
+      "cacheConfig": {},
       "controller": AbortController {
-        Symbol(SameObject caches): Object {
+        Symbol(SameObject caches): {
           "signal": AbortSignal {},
         },
       },
-      "fetchOpts": Object {
-        "body": "{\\"id\\":\\"MyRequest\\",\\"query\\":\\"\\",\\"variables\\":{}}",
-        "headers": Object {
+      "fetchOpts": {
+        "body": "{"id":"MyRequest","query":"","variables":{}}",
+        "headers": {
           "Accept": "*/*",
           "Content-Type": "application/json",
         },
@@ -21,22 +21,22 @@ Array [
         "signal": AbortSignal {},
       },
       "id": "MyRequest",
-      "operation": Object {
+      "operation": {
         "id": "MyRequest",
         "operationKind": "query",
         "text": "",
       },
       "uploadables": undefined,
-      "variables": Object {},
+      "variables": {},
     },
   ],
-  Array [
+  [
     "Done MyRequest in XXXms",
-    Object {
+    {
       "query": "",
       "req": "RelayRequest object",
       "res": "RelayResponse object",
-      "variables": Object {},
+      "variables": {},
     },
   ],
 ]
