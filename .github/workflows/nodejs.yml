@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [12, 14, 16]
+        node-version: [14, 16, 18]
       fail-fast: false
     steps:
       - uses: actions/checkout@v2
@@ -35,7 +35,7 @@ jobs:
         uses: mikepenz/action-junit-report@v2
         with:
           check_name: JUnit Annotations for Node ${{ matrix.node-version }}
-          report_paths: '**/coverage/junit/**/*.xml'    
+          report_paths: "**/coverage/junit/**/*.xml"
 
   publish:
     if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/alpha' || github.ref == 'refs/heads/beta'
@@ -43,10 +43,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Use Node.js 12
+      - name: Use Node.js 14
         uses: actions/setup-node@v2
         with:
-          node-version: 12
+          node-version: 14
       - name: Install node_modules
         run: yarn install
       - name: Build
@@ -56,4 +56,3 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
