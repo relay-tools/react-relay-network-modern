@@ -37,6 +37,4 @@
 [libs]
 
 [options]
-esproposal.class_instance_fields=enable
-suppress_comment= \\(.\\|\n\\)*\\$FlowFixMe
-esproposal.optional_chaining=enable
+exact_by_default=false
