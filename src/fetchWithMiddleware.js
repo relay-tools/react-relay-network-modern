@@ -25,11 +25,13 @@ function runFetch(req: RelayRequestAny): Promise<FetchResponse> {
 }
 
 // convert fetch response to RelayResponse object
-const convertResponse: (next: MiddlewareRawNextFn) => MiddlewareNextFn = (next) => async (req) => {
+const convertResponse: (noThrow?: boolean) => (next: MiddlewareRawNextFn) => MiddlewareNextFn = (
+  noThrow
+) => (next) => async (req) => {
   const resFromFetch = await next(req);
 
   const res = await RelayResponse.createFromFetch(resFromFetch);
-  if (res.status && res.status >= 400) {
+  if (!noThrow && res.status && res.status >= 400) {
     throw createRequestError(req, res);
   }
   return res;
@@ -44,7 +46,7 @@ export default function fetchWithMiddleware(
   // $FlowFixMe
   const wrappedFetch: MiddlewareNextFn = compose(
     ...middlewares,
-    convertResponse,
+    convertResponse(noThrow),
     ...rawFetchMiddlewares
   )((runFetch: any));
 
