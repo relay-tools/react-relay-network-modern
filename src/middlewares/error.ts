@@ -1,30 +1,29 @@
-/* @flow */
 /* eslint-disable no-console */
-
-import RelayRequest from '../RelayRequest';
-import RelayRequestBatch from '../RelayRequestBatch';
-import type RelayResponse from '../RelayResponse';
-import type { Middleware, GraphQLResponseErrors, RelayRequestAny } from '../definition';
-
-export type GqlErrorMiddlewareOpts = {|
-  logger?: Function,
-  prefix?: string,
-  disableServerMiddlewareTip?: boolean,
-|};
-
+import RelayRequest from "../RelayRequest";
+import RelayRequestBatch from "../RelayRequestBatch";
+import type RelayResponse from "../RelayResponse";
+import type { Middleware, GraphQLResponseErrors, RelayRequestAny } from "../definition";
+export type GqlErrorMiddlewareOpts = {
+  logger?: (...args: Array<any>) => any;
+  prefix?: string;
+  disableServerMiddlewareTip?: boolean;
+};
 export default function errorMiddleware(options?: GqlErrorMiddlewareOpts): Middleware {
   const opts = options || {};
   const logger = opts.logger || console.error.bind(console);
   const prefix = opts.prefix || '[RELAY-NETWORK] GRAPHQL SERVER ERROR:\n\n';
   const disableServerMiddlewareTip = opts.disableServerMiddlewareTip || false;
 
-  function displayErrors(
-    errors: GraphQLResponseErrors,
-    reqRes: { req: RelayRequestAny, res: RelayResponse }
-  ) {
-    return errors.forEach((error) => {
-      const { message, stack, ...rest } = error;
-
+  function displayErrors(errors: GraphQLResponseErrors, reqRes: {
+    req: RelayRequestAny;
+    res: RelayResponse;
+  }) {
+    return errors.forEach(error => {
+      const {
+        message,
+        stack,
+        ...rest
+      } = error;
       let msg = `${prefix}`;
       const fmt = [];
 
@@ -53,17 +52,23 @@ export default function errorMiddleware(options?: GqlErrorMiddlewareOpts): Middl
     });
   }
 
-  return (next) => (req) => {
-    return next(req).then((res) => {
+  return next => req => {
+    return next(req).then(res => {
       if (req instanceof RelayRequest) {
         if (Array.isArray(res.errors)) {
-          displayErrors(res.errors, { req, res });
+          displayErrors(res.errors, {
+            req,
+            res
+          });
         }
       } else if (req instanceof RelayRequestBatch) {
         if (Array.isArray(res.json)) {
           res.json.forEach((payload: any) => {
             if (Array.isArray(payload.errors)) {
-              displayErrors(payload.errors, { req, res });
+              displayErrors(payload.errors, {
+                req,
+                res
+              });
             }
           });
         }

@@ -1,11 +1,8 @@
-/* @flow */
-
-import type { FetchOpts, Variables } from './definition';
-import type RelayRequest from './RelayRequest';
-import RRNLError from './RRNLError';
-
+import { $Shape } from "utility-types";
+import type { FetchOpts, Variables } from "./definition";
+import type RelayRequest from "./RelayRequest";
+import RRNLError from "./RRNLError";
 export type Requests = RelayRequest[];
-
 export default class RelayRequestBatch {
   fetchOpts: $Shape<FetchOpts>;
   requests: Requests;
@@ -15,18 +12,17 @@ export default class RelayRequestBatch {
     this.fetchOpts = {
       method: 'POST',
       headers: {},
-      body: this.prepareBody(),
+      body: this.prepareBody()
     };
   }
 
-  setFetchOption(name: string, value: mixed) {
+  setFetchOption(name: string, value: unknown) {
     this.fetchOpts[name] = value;
   }
 
-  setFetchOptions(opts: Object) {
-    this.fetchOpts = {
-      ...this.fetchOpts,
-      ...opts,
+  setFetchOptions(opts: Record<string, any>) {
+    this.fetchOpts = { ...this.fetchOpts,
+      ...opts
     };
   }
 
@@ -34,15 +30,16 @@ export default class RelayRequestBatch {
     if (!this.fetchOpts.body) {
       this.fetchOpts.body = this.prepareBody();
     }
-    return (this.fetchOpts.body: any) || '';
+
+    return (this.fetchOpts.body as any) || '';
   }
 
   prepareBody(): string {
-    return `[${this.requests.map((r) => r.getBody()).join(',')}]`;
+    return `[${this.requests.map(r => r.getBody()).join(',')}]`;
   }
 
   getIds(): string[] {
-    return this.requests.map((r) => r.getID());
+    return this.requests.map(r => r.getID());
   }
 
   getID(): string {
@@ -58,11 +55,12 @@ export default class RelayRequestBatch {
   }
 
   clone(): RelayRequestBatch {
-    // $FlowFixMe
     const newRequest = Object.assign(Object.create(Object.getPrototypeOf(this)), this);
-    newRequest.fetchOpts = { ...this.fetchOpts };
-    newRequest.fetchOpts.headers = { ...this.fetchOpts.headers };
-    return (newRequest: any);
+    newRequest.fetchOpts = { ...this.fetchOpts
+    };
+    newRequest.fetchOpts.headers = { ...this.fetchOpts.headers
+    };
+    return (newRequest as any);
   }
 
   getVariables(): Variables {
@@ -72,4 +70,5 @@ export default class RelayRequestBatch {
   getQueryString(): string {
     return this.prepareBody();
   }
+
 }
