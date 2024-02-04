@@ -28,7 +28,6 @@ export default function authMiddleware(opts?: AuthMiddlewareOpts): Middleware {
   let tokenRefreshInProgress = null;
   return next => async req => {
     try {
-      // $FlowFixMe
       const token = await (isFunction(tokenOrThunk) ? tokenOrThunk(req) : tokenOrThunk);
 
       if (!token && tokenRefreshPromise && !allowEmptyToken) {

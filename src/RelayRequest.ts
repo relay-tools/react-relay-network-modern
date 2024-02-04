@@ -108,7 +108,6 @@ export default class RelayRequest {
   }
 
   clone(): RelayRequest {
-    // $FlowFixMe
     const newRequest = Object.assign(Object.create(Object.getPrototypeOf(this)), this);
     newRequest.fetchOpts = { ...this.fetchOpts
     };

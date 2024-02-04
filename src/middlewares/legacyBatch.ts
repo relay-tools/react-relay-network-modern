@@ -161,7 +161,6 @@ async function sendRequests(requestMap: BatchRequestMap, next, opts) {
   } else if (ids.length > 1) {
     // SEND AS BATCHED QUERY
     const batchRequest = new RelayRequestBatch(ids.map(id => requestMap[id].req));
-    // $FlowFixMe
     const url = await (isFunction(opts.batchUrl) ? opts.batchUrl(requestMap) : opts.batchUrl);
     batchRequest.setFetchOption('url', url);
     const {

@@ -55,7 +55,6 @@ export default class RelayRequestBatch {
   }
 
   clone(): RelayRequestBatch {
-    // $FlowFixMe
     const newRequest = Object.assign(Object.create(Object.getPrototypeOf(this)), this);
     newRequest.fetchOpts = { ...this.fetchOpts
     };

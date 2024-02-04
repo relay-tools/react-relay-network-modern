@@ -32,7 +32,6 @@ const convertResponse: (next: MiddlewareRawNextFn) => MiddlewareNextFn = next =>
 export default function fetchWithMiddleware(req: RelayRequestAny, middlewares: Middleware[], // works with RelayResponse
 rawFetchMiddlewares: MiddlewareRaw[], // works with raw fetch response
 noThrow?: boolean): Promise<RelayResponse> {
-  // $FlowFixMe
   const wrappedFetch: MiddlewareNextFn = compose(...middlewares, convertResponse, ...rawFetchMiddlewares)((runFetch as any));
   return wrappedFetch(req).then(res => {
     if (!noThrow && (!res || res.errors || !res.data)) {
@@ -59,7 +58,6 @@ function compose(...funcs) {
   } else {
     const last = funcs[funcs.length - 1];
     const rest = funcs.slice(0, -1);
-    // $FlowFixMe - Suppress error about promise not being callable
     return (...args) => rest.reduceRight((composed, f) => f((composed as any)), last(...args));
   }
 }
