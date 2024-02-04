@@ -1,64 +1,55 @@
-/* @flow */
+import { $PropertyType } from "utility-types";
+
 /* eslint-disable no-param-reassign */
-
-import { isFunction } from '../utils';
-import RelayRequestBatch from '../RelayRequestBatch';
-import RelayRequest from '../RelayRequest';
-import type RelayResponse from '../RelayResponse';
-import type { Middleware, FetchOpts } from '../definition';
-import RRNLError from '../RRNLError';
-
+import { isFunction } from "../utils";
+import RelayRequestBatch from "../RelayRequestBatch";
+import RelayRequest from "../RelayRequest";
+import type RelayResponse from "../RelayResponse";
+import type { Middleware, FetchOpts } from "../definition";
+import RRNLError from "../RRNLError";
 // Max out at roughly 100kb (express-graphql imposed max)
 const DEFAULT_BATCH_SIZE = 102400;
-
-type Headers = { [name: string]: string };
-
-export type BatchMiddlewareOpts = {|
-  batchUrl?:
-    | string
-    | Promise<string>
-    | ((requestList: RequestWrapper[]) => string | Promise<string>),
-  batchTimeout?: number,
-  maxBatchSize?: number,
-  allowMutations?: boolean,
-  method?: 'POST' | 'GET',
-  headers?: Headers | Promise<Headers> | ((req: RelayRequestBatch) => Headers | Promise<Headers>),
+type Headers = Record<string, string>;
+export type BatchMiddlewareOpts = {
+  batchUrl?: string | Promise<string> | ((requestList: RequestWrapper[]) => string | Promise<string>);
+  batchTimeout?: number;
+  maxBatchSize?: number;
+  allowMutations?: boolean;
+  method?: "POST" | "GET";
+  headers?: Headers | Promise<Headers> | ((req: RelayRequestBatch) => Headers | Promise<Headers>);
   // Avaliable request modes in fetch options. For details see https://fetch.spec.whatwg.org/#requests
-  credentials?: $PropertyType<FetchOpts, 'credentials'>,
-  mode?: $PropertyType<FetchOpts, 'mode'>,
-  cache?: $PropertyType<FetchOpts, 'cache'>,
-  redirect?: $PropertyType<FetchOpts, 'redirect'>,
-|};
-
-export type RequestWrapper = {|
-  req: RelayRequest,
-  completeOk: (res: Object) => void,
-  completeErr: (e: Error) => void,
-  done: boolean,
-  duplicates: Array<RequestWrapper>,
-|};
-
-type Batcher = {
-  bodySize: number,
-  requestList: RequestWrapper[],
-  acceptRequests: boolean,
+  credentials?: $PropertyType<FetchOpts, "credentials">;
+  mode?: $PropertyType<FetchOpts, "mode">;
+  cache?: $PropertyType<FetchOpts, "cache">;
+  redirect?: $PropertyType<FetchOpts, "redirect">;
 };
-
+export type RequestWrapper = {
+  req: RelayRequest;
+  completeOk: (res: Record<string, any>) => void;
+  completeErr: (e: Error) => void;
+  done: boolean;
+  duplicates: Array<RequestWrapper>;
+};
+type Batcher = {
+  bodySize: number;
+  requestList: RequestWrapper[];
+  acceptRequests: boolean;
+};
 export class RRNLBatchMiddlewareError extends RRNLError {
   constructor(msg: string) {
     super(msg);
     this.name = 'RRNLBatchMiddlewareError';
   }
-}
 
+}
 export default function batchMiddleware(options?: BatchMiddlewareOpts): Middleware {
   const opts = options || {};
   const batchTimeout = opts.batchTimeout || 0; // 0 is the same as nextTick in nodeJS
+
   const allowMutations = opts.allowMutations || false;
   const batchUrl = opts.batchUrl || '/graphql/batch';
   const maxBatchSize = opts.maxBatchSize || DEFAULT_BATCH_SIZE;
   const singleton = {};
-
   const fetchOpts = {};
   if (opts.method) fetchOpts.method = opts.method;
   if (opts.credentials) fetchOpts.credentials = opts.credentials;
@@ -66,17 +57,14 @@ export default function batchMiddleware(options?: BatchMiddlewareOpts): Middlewa
   if (opts.cache) fetchOpts.cache = opts.cache;
   if (opts.redirect) fetchOpts.redirect = opts.redirect;
   if (opts.headers) fetchOpts.headersOrThunk = opts.headers;
-
-  return (next) => (req) => {
+  return next => req => {
     // do not batch mutations unless allowMutations = true
     if (req.isMutation() && !allowMutations) {
       return next(req);
     }
 
     if (!(req instanceof RelayRequest)) {
-      throw new RRNLBatchMiddlewareError(
-        'Relay batch middleware accepts only simple RelayRequest. Did you add batchMiddleware twice?'
-      );
+      throw new RRNLBatchMiddlewareError('Relay batch middleware accepts only simple RelayRequest. Did you add batchMiddleware twice?');
     }
 
     // req with FormData can not be batched
@@ -94,15 +82,17 @@ export default function batchMiddleware(options?: BatchMiddlewareOpts): Middlewa
       batchUrl,
       singleton,
       maxBatchSize,
-      fetchOpts,
+      fetchOpts
     });
   };
 }
 
 function passThroughBatch(req: RelayRequest, next, opts) {
-  const { singleton } = opts;
+  const {
+    singleton
+  } = opts;
+  const bodyLength = (req.getBody() as any).length;
 
-  const bodyLength = (req.getBody(): any).length;
   if (!bodyLength) {
     return next(req);
   }
@@ -117,30 +107,27 @@ function passThroughBatch(req: RelayRequest, next, opts) {
 
   // +1 accounts for tailing comma after joining
   singleton.batcher.bodySize += bodyLength + 1;
-
   // queue request
   return new Promise((resolve, reject) => {
-    const { requestList } = singleton.batcher;
-
+    const {
+      requestList
+    } = singleton.batcher;
     const requestWrapper: RequestWrapper = {
       req,
-      completeOk: (res) => {
+      completeOk: res => {
         requestWrapper.done = true;
         resolve(res);
-        requestWrapper.duplicates.forEach((r) => r.completeOk(res));
+        requestWrapper.duplicates.forEach(r => r.completeOk(res));
       },
-      completeErr: (err) => {
+      completeErr: err => {
         requestWrapper.done = true;
         reject(err);
-        requestWrapper.duplicates.forEach((r) => r.completeErr(err));
+        requestWrapper.duplicates.forEach(r => r.completeErr(err));
       },
       done: false,
-      duplicates: [],
+      duplicates: []
     };
-
-    const duplicateIndex = requestList.findIndex(
-      (wrapper) => req.getBody() === wrapper.req.getBody()
-    );
+    const duplicateIndex = requestList.findIndex(wrapper => req.getBody() === wrapper.req.getBody());
 
     if (duplicateIndex !== -1) {
       /*
@@ -160,24 +147,21 @@ function passThroughBatch(req: RelayRequest, next, opts) {
 
 function prepareNewBatcher(next, opts): Batcher {
   const batcher: Batcher = {
-    bodySize: 2, // account for '[]'
+    bodySize: 2,
+    // account for '[]'
     requestList: [],
-    acceptRequests: true,
+    acceptRequests: true
   };
-
   setTimeout(() => {
     batcher.acceptRequests = false;
-    sendRequests(batcher.requestList, next, opts)
-      .then(() => finalizeUncompleted(batcher.requestList))
-      .catch((e) => {
-        if (e && e.name === 'AbortError') {
-          finalizeCanceled(batcher.requestList, e);
-        } else {
-          finalizeUncompleted(batcher.requestList);
-        }
-      });
+    sendRequests(batcher.requestList, next, opts).then(() => finalizeUncompleted(batcher.requestList)).catch(e => {
+      if (e && e.name === 'AbortError') {
+        finalizeCanceled(batcher.requestList, e);
+      } else {
+        finalizeUncompleted(batcher.requestList);
+      }
+    });
   }, opts.batchTimeout);
-
   return batcher;
 }
 
@@ -185,49 +169,46 @@ async function sendRequests(requestList: RequestWrapper[], next, opts) {
   if (requestList.length === 1) {
     // SEND AS SINGLE QUERY
     const wrapper = requestList[0];
-
     const res = await next(wrapper.req);
     wrapper.completeOk(res);
-    wrapper.duplicates.forEach((r) => r.completeOk(res));
+    wrapper.duplicates.forEach(r => r.completeOk(res));
     return res;
   } else if (requestList.length > 1) {
     // SEND AS BATCHED QUERY
-
-    const batchRequest = new RelayRequestBatch(requestList.map((wrapper) => wrapper.req));
+    const batchRequest = new RelayRequestBatch(requestList.map(wrapper => wrapper.req));
     // $FlowFixMe
     const url = await (isFunction(opts.batchUrl) ? opts.batchUrl(requestList) : opts.batchUrl);
     batchRequest.setFetchOption('url', url);
-
-    const { headersOrThunk, ...fetchOpts } = opts.fetchOpts;
+    const {
+      headersOrThunk,
+      ...fetchOpts
+    } = opts.fetchOpts;
     batchRequest.setFetchOptions(fetchOpts);
 
     if (headersOrThunk) {
-      const headers = await (isFunction(headersOrThunk)
-        ? (headersOrThunk: any)(batchRequest)
-        : headersOrThunk);
+      const headers = await (isFunction(headersOrThunk) ? (headersOrThunk as any)(batchRequest) : headersOrThunk);
       batchRequest.setFetchOption('headers', headers);
     }
 
     try {
       const batchResponse = await next(batchRequest);
+
       if (!batchResponse || !Array.isArray(batchResponse.json)) {
-        throw new RRNLBatchMiddlewareError(
-          'Wrong response from server. Did your server support batch request?'
-        );
+        throw new RRNLBatchMiddlewareError('Wrong response from server. Did your server support batch request?');
       }
 
       batchResponse.json.forEach((payload: any, index) => {
         if (!payload) return;
         const request = requestList[index];
+
         if (request) {
           const res = createSingleResponse(batchResponse, payload);
           request.completeOk(res);
         }
       });
-
       return batchResponse;
     } catch (e) {
-      requestList.forEach((request) => request.completeErr(e));
+      requestList.forEach(request => request.completeErr(e));
     }
   }
 
@@ -236,19 +217,14 @@ async function sendRequests(requestList: RequestWrapper[], next, opts) {
 
 // check that server returns responses for all requests
 function finalizeCanceled(requestList: RequestWrapper[], error: Error) {
-  requestList.forEach((request) => request.completeErr(error));
+  requestList.forEach(request => request.completeErr(error));
 }
 
 // check that server returns responses for all requests
 function finalizeUncompleted(requestList: RequestWrapper[]) {
   requestList.forEach((request, index) => {
     if (!request.done) {
-      request.completeErr(
-        new RRNLBatchMiddlewareError(
-          `Server does not return response for request at index ${index}.\n` +
-            `Response should have an array with ${requestList.length} item(s).`
-        )
-      );
+      request.completeErr(new RRNLBatchMiddlewareError(`Server does not return response for request at index ${index}.\n` + `Response should have an array with ${requestList.length} item(s).`));
     }
   });
 }

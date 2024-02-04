@@ -1,25 +1,21 @@
-/* @flow */
 /* eslint-disable import/prefer-default-export, no-param-reassign */
-
-import type RelayNetworkLayer from '../RelayNetworkLayer';
-import type RelayResponse from '../RelayResponse';
-import type { CacheConfig } from '../definition';
-
+import type RelayNetworkLayer from "../RelayNetworkLayer";
+import type RelayResponse from "../RelayResponse";
+import type { CacheConfig } from "../definition";
 type ReqData = {
-  query?: string,
-  variables?: Object,
-  cacheConfig?: CacheConfig,
-  files?: any,
+  query?: string;
+  variables?: Record<string, any>;
+  cacheConfig?: CacheConfig;
+  files?: any;
 };
-
 type ReqId = string;
 
 class MockReq {
   reqid: ReqId;
   reqData: ReqData;
   error: Error;
-  payload: Object;
-  cacheConfig: Object;
+  payload: Record<string, any>;
+  cacheConfig: Record<string, any>;
 
   constructor(reqid?: ReqId, reqData?: ReqData = {}) {
     this.reqid = reqid || Math.random().toString();
@@ -38,7 +34,7 @@ class MockReq {
     return `debugname${this.reqid}`;
   }
 
-  getVariables(): Object {
+  getVariables(): Record<string, any> {
     return this.reqData.variables || {};
   }
 
@@ -50,7 +46,7 @@ class MockReq {
     this.error = err;
   }
 
-  resolve(resp: Object) {
+  resolve(resp: Record<string, any>) {
     this.payload = resp;
   }
 
@@ -60,52 +56,54 @@ class MockReq {
     const operation = ({
       id: this.getID(),
       text,
-      operationKind,
-    }: any);
+      operationKind
+    } as any);
     const variables = this.getVariables() || {};
     const cacheConfig = this.reqData.cacheConfig || {};
     const uploadables = this.getFiles();
-
-    const res = (rnl.fetchFn(operation, variables, cacheConfig, uploadables): any);
-
+    const res = (rnl.fetchFn(operation, variables, cacheConfig, uploadables) as any);
     const promise = new Promise((resolve, reject) => {
       res.subscribe({
         complete: () => {},
-        error: (error) => reject(error),
-        next: (value) => resolve(value),
+        error: error => reject(error),
+        next: value => resolve(value)
       });
     });
-
     // avoid unhandled rejection in tests
     promise.catch(() => {});
-
     // but allow to read rejected response
     return promise;
   }
+
 }
 
 export function mockReq(reqid?: ReqId | number, data?: ReqData): MockReq {
   return new MockReq(reqid ? reqid.toString() : undefined, data);
 }
-
 export function mockMutationReq(reqid?: ReqId | number, data?: ReqData): MockReq {
   return new MockReq(reqid ? reqid.toString() : undefined, {
     query: 'mutation {}',
-    ...data,
+    ...data
   });
 }
-
 export function mockFormDataReq(reqid?: ReqId | number, data?: ReqData): MockReq {
   return new MockReq(reqid ? reqid.toString() : undefined, {
-    files: { file1: 'data' },
-    ...data,
+    files: {
+      file1: 'data'
+    },
+    ...data
   });
 }
-
 export function mockReqWithSize(reqid: ReqId | number, size: number): MockReq {
-  return mockReq(reqid, { query: `{${'x'.repeat(size)}}` });
+  return mockReq(reqid, {
+    query: `{${'x'.repeat(size)}}`
+  });
 }
-
 export function mockReqWithFiles(reqid: ReqId | number): MockReq {
-  return mockReq(reqid, { files: { file1: 'data', file2: 'data' } });
+  return mockReq(reqid, {
+    files: {
+      file1: 'data',
+      file2: 'data'
+    }
+  });
 }

@@ -1,20 +1,15 @@
-// @flow
 /* eslint-disable no-console */
+import type { Middleware, RelayRequestAny, MiddlewareNextFn } from "../definition";
+import type RelayResponse from "../RelayResponse";
+type PersistedQueriesMiddlewareOptions = {
+  hash: string;
+};
 
-import type { Middleware, RelayRequestAny, MiddlewareNextFn } from '../definition';
-import type RelayResponse from '../RelayResponse';
-
-type PersistedQueriesMiddlewareOptions = {| hash: string |};
-
-async function makePersistedQueryRequestWithFallback(
-  o: {
-    req: RelayRequestAny,
-    next: MiddlewareNextFn,
-    options?: PersistedQueriesMiddlewareOptions,
-  },
-  original = false,
-  hasRunFallback: boolean = false
-): Promise<RelayResponse> {
+async function makePersistedQueryRequestWithFallback(o: {
+  req: RelayRequestAny;
+  next: MiddlewareNextFn;
+  options?: PersistedQueriesMiddlewareOptions;
+}, original = false, hasRunFallback: boolean = false): Promise<RelayResponse> {
   const makeFallback = async (prevError: Error) => {
     if (hasRunFallback) {
       throw prevError;
@@ -29,9 +24,11 @@ async function makePersistedQueryRequestWithFallback(
       // process it
       // If the backend rejects it we fallback to the original request (which has the text query)
       const persistedQueriesReq = JSON.parse(JSON.stringify(o.req));
-
-      const { cacheID, id, text: queryText } = persistedQueriesReq.operation;
-
+      const {
+        cacheID,
+        id,
+        text: queryText
+      } = persistedQueriesReq.operation;
       const queryId = id || cacheID;
 
       if (!queryId && (!o.options?.hash || !queryText)) {
@@ -43,9 +40,7 @@ async function makePersistedQueryRequestWithFallback(
       delete body.query;
       body.doc_id = queryId;
       persistedQueriesReq.fetchOpts.body = JSON.stringify(body);
-
       delete persistedQueriesReq.operation.text;
-
       return await o.next(original ? o.req : persistedQueriesReq);
     } catch (e) {
       return makeFallback(e);
@@ -55,13 +50,10 @@ async function makePersistedQueryRequestWithFallback(
   return makeRequest();
 }
 
-export default function persistedQueriesMiddleware(
-  options?: PersistedQueriesMiddlewareOptions
-): Middleware {
-  return (next) => (req) =>
-    makePersistedQueryRequestWithFallback({
-      req,
-      next,
-      options,
-    });
+export default function persistedQueriesMiddleware(options?: PersistedQueriesMiddlewareOptions): Middleware {
+  return next => req => makePersistedQueryRequestWithFallback({
+    req,
+    next,
+    options
+  });
 }

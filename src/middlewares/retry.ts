@@ -1,41 +1,32 @@
-/* @flow */
 /* eslint-disable no-console */
-
-import type { Middleware, RelayRequestAny, MiddlewareNextFn } from '../definition';
-import type RelayResponse from '../RelayResponse';
-import { isFunction } from '../utils';
-import RRNLError from '../RRNLError';
-
+import type { Middleware, RelayRequestAny, MiddlewareNextFn } from "../definition";
+import type RelayResponse from "../RelayResponse";
+import { isFunction } from "../utils";
+import RRNLError from "../RRNLError";
 export type RetryAfterFn = (attempt: number) => number | false;
 export type TimeoutAfterFn = (attempt: number) => number;
-export type ForceRetryFn = (runNow: Function, delay: number) => any;
-export type AbortFn = (msg: ?string) => any;
-
-export type BeforeRetryCb = (meta: {|
-  forceRetry: Function,
-  abort: AbortFn,
-  delay: number,
-  attempt: number,
-  lastError: ?Error,
-  req: RelayRequestAny,
-|}) => any;
-
-export type StatusCheckFn = (
-  statusCode: number,
-  req: RelayRequestAny,
-  res: RelayResponse
-) => boolean;
-
-export type RetryMiddlewareOpts = {|
-  fetchTimeout?: number | TimeoutAfterFn,
-  retryDelays?: number[] | RetryAfterFn,
-  statusCodes?: number[] | false | StatusCheckFn,
-  logger?: Function | false,
-  allowMutations?: boolean,
-  allowFormData?: boolean,
-  forceRetry?: ForceRetryFn | false, // DEPRECATED in favor `beforeRetry`
-  beforeRetry?: BeforeRetryCb | false,
-|};
+export type ForceRetryFn = (runNow: (...args: Array<any>) => any, delay: number) => any;
+export type AbortFn = (msg: string | null | undefined) => any;
+export type BeforeRetryCb = (meta: {
+  forceRetry: (...args: Array<any>) => any;
+  abort: AbortFn;
+  delay: number;
+  attempt: number;
+  lastError: Error | null | undefined;
+  req: RelayRequestAny;
+}) => any;
+export type StatusCheckFn = (statusCode: number, req: RelayRequestAny, res: RelayResponse) => boolean;
+export type RetryMiddlewareOpts = {
+  fetchTimeout?: number | TimeoutAfterFn;
+  retryDelays?: number[] | RetryAfterFn;
+  statusCodes?: number[] | false | StatusCheckFn;
+  logger?: ((...args: Array<any>) => any) | false;
+  allowMutations?: boolean;
+  allowFormData?: boolean;
+  forceRetry?: ForceRetryFn | false;
+  // DEPRECATED in favor `beforeRetry`
+  beforeRetry?: BeforeRetryCb | false;
+};
 
 function noopFn() {}
 
@@ -44,27 +35,29 @@ export class RRNLRetryMiddlewareError extends RRNLError {
     super(msg);
     this.name = 'RRNLRetryMiddlewareError';
   }
-}
 
+}
 export default function retryMiddleware(options?: RetryMiddlewareOpts): Middleware {
   const opts = options || {};
   const timeout = opts.fetchTimeout || 15000;
   const retryDelays = opts.retryDelays || [1000, 3000];
   const statusCodes = opts.statusCodes || false;
-  const logger =
-    opts.logger === false ? () => {} : opts.logger || console.log.bind(console, '[RELAY-NETWORK]');
+  const logger = opts.logger === false ? () => {} : opts.logger || console.log.bind(console, '[RELAY-NETWORK]');
   const allowMutations = opts.allowMutations || false;
   const allowFormData = opts.allowFormData || false;
   const forceRetryFn = opts.forceRetry || false; // DEPRECATED in favor `beforeRetry`
+
   const beforeRetry = opts.beforeRetry || false;
 
   let retryAfterMs: RetryAfterFn = () => false;
+
   if (retryDelays) {
     if (Array.isArray(retryDelays)) {
-      retryAfterMs = (attempt) => {
+      retryAfterMs = attempt => {
         if (retryDelays.length >= attempt) {
           return retryDelays[attempt];
         }
+
         return false;
       };
     } else if (isFunction(retryDelays)) {
@@ -73,6 +66,7 @@ export default function retryMiddleware(options?: RetryMiddlewareOpts): Middlewa
   }
 
   let timeoutAfterMs: TimeoutAfterFn;
+
   if (typeof timeout === 'number') {
     timeoutAfterMs = () => timeout;
   } else {
@@ -82,6 +76,7 @@ export default function retryMiddleware(options?: RetryMiddlewareOpts): Middlewa
   let retryOnStatusCode: StatusCheckFn = (status, req, res) => {
     return res.status < 200 || res.status > 300;
   };
+
   if (statusCodes) {
     if (Array.isArray(statusCodes)) {
       retryOnStatusCode = (status, req, res) => statusCodes.indexOf(res.status) !== -1;
@@ -90,7 +85,7 @@ export default function retryMiddleware(options?: RetryMiddlewareOpts): Middlewa
     }
   }
 
-  return (next) => (req) => {
+  return next => req => {
     if (req.isMutation() && !allowMutations) {
       return next(req);
     }
@@ -107,33 +102,30 @@ export default function retryMiddleware(options?: RetryMiddlewareOpts): Middlewa
       retryOnStatusCode,
       forceRetryFn,
       beforeRetry,
-      logger,
+      logger
     });
   };
 }
 
-async function makeRetriableRequest(
-  o: {
-    req: RelayRequestAny,
-    next: MiddlewareNextFn,
-    timeoutAfterMs: TimeoutAfterFn,
-    retryAfterMs: RetryAfterFn,
-    retryOnStatusCode: StatusCheckFn,
-    forceRetryFn: ForceRetryFn | false,
-    beforeRetry: BeforeRetryCb | false,
-    logger: Function,
-  },
-  delay: number = 0,
-  attempt: number = 0,
-  lastError: ?Error = null
-): Promise<RelayResponse> {
+async function makeRetriableRequest(o: {
+  req: RelayRequestAny;
+  next: MiddlewareNextFn;
+  timeoutAfterMs: TimeoutAfterFn;
+  retryAfterMs: RetryAfterFn;
+  retryOnStatusCode: StatusCheckFn;
+  forceRetryFn: ForceRetryFn | false;
+  beforeRetry: BeforeRetryCb | false;
+  logger: (...args: Array<any>) => any;
+}, delay: number = 0, attempt: number = 0, lastError: Error | null | undefined = null): Promise<RelayResponse> {
   const makeRetry = async (prevError: Error) => {
     const retryDelay = o.retryAfterMs(attempt);
+
     if (retryDelay) {
       o.logger(prevError.message);
       o.logger(`will retry in ${retryDelay} milliseconds`);
       return makeRetriableRequest(o, retryDelay, attempt + 1, prevError);
     }
+
     throw prevError;
   };
 
@@ -152,9 +144,7 @@ async function makeRetriableRequest(
 
       // response with invalid statusCode
       if (e && e.res && o.retryOnStatusCode(e.res.status, o.req, e.res)) {
-        const err = new RRNLRetryMiddlewareError(
-          `Wrong response status ${e.res.status}, retrying...`
-        );
+        const err = new RRNLRetryMiddlewareError(`Wrong response status ${e.res.status}, retrying...`);
         return makeRetry(err);
       }
 
@@ -167,7 +157,11 @@ async function makeRetriableRequest(
     return makeRequest();
   } else {
     // second and all further calls should be delayed
-    const { promise, forceExec, abort } = delayedExecution(makeRequest, delay);
+    const {
+      promise,
+      forceExec,
+      abort
+    } = delayedExecution(makeRequest, delay);
 
     if (o.forceRetryFn) {
       // DEPRECATED in favor `beforeRetry`
@@ -181,7 +175,7 @@ async function makeRetriableRequest(
         attempt,
         delay,
         lastError,
-        req: o.req,
+        req: o.req
       });
     }
 
@@ -193,13 +187,10 @@ async function makeRetriableRequest(
  * This function delays execution of some function for some period of time.
  * Returns a promise, with ability to run execution immidiately, or abort it.
  */
-export function delayedExecution<T>(
-  execFn: () => Promise<T>,
-  delay: number = 0
-): {
-  forceExec: () => any,
-  abort: () => any,
-  promise: Promise<T>,
+export function delayedExecution<T>(execFn: () => Promise<T>, delay: number = 0): {
+  forceExec: () => any;
+  abort: () => any;
+  promise: Promise<T>;
 } {
   let abort = noopFn;
   let forceExec = noopFn;
@@ -208,18 +199,19 @@ export function delayedExecution<T>(
     return {
       abort,
       forceExec,
-      promise: execFn(),
+      promise: execFn()
     };
   }
 
   const promise = new Promise((resolve, reject) => {
     let delayId;
 
-    abort = (msg) => {
+    abort = msg => {
       if (delayId) {
         clearTimeout(delayId);
         delayId = null;
       }
+
       reject(new RRNLRetryMiddlewareError(msg || 'Aborted in beforeRetry() callback'));
     };
 
@@ -235,8 +227,11 @@ export function delayedExecution<T>(
       resolve(execFn());
     }, delay);
   });
-
-  return { forceExec, abort, promise };
+  return {
+    forceExec,
+    abort,
+    promise
+  };
 }
 
 /*
@@ -244,11 +239,7 @@ export function delayedExecution<T>(
  * if Promise completed in this period, then returns its result
  * if not - returns other Promise from onTimeout() callback
  */
-export function promiseWithTimeout<T>(
-  promise: Promise<T>,
-  timeoutMS: number,
-  onTimeout: () => Promise<T>
-): Promise<T> {
+export function promiseWithTimeout<T>(promise: Promise<T>, timeoutMS: number, onTimeout: () => Promise<T>): Promise<T> {
   if (!timeoutMS) {
     return promise;
   }
@@ -257,15 +248,12 @@ export function promiseWithTimeout<T>(
     const timeoutId = setTimeout(() => {
       onTimeout().then(resolve).catch(reject);
     }, timeoutMS);
-
-    promise
-      .then((res) => {
-        clearTimeout(timeoutId);
-        resolve(res);
-      })
-      .catch((err) => {
-        clearTimeout(timeoutId);
-        reject(err);
-      });
+    promise.then(res => {
+      clearTimeout(timeoutId);
+      resolve(res);
+    }).catch(err => {
+      clearTimeout(timeoutId);
+      reject(err);
+    });
   });
 }
